@@ -94,5 +94,17 @@ Schema file contains the SQL create or alter table commands. The schema can be c
 2. Open nodes.yaml file. Add nodes and create a new group. 
 3. **Run:** actordbctrl updatenodes
 
+## 5. Building ActorDB
 
+1. Clone from github
+2. make dist
+3. make package
+4. Release should be generated in: ./package/packages 
+
+## 6. Running ActorDB dev mode
+
+1. Clone from github
+2. Move to actordb folder
+3. ./startdev.sh
+4. ./actordbctrl init
 
