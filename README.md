@@ -38,8 +38,11 @@ Sacrifices
 	3. Keep copy as an archive 
 
 How to configure and run: https://github.com/biokoda/actordb/blob/master/CONFIGURE.md
+
 deb package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5-1_amd64.deb
+
 osx package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5-OSX-x86_64.tar.gz
+
 More packages to come...	
 
 ### 1. Query model
