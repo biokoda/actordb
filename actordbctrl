@@ -5,22 +5,20 @@ main([]) ->
   io:format("Supported commands: init, updateschema, updatenodes~n");
 main(Args) ->
 	[] = os:cmd(epmd_path() ++ " -daemon"),
-  case Args of
-    [EtcPath1x,Cmd] ->
-      EtcPath1 = EtcPath1x ++ "/etc"
-  end,
-  EtcPath2 = "{{platform_etc_dir}}",
-  case filelib:is_file(EtcPath2++"/app.config") of
-    true ->
-      EtcPath = EtcPath2;
-    false ->
-      EtcPath = EtcPath1
-  end,
-  case filelib:is_file(EtcPath++"/app.config") of
-    false ->
-      io:format("Unable to find app.config at ~p~n",[EtcPath++"/app.config"]);
-    true ->
-      ok
+  [Cmd] = Args,
+  Dirname = filename:dirname(escript:script_name()),
+  case Dirname of
+    "." ->
+      Upper = filename:absname("../etc"),
+      Cur = filename:absname("etc"),
+      case filelib:is_dir(Upper) of
+        true ->
+          EtcPath = Upper;
+        false ->
+          EtcPath = Cur
+      end;
+    _ ->
+      EtcPath = filename:absname(filename:join(lists:reverse(tl(lists:reverse(filename:split(Dirname)))))++"/etc")
   end,
   {ok,VmBin} = file:read_file(EtcPath++"/vm.args"),
   Lines = string:tokens(binary_to_list(VmBin),"\r\n"),
@@ -37,7 +35,7 @@ main(Args) ->
   				ok
   		end;
   	_X ->
-  		io:format("ActorDB not running~n"),
+  		io:format("ActorDB not running ~n"),
   		halt(1)
   end,
   case rpc:call(Node,actordb_cmd,cmd,[list_to_atom(Cmd),parse,EtcPath]) of
@@ -121,7 +119,4 @@ epmd_path() ->
     Epmd ->
       Epmd
   end.
-
-
-
 
