@@ -189,7 +189,7 @@ Will create a copy of an actor with a different name. Actor listed in "ACTOR" st
 
 ### 2. Operational characteristics
 
-An ActorDB setup is a network of small replication clusters of recommended size 3 but can be any size. Actors are asigned a replication cluster and live within that replication cluster. There can be as many replication clusters as you need and you can add new clusters at any time. ActorDB is tightly coupled on the replication cluster level, but loosely coupled between replication clusters. You can grow an ActorDB setup from a single 3 node replication cluster to hundreds of clusters if you need.
+An ActorDB setup is a network of small replication clusters of recommended size 3 but can be any size. Actors are assigned a replication cluster and live within that replication cluster. There can be as many replication clusters as you need and you can add new clusters at any time. ActorDB is tightly coupled on the replication cluster level, but loosely coupled between replication clusters. You can grow an ActorDB setup from a single 3 node replication cluster to hundreds of clusters if you need.
 
 Every write to an actor is executed on all nodes of a replication cluster. SQL commands will succeed only if a majority of the cluster is online.
 
