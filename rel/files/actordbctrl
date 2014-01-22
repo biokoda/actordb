@@ -1,3 +1,0 @@
-#!/bin/sh
-{{runner_base_dir}}/{{erts_vsn}}/bin/escript {{runner_base_dir}}/{{erts_vsn}}/bin/actordbctrl.escript "{{runner_base_dir}}" $1
-
