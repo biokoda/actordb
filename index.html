@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <!--<meta charset="utf-8">-->
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/actordb-website.css">
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="js/vendor/jquery-1.10.1.min.js"></script>
+        <style>
+            .block {
+                display:block !Important;
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+                $("#mobile_menu").click(function(evt){
+                    $(this).siblings(".navigation").toggleClass("block");
+                });
+            });
+        </script>
+        <!--[if gte IE 9]>
+          <style type="text/css">
+            .gradient {filter: none;}
+          </style>
+        <![endif]-->
+    </head>
+    <!-- id="view320logo" ta Id mora bit, ne ga odstranjevat -->
+    <body id="view320logo">
+        <!--[if lt IE 9]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+        <div class="header">
+            <div class="pagewrapper clearfix">
+                <a href="" class="global-header_logo"></a>
+                <a href="" class="global320-header_logo_text global-header_logo_text"></a>
+                <ul class="navigation">
+                    <li class="sel"><a href="/">Home</a></li>
+                    <li><a target="_blank" href="https://www.github.com/biokoda/actordb">Source</a></li>
+                    <li class="right"><a target="_blank" href="https://github.com/biokoda/actordb/releases">Download</a></li>
+                </ul>
+                <span id="mobile_menu" class="menu"></span>
+            </div>
+        </div>
+
+        <div class="skewed_pttrn">
+            <div class="circlemiddle">
+                <div class="pagewrapper">
+                    <a href="" class="global-main_logo global320-main_logo"></a>
+                    <p class="sitedescription">
+                        A distributed SQL database with the scalability of a KV store.
+                    </p>
+                    <a href="https://www.github.com/biokoda/actordb" target="_blank" class="redgradborbtn width160 gradient"><span class="elightwhite">Download ActorDB</span></a>
+                    <div class="productlinks">
+                        <a class="link" target="_blank" href="https://www.github.com/biokoda/actordb">GitHub</a>
+                        <a class="link" target="_blank" href="https://github.com/biokoda/actordb/blob/master/README.md">Get Started</a>
+                        <a class="link marginrightzero" href="">Version 0.5</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="skewed_pttrn_red">
+            <div class="pagewrapper">
+                <h1 class="maintitle">Features</h1>
+                <p class="maintext">
+                    ActorDB is strongly consistent, distributed and horizontally scalable.<br/><br/>Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors.
+                </p>
+                <div class="featurelist clearfix">
+                    <div class="feat">
+                        <div class="iconholder"><span class="global-customize_icon"></span></div>
+                        <p class="title">Scalable</p>
+                        <p class="text">ActorDB can run on a single server or hundreds. It can store gigabytes or petabytes.</p>
+                    </div>
+                    <div class="feat borders">
+                        <div class="iconholder"><span class="global-actor_model_icon"></span></div>
+                        <p class="title">Features</p>
+                         <p class="text">Full relational database within an actor. Queries and transactions over multiple actors. Redundant. Massively concurrent. No single point of failure. ACID. Connectable over MySQL protocol.</p>
+                    </div>
+                    <div class="feat">
+                        <div class="iconholder"><span class="global-extendable_icon"></span></div>
+                        <p class="title">Easy to use</p>
+                         <p class="text">Works with default MySQL drivers of your platform. Simple configuration and administration.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="skewed_pttrn">
+            <div class="pagewrapper">
+                <h1 class="maintitle">Open source</h1>
+                <p style="margin-bottom:100px;" class="maintext">
+                    ActorDB is an Open Source project licensed under Mozilla Public License 2.0.
+                </p>
+                <div class="columnlist clearfix">
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="pagewrapper">
+                <div class="linkholder">
+                    <a href="https://www.github.com/biokoda/actordb" class="link">GitHub</a>
+                    <a href="https://github.com/biokoda/actordb/issues" class="link">Issues</a>
+                    <a href="https://github.com/biokoda/actordb/blob/master/README.md" class="link marginrightzero">Changelog</a>
+                </div>
+                <p class="text">Product by Biokoda. <br/ >
+                    Licensed under Mozilla Public License 2.0.
+                </p>
+                <a class="global-footer_logo"></a>        
+            </div>
+        </div>
+
+
+
+        
+        
+      
+        <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>-->
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/vendor/jquery.easypiechart.min.js"></script>
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        
+        <script type="text/javascript">
+            var isAtLeastIE11 = !!(navigator.userAgent.match(/Trident/) && !navigator.userAgent.match(/MSIE/));
+            if (isAtLeastIE11) {
+                $("html").addClass("ieedge");
+            }
+            if (navigator.platform.indexOf("Win") != -1 && navigator.userAgent.indexOf("MSIE") != -1 || navigator.platform.indexOf("Win") != -1 && isAtLeastIE11){
+                $("html").addClass("iecomm");
+            } 
+            if (navigator.platform.indexOf("Win") !=-1 && navigator.userAgent.indexOf("Chrome") != -1) {
+                $("html").addClass("winchrome");
+            }
+        </script>
+        <script src="js/actordb-website.js"></script>
+    </body>
+</html>
