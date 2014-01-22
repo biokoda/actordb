@@ -15,7 +15,6 @@ ActorDB is:
 *   Redundant.
 *   Massively concurrent.
 *   No single point of failure.
-*   Based on sqlite (every actor is an sqlite database).
 *   ACID.
 *   Runs over MySQL protocol.
 
@@ -24,7 +23,6 @@ Advantages
 *   Complete horizontal scalability. All nodes are equivalent and you can have as many nodes as you need.
 *   Full featured ACID database.
 *   Suitable for very large datasets over many actors and servers.
-*   Does not reinvent the storage engine and it does not avoid the issue by being RAM only. Sqlite is one of the most well tested, stable and reliable pieces of software in use. Not only that, you can query the actual database files directly with your language of choice. There is an sqlite interface implemented for practically every language.
 *   No special drivers needed. Use the mysql driver of your language of choice. 
 *   Easy to configure and administer. 
 *   No global locks. Only the actors (one or many) involved in a transaction are locked during a write. All other actors are unaffected.
@@ -32,7 +30,7 @@ Advantages
 Sacrifices
 
 *   Decoupled data. You can't run arbitrary queries over your data. But you can still have a full relational database within actors. So you need to organize and split your data model into actors. Read the query model and examples sections to understand how.
-*   Single actor performance is limited to the speed of an sqlite instance (which is still quite fast). If you require a lot of data (many GB) within a single actor, ActorDB may not be the best tool for the job. You can however create copies of actors and implement archiving of old data. If an actor grows to some size, you can: 
+*   If you require a lot of data (> 10 GB) within a single actor, ActorDB may not be the best tool for the job. You can however create copies of actors and implement archiving of old data. If an actor grows to some size, you can: 
 	1. Create a copy of an actor
 	2. Delete old data from original actor
 	3. Keep copy as an archive 
@@ -210,7 +208,7 @@ Expanding should be done by adding a replication cluster, not adding a single no
 
 ### 3. Performance characteristics
 
-ActorDB can work across multiple hard drives in a single node. It can work across as many nodes as you need. Single actor performance is limited to the speed of an sqlite instance (which should be quite fast) and your configured replication level. 
+ActorDB can work across multiple hard drives in a single node. It can work across as many nodes as you need. 
 
 ActorDB is not concurrent within a transaction. Writes to a single actor are fast and independent of other actors. Writes to multiple actors at the same time are O(2+2N). Use them only when you require them for consistency reasons. For optimal performance, structure your database to minimize multi-actor updates. 
 
