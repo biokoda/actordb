@@ -13,6 +13,7 @@
         <meta property="og:type" content="website" />
         <meta property="og:url" content="http://www.actordb.com/" />
         <meta property="og:image" content="http://www.actordb.com/imgs/actordb_fb_logo.png" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
         <link rel="stylesheet" href="css/bootstrap.css">
         <link rel="stylesheet" href="css/actordb-website.css">
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
@@ -202,13 +203,12 @@
                         <li>1. One of them is confirmed master already, current node turns itself into a slave. Any queued up requests are redirected to master.</li>
                         <li>2. No nodes are confirmed or unconfirmed master, it will assume master role.</li>
 <li>3. One or more nodes are unconfirmed masters. Generally this should be a very rare event, because requests always get routed with consistent hashing to specific nodes. But since they are all unconfirmed, they are all currently trying to verify their state at the same time. Every one of them will do a sort of node names and pick the first one.</li>
-<li>4. It finds multiple confirmed masters. This should be impossible. In case it happens through code error, it will tell other nodes to close actor.</li>
+<li>4. It finds multiple confirmed masters. This should be impossible. In case it happens through code error, it will tell other nodes to close actor.Note that even if actor somehow gets in this state, write logic will prevent writes coming from the wrong direction (a master receives a write from what it thinks is a slave). The worst case scenario will be a failed write request and not a conflicted actor database.</li>
                     </ol> 
                 </div>
-                <p class="pagetext"></p>
-                <p class="pagetext">Note that even if actor somehow gets in this state, write logic will prevent writes coming from the wrong direction (a master receives a write from what it thinks is a slave). The worst case scenario will be a failed write request and not a conflicted actor database.
+                <p class="pagetext">
 </p>
-                <p class="pagetext">What if a node was offline for a while and missed some writes? It will find a node that has the correct version of the database and copy it from there. ActorDB can execute reads and writes to an actor database while copying it over to another node.
+                <p class="pagetext">What if a node was offline for a while and missed some writes? <br/>It will find a node that has the correct version of the database and copy it from there. ActorDB can execute reads and writes to an actor database while copying it over to another node.
 </p>
                 <p class="pagetext"></p>
                 <p class="pagetext"></p>
