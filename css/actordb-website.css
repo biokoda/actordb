@@ -14,6 +14,12 @@
 
 ul, ol { list-style-type: none; margin: 0px; padding: 0px; }
 
+ol li, ul li { text-align: justify; }
+
+ul.bulletlist li { position: relative; }
+
+ul.bulletlist li:before { position: absolute; content: ''; width: 6px; height: 6px; background: url(../imgs/listbullet.png); left: -16px; top: 7px; }
+
 html { height: 100%; }
 
 body { height: 100%; margin: 0px; font-weight: normal; font-family: 'gothamthin', sans-serif; position: relative; font-size: 14px; color: #141414; }
@@ -80,6 +86,10 @@ pre { font-size: 14px; font-family: 'gothamlight'; -webkit-border-radius: 0px; -
 .elightwhite { color: white; font-family: 'gothamextra_light'; }
 
 a.redlink { color: #dc1414; font-weight: bold; }
+
+.hr14color { border: none; height: 1px; width: 100%; background: #141414; margin: 20px 0; }
+
+.hr14colorsmalmargin { border: none; height: 1px; width: 100%; background: #141414; margin: 10px 0 !Important; }
 
 /* search bliznjice */
 /* landing page */
@@ -175,6 +185,8 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .pagecontainer .pagewrapper .leftmenu .menutitle { padding: 0 0 0 016px; border-bottom: solid 1px #dcdcdc; }
 
+.pagecontainer .pagewrapper .leftmenu .menutitle a { color: #141414; }
+
 .pagecontainer .pagewrapper .leftmenu .menu { padding: 1px 0 60px 0; }
 
 .pagecontainer .pagewrapper .leftmenu .menu li { padding: 0 0 0 016px; width: auto; height: 28px; vertical-align: middle; line-height: 26px; }
@@ -191,7 +203,11 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .pagecontainer .pagewrapper .content .pagesubtitle { font-size: 18px; }
 
-.pagecontainer .pagewrapper .content .pagetext { margin: 0 0 20px 0; }
+.pagecontainer .pagewrapper .content h3.pagesubtitle { font-size: 14px; }
+
+.pagecontainer .pagewrapper .content .pagetext { margin: 0 0 20px 0; text-align: justify; }
+
+.pagecontainer .pagewrapper .content .pagetext .bulletlist { margin: 0 0 0 20px; text-align: justify; }
 
 .pagecontainer .pagewrapper .content .contentitle { font-size: 24px; margin: 0 0 14px 0; }
 
@@ -204,6 +220,12 @@ a.redlink { color: #dc1414; font-weight: bold; }
 .pagecontainer .pagewrapper .structuretitleholder .path { position: absolute; left: 30px; top: 4px; color: Red; }
 
 .pagecontainer .pagewrapper .structuretitleholder .title { text-align: center; display: block; margin: 4px auto 0 auto; font-family: 'gothamlight'; color: #141414; }
+
+.imgholder { padding: 20px 0px 20px 0px; text-align: center; }
+
+.imgholder .img_left { display: inline-block; margin: 0 30px 0 0; }
+
+.imgholder .img_right { display: inline-block; }
 
 /* widths */
 .width160 { width: 160px; }
@@ -267,4 +289,10 @@ a.redlink { color: #dc1414; font-weight: bold; }
   .pagecontainer .pagewrapper .structuretitleholder .path { font-size: 10px; }
   .pagecontainer .pagewrapper .structuretitleholder .title { font-size: 10px; }
   pre { font-size: 10px; } }
+.block { display: block !Important; }
+
+ol { padding-left: 15px; }
+
+ol li { padding-bottom: 3px; }
+
 .browsepublicfolder .link:hover { border-bottom: solid 1px transparent; }
