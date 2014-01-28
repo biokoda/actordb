@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head prefix="og: http://ogp.me/ns#">
+        <!--<meta charset="utf-8">-->
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>ActorDB | Documentation</title>        
+        <meta name="description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors.">
+        <meta name="viewport" content="width=device-width">
+        <meta property="og:title" content="ActorDB | Documentation" />
+        <meta property="og:description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors." />
+        <meta property="og:site_name" content="ActorDB" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="http://www.actordb.com/" />
+        <meta property="og:image" content="http://www.actordb.com/imgs/actordb_fb_logo.png" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/actordb-website.css">
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="js/vendor/jquery-1.10.1.min.js"></script>
+        <style>
+            .block {
+                display:block !Important;
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+                $("#mobile_menu").click(function(evt){
+                    $(this).siblings(".navigation").toggleClass("block");
+                });
+            });
+        </script>
+        <!--[if gte IE 9]>
+          <style type="text/css">
+            .gradient {filter: none;}
+          </style>
+        <![endif]-->
+    </head>    
+    <body id="view320logo" >
+        <!--[if lt IE 9]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+        <div class="header">
+            <div class="pagewrapper clearfix">
+                <a href="" class="global-header_logo"></a>
+                <a href="" class="global320-header_logo_text global-header_logo_text"></a>
+                <ul class="navigation">
+                    <li ><a href="index.html">Home</a></li>
+                    <li  class="sel"><a href="docs-about.html">Documentation</a></li>
+                    <li><a target="_blank" href="https://www.github.com/biokoda/actordb">Source</a></li>
+                    <li class="  right"><a target="_blank" href="downloads.html">Downloads</a></li>
+                </ul>
+                <span id="mobile_menu" class="menu"></span>
+            </div>
+        </div>
+
+        <div class="pagecontainer">
+    <div class="pagewrapper clearfix">
+        <div class="leftmenu">
+            <div class="menutitle"><a href="docs-about.html">1. ABOUT</a></div>
+            <ul class="menu">
+            <!--    <li><a href="" class="link">1. About</a></li>-->
+            </ul>
+            <div class="menutitle"><a href="docs-howitworks.html">2. HOW IT WORKS</a></div>
+            <ul class="menu">
+                <li><a href="docs-howitworks.html#overview" class="link">2.1 Overview</a></li>
+                <li><a href="docs-howitworks.html#nodesyny" class="link">2.2 Node sync</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-howitworks.html#h_221" class="link">2.2.1 Global state</a></li>
+                        <li><a href="docs-howitworks.html#h_222" class="link">2.2.2 Actors</a></li>
+                        <li><a href="docs-howitworks.html#h_223" class="link">2.2.3 Multi-actor transactions</a></li>
+                    </ul>
+                <li><a href="docs-howitworks.html#dbengine" class="link">2.3 Database engine</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-querymodel.html">3. QUERY MODEL</a></div>
+            <ul class="menu">
+                <li><a href="docs-querymodel.html#query_actor" class="link">3.1 ACTOR statement</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-querymodel.html#h_311" class="link">3.1.1 Single actor</a></li>
+                        <li><a href="docs-querymodel.html#h_312" class="link">3.1.2 Multiple actors</a></li>
+                        <li><a href="docs-querymodel.html#h_313" class="link">3.1.3 All actors of a type</a></li>
+                        <li><a href="docs-querymodel.html#h_314" class="link">3.1.4 Loop over actors</a></li>
+                    </ul>
+                <li><a href="docs-querymodel.html#query_variables" class="link">3.2 Variables</a></li>
+                    <ul class="level3">
+                        <li><a class="link">3.2.1 Appending columns to result</a></li>                        
+                    </ul>
+                <li><a href="docs-querymodel.html#query_pragma" class="link">3.3 PRAGMA statement</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-kvstore.html">4. KEY/VALUE STORE</a></div>
+            <ul class="menu">                                
+            </ul>
+            <div class="menutitle"><a href="docs-examples.html">5. EXAMPLES</a></div>
+            <ul class="menu">
+                <li><a href="docs-examples.html#example_webforum" class="link">5.1 Web forum</a></li>                
+            </ul>
+            <div class="menutitle"><a href="docs-configuration.html">6. CONFIGURATION</a></div>
+            <ul class="menu">
+            </ul>
+        </div>
+        <div class="content">
+
+   				   <h1 id="examples" class="pagetitle">5. Examples</h1>
+
+
+            <p class="pagetext">Web forums, news sites, blogs and even websites like reddit can all fit within the same basic hierarchical structure.</p>
+
+
+            <div class="structure">
+                <pre>
+
+Landing page    -> subsection1 -> article1
+                                                          article2
+                                                          ...
+                            -> subsection2 -> ...
+                            -> ...
+                </pre>
+            </div>
+
+
+
+            <p class="pagetext">Each level is an actor type. Article actors are what gets changed most frequently and where the scalability and concurrency of ActorDB is most important.</p>
+            <p class="pagetext">Landing page contains the current emphasized articles and links to subsections. This is a single actor, but is easily cachable with memcached or varnish.</p>
+            <p class="pagetext">Subsection contains titles, ids and other basic information about articles that belong to it.</p>
+            <p class="pagetext">Articles cointain the article data (text,links) and comments.</p>
+
+            <h2 id="example_webforum" class="pagesubtitle">5.1 Web Forum</h2>
+
+            <p class="pagetext">Actor types: subforums, threads, users.</p>
+            <p class="pagetext">schema.yaml would look like this:</p>
+
+
+            <div class="structure">
+                <pre>
+user:
+- CREATE TABLE user (id INTEGER PRIMARY KEY, email TEXT, username TEXT, registered_at DATETIME);
+- CREATE TABLE mymessages (id INTEGER PRIMARY KEY, threadid INTEGER);
+
+thread:
+- CREATE TABLE messages (id INTEGER PRIMARY KEY, txt TEXT, user INTEGER, time DATETIME);
+
+subforum:
+- CREATE TABLE threads (id INTEGER PRIMARY KEY, title TEXT, created DATETIME);
+                </pre>
+            </div>
+
+
+            <hr class="hr14colorsmalmargin" />
+
+            <h3 class="pagesubtitle">create new thread query:</h3> 
+            
+
+
+            <div class="structure">
+                <pre>
+ACTOR thread({{uniqid.threadid}}) create;
+INSERT INTO messages VALUES ({{uniqid.msgid}}, 'txt', _userid_, datetime('now'));
+ACTOR user(_userid_);
+INSERT INTO mymessages VALUES ({{uniqid.msgid}},{{uniqid.threadid}});
+ACTOR subforum(_subforumid_);
+INSERT INTO threads VALUES ({{uniqid.threadid}},'Thread title',datetime('now'))
+                </pre>
+            </div>
+
+
+            <p class="pagetext">This query is sent to ActorDB in a single call. Activities line by line:</p>
+            <p class="pagetext">
+                <ol>
+<li>1. Create an actor of type thread with a generated unique integer id named threadid. ACTOR command will either create an actor if it does not exist or switch to that actor and cause all sql statements to be sent to that actor until next ACTOR command.</li>
+<li>2. Insert first message into thread.</li>
+<li>3. Switch to actor with a known id userid of type user.</li>
+<li>4. Insert msg id into his own table of messages.</li>
+<li>5. Switch to subforum actor.</li>
+<li>6. Insert new thread.</li>
+                </ol>
+            </p>
+
+            <hr class="hr14colorsmalmargin" />
+
+            <h3 class="pagesubtitle">read thread</h3> 
+
+
+            <div class="structure">
+                <pre>
+ACTOR thread(_threadid_);
+SELECT * FROM messages LIMIT 30;
+                </pre>
+            </div>
+
+            
+            <hr class="hr14colorsmalmargin" />
+
+           <h3 class="pagesubtitle">post message to existing thread</h3> 
+            
+
+            <div class="structure">
+                <pre>
+ACTOR thread(_threadid_);
+INSERT INTO messages VALUES ({{uniqid.msgid}},'I disagree because of reasons.',_userid_,datetime('now'));
+ACTOR user(_userid_)
+INSERT INTO mymessages VALUES ({{uniqid.msgid}},_threadid_);
+                </pre>
+            </div>
+
+
+<div class="pageactions">
+    <span class="goleft"><a href="docs-kvstore.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(4. Key/Value store)</span>
+    <span class="goright">(6. Configuration)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="docs-configuration.html"><span class="pagebtn">Next >></span></a></span>   
+</div>
+
+
+            <p class="pagetext"></p>
+
+
+
+   			<p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+
+        </div>
+    </div>
+</div>
+
+        <div class="footer">
+            <div class="pagewrapper">
+                <div class="linkholder">
+                    <a href="https://www.github.com/biokoda/actordb" class="link">GitHub</a>
+                    <a href="https://github.com/biokoda/actordb/issues" class="link">Issues</a>
+                    <a href="https://github.com/biokoda/actordb/blob/master/README.md" class="link marginrightzero">Changelog</a>
+                </div>
+                <p class="text">Product by Biokoda. <br/ >
+                    Licensed under Mozilla Public License 2.0.
+                </p>
+                <a class="global-footer_logo"></a>        
+            </div>
+        </div>
+
+        <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>-->
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/vendor/jquery.easypiechart.min.js"></script>
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        
+        <script type="text/javascript">
+            var isAtLeastIE11 = !!(navigator.userAgent.match(/Trident/) && !navigator.userAgent.match(/MSIE/));
+            if (isAtLeastIE11) {
+                $("html").addClass("ieedge");
+            }
+            if (navigator.platform.indexOf("Win") != -1 && navigator.userAgent.indexOf("MSIE") != -1 || navigator.platform.indexOf("Win") != -1 && isAtLeastIE11){
+                $("html").addClass("iecomm");
+            } 
+            if (navigator.platform.indexOf("Win") !=-1 && navigator.userAgent.indexOf("Chrome") != -1) {
+                $("html").addClass("winchrome");
+            }
+        </script>
+        <script src="js/actordb-website.js"></script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-47379916-1', 'actordb.com');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

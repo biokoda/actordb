@@ -7,10 +7,14 @@
 
 @font-face { font-family: 'gothamextra_light'; src: url("../webfonts/gotham-xlight-webfont.eot"); src: url("../webfonts/gotham-xlight-webfont.eot?#iefix") format("embedded-opentype"), url("../webfonts/gotham-xlight-webfont.woff") format("woff"), url("../webfonts/gotham-xlight-webfont.ttf") format("truetype"), url("../webfonts/gotham-xlight-webfont.svg#gothamextra_light") format("svg"); font-weight: normal; font-style: normal; }
 
+@font-face { font-family: 'gothambook_italic'; src: url("../webfonts/gotham-bookita.eot"); src: url("../webfonts/gotham-bookita.eot?#iefix") format("embedded-opentype"), url("../webfonts/gotham-bookita.woff") format("woff"), url("../webfonts/gotham-bookita.ttf") format("truetype"), url("../webfonts/gotham-bookita.svg#gothambook_italic") format("svg"); font-weight: normal; font-style: normal; }
+
+@font-face { font-family: 'gothammedium'; src: url("../webfonts/gotham-medium.eot"); src: url("../webfonts/gotham-medium.eot?#iefix") format("embedded-opentype"), url("../webfonts/gotham-medium.woff") format("woff"), url("../webfonts/gotham-medium.ttf") format("truetype"), url("../webfonts/gotham-medium.svg#gothammedium") format("svg"); font-weight: normal; font-style: normal; }
+
 /* variables */
 /* mixins */
 /* GLOBAL CSS */
-.global-sprite, body .global-actor_model_icon, body .global-customize_icon, body .global-extendable_icon, body .global-footer_logo, body .global-header_logo, body .global-header_logo_text, body .global-main_logo { background: url('../imgs/sprite-global.png') no-repeat; }
+.global-sprite, body .global-actor_model_icon, body .global-customize_icon, body .global-download_desktop_btn, body .global-extendable_icon, body .global-footer_logo, body .global-header_logo, body .global-header_logo_text, body .global-main_logo { background: url('../imgs/sprite-global.png') no-repeat; }
 
 ul, ol { list-style-type: none; margin: 0px; padding: 0px; }
 
@@ -23,13 +27,14 @@ ul.bulletlist li:before { position: absolute; content: ''; width: 6px; height: 6
 html { height: 100%; }
 
 body { height: 100%; margin: 0px; font-weight: normal; font-family: 'gothamthin', sans-serif; position: relative; font-size: 14px; color: #141414; }
-body .global-actor_model_icon { background-position: -108px 0; height: 115px; width: 122px; }
-body .global-customize_icon { background-position: 0 0; height: 95px; width: 108px; }
-body .global-extendable_icon { background-position: -230px 0; height: 125px; width: 134px; }
-body .global-footer_logo { background-position: -144px -125px; height: 36px; width: 156px; }
-body .global-header_logo { background-position: -300px -125px; height: 40px; width: 28px; }
-body .global-header_logo_text { background-position: 0 -125px; height: 33px; width: 144px; }
-body .global-main_logo { background-position: 0 -165px; height: 100px; width: 367px; }
+body .global-actor_model_icon { background-position: -150px 0; height: 115px; width: 122px; }
+body .global-customize_icon { background-position: -134px -255px; height: 95px; width: 108px; }
+body .global-download_desktop_btn { background-position: 0 0; height: 60px; width: 150px; }
+body .global-extendable_icon { background-position: 0 -255px; height: 125px; width: 134px; }
+body .global-footer_logo { background-position: -172px -115px; height: 36px; width: 156px; }
+body .global-header_logo { background-position: 0 -115px; height: 40px; width: 28px; }
+body .global-header_logo_text { background-position: -28px -115px; height: 33px; width: 144px; }
+body .global-main_logo { background-position: 0 -155px; height: 100px; width: 367px; }
 
 p { margin: 0px; width: 100%; }
 
@@ -183,31 +188,31 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .pagecontainer .pagewrapper .leftmenu { font-family: 'gothambook'; padding: 95px 0 0 0; float: left; width: 200px; height: 300px; }
 
-.pagecontainer .pagewrapper .leftmenu .menutitle { padding: 0 0 0 016px; border-bottom: solid 1px #dcdcdc; }
+.pagecontainer .pagewrapper .leftmenu .menutitle > a { margin: 0 0 5px 0; display: block; color: #141414; border-bottom: solid 1px #dcdcdc; font-family: 'gothambook'; font-size: 16px; }
 
-.pagecontainer .pagewrapper .leftmenu .menutitle a { color: #141414; }
+.pagecontainer .pagewrapper .leftmenu .menu { padding: 1px 0 30px 15px; }
 
-.pagecontainer .pagewrapper .leftmenu .menu { padding: 1px 0 60px 0; }
+.pagecontainer .pagewrapper .leftmenu .menu > a { font-size: 16px; }
 
-.pagecontainer .pagewrapper .leftmenu .menu li { padding: 0 0 0 016px; width: auto; height: 28px; vertical-align: middle; line-height: 26px; }
+.pagecontainer .pagewrapper .leftmenu .menu .link { font-size: 16px; text-align: left; cursor: pointer; display: block; color: #141414; font-family: 'gothambook'; width: 100%; min-height: 28px; vertical-align: middle; line-height: 29px; }
 
-.pagecontainer .pagewrapper .leftmenu .menu .link { color: #141414; font-family: 'gothamextra_light'; }
+.pagecontainer .pagewrapper .leftmenu .menu .link:hover { background: #dc1414; color: white; }
 
-.pagecontainer .pagewrapper .leftmenu .menu li:hover { background: #dc1414; }
+.pagecontainer .pagewrapper .content { font-family: 'gothamextra_light'; float: left; width: 859px; padding: 30px 30px 100px 30px; border-left: solid 1px #dcdcdc; border-right: solid 1px #dcdcdc; height: 100%; }
 
-.pagecontainer .pagewrapper .leftmenu .menu li:hover .link { color: white; }
+.pagecontainer .pagewrapper .content .pagetitle { font-size: 30px; padding: 25px 0 0 0; font-family: 'gothambook'; }
 
-.pagecontainer .pagewrapper .content { font-family: 'gothamextra_light'; float: left; width: 859px; padding: 0 30px 100px 30px; border-left: solid 1px #dcdcdc; border-right: solid 1px #dcdcdc; height: 100%; }
+.pagecontainer .pagewrapper .content .pagesubtitle { font-size: 18px; font-family: 'gothambook'; }
 
-.pagecontainer .pagewrapper .content .pagetitle { font-size: 30px; padding: 55px 0 0 0; }
+.pagecontainer .pagewrapper .content h3.pagesubtitle { font-size: 14px; font-family: 'gothambook'; }
 
-.pagecontainer .pagewrapper .content .pagesubtitle { font-size: 18px; }
+.pagecontainer .pagewrapper .content .pagetext { margin: 0 0 20px 0; text-align: justify; font-family: 'gothambook'; }
 
-.pagecontainer .pagewrapper .content h3.pagesubtitle { font-size: 14px; }
+.pagecontainer .pagewrapper .content .pagetextitalic { font-family: 'gothambook_italic'; padding: 0 0 15px 0; }
 
-.pagecontainer .pagewrapper .content .pagetext { margin: 0 0 20px 0; text-align: justify; }
+.pagecontainer .pagewrapper .content .mediumtext { font-family: 'gothammedium'; }
 
-.pagecontainer .pagewrapper .content .pagetext .bulletlist { margin: 0 0 0 20px; text-align: justify; }
+.pagecontainer .pagewrapper .content .bulletlist { margin: 0 0 0 20px; text-align: justify; }
 
 .pagecontainer .pagewrapper .content .contentitle { font-size: 24px; margin: 0 0 14px 0; }
 
@@ -227,6 +232,65 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .imgholder .img_right { display: inline-block; }
 
+.level3 { padding: 0 0 0 30px; }
+
+.level3 a { font-size: 14px !Important; }
+
+.gotham { font-family: 'gothambook'; }
+
+.pageactions { margin: 70px 0 0 0; }
+
+.pageactions .goleft { float: left; font-family: 'gothambook'; color: #141414; font-size: 14px; }
+
+.pageactions .goright { float: right; font-family: 'gothambook'; color: #141414; font-size: 14px; }
+
+.pageactions .goleft .pagebtn { font-family: 'gothambook'; cursor: pointer; color: #cd2026; font-size: 14px; }
+
+.pageactions .goright .pagebtn { font-family: 'gothambook'; cursor: pointer; color: #cd2026; font-size: 14px; }
+
+/* downloads page  */
+.downloads h1.downloadstitle { font-size: 30px; font-family: 'gothambook'; color: #141414; }
+
+.downloads .downloadstext16 { margin: 0 0 13px 0; font-size: 16px; font-family: 'gothambook'; color: #141414; }
+
+.downloads .downloadstitle { font-size: 18px; font-family: 'gothambook'; color: #141414; }
+
+.downloads .downloadstitle .smallertext, .downloads .exposedtext { font-family: 'gothambook'; color: #141414; font-size: 14px; }
+
+.downloads .downloadlinks { text-align: center; margin: 56px 0 50px 0; }
+
+.downloads .downloadlinks .dwnbtn { display: inline-block; margin: 0 25px 0 0; }
+
+.downloads .downloadlinks .dwnbtn:last-child { margin: 0px; }
+
+.downloads .downloadlinks .dwnbtn .os { margin: 10px 0 0 0; float: left; width: 108px; text-align: center; font-size: 18px; font-family: 'gothambook'; color: white; }
+
+.downloads .downloadlinks .dwnbtn .dwn { float: left; width: 108px; text-align: center; font-size: 14px; font-family: 'gothambook'; color: white; }
+
+.downloads .pagecontainer .pagewrapper .content { padding: 50px 30px 0 30px; float: none; margin: 0 auto; background: url(../imgs/pagecontainer_1280_middle_bg.png) repeat-y center top; }
+
+.downloads .pagecontainer .pagewrapper { background: url(../imgs/pagecontainer_1280_middle_bg.png) repeat-y center top; }
+
+.downloads .pagecontainer { background: url(../imgs/pagecontainer_1280_middle_bg.png) repeat-y center top; }
+
+.downloads .dwntable li.border { border-bottom: solid 1px #dcdcdc; margin: 0 0 10px 0; padding: 0 0 10px 0; }
+
+.downloads .dwntable .head { padding-left: 287px !Important; }
+
+.downloads .dwntable .head span { font-size: 18px; font-family: 'gothambook'; }
+
+.downloads .dwntable .col1 { float: left; display: inline-block; width: 278px; padding: 0 10px 0 0; }
+
+.downloads .dwntable .col2 { float: left; display: inline-block; width: 134px; padding: 0 10px 0 0; }
+
+.downloads .dwntable .col3 { float: left; display: inline-block; width: 170px; padding: 0 10px 0 0; }
+
+.downloads .dwntable .col4 { float: left; display: inline-block; width: 200px; padding: 0 10px 0 0; }
+
+.downloads .otherlinks { margin: 110px 0 200px 0; }
+
+.downloads .otherlinks a { display: block; margin: 5px 0; font-size: 18px; font-family: 'gothambook'; color: #141414; }
+
 /* widths */
 .width160 { width: 160px; }
 
@@ -235,7 +299,10 @@ a.redlink { color: #dc1414; font-weight: bold; }
   /* get started page */
   .pagecontainer { background: url(../imgs/pagecontainer_960_bg_center.png) repeat-y center top; }
   .pagecontainer .pagewrapper { background: url(../imgs/pagecontainer_960_bg.png) repeat-y -121px top; width: 945px; }
-  .pagecontainer .pagewrapper .content { width: 683px; padding: 0 30px 100px 30px; } }
+  .pagecontainer .pagewrapper .content { width: 683px; padding: 30px 30px 100px 30px; }
+  .downloads .pagecontainer .pagewrapper { background: url(../imgs/pagecontainer_1280_middle_bg.png) repeat-y center top; }
+  .downloads .pagecontainer { background: url(../imgs/pagecontainer_1280_middle_bg.png) repeat-y center top; }
+  .downloads .pagecontainer .pagewrapper .content { width: 859px; } }
 @media screen and (min-width: 1px) and (max-width: 959px) { .pagewrapper { width: auto; }
   .header .navigation, .header .global-header_logo { display: none; }
   .header .navigation { padding: 20px 0; right: 0px; top: 66px; position: absolute; width: 160px; background: #dcdcdc; }
@@ -259,9 +326,14 @@ a.redlink { color: #dc1414; font-weight: bold; }
   /* get started page */
   .pagecontainer .pagewrapper .leftmenu { display: none; }
   .pagecontainer .pagewrapper { background: white; width: 100%; }
-  .pagecontainer .pagewrapper .content { float: none; width: auto; padding: 0 30px 100px 30px; height: auto; }
+  .pagecontainer .pagewrapper .content { float: none; width: auto; padding: 30px 30px 100px 30px; height: auto; }
   .pagecontainer .pagewrapper hr { width: 290px; margin: 37px auto; }
-  .pagecontainer .pagewrapper .structuretitleholder .title { text-align: right; padding: 0 30px 0 0; } }
+  .pagecontainer .pagewrapper .structuretitleholder .title { text-align: right; padding: 0 30px 0 0; }
+  .downloads .pagecontainer .pagewrapper .content { width: auto; background: none; }
+  .downloads .pagecontainer .pagewrapper, .downloads .pagecontainer { background: none; }
+  .downloads .dwntable .col1 { width: 200px; }
+  .downloads .dwntable .head { padding-left: 210px !Important; }
+  .downloads .dwntable .col4, .downloads .dwntable .col3, .downloads .dwntable .col2 { width: 100px; } }
 @media screen and (min-width: 1px) and (max-width: 639px) { .global320-sprite, #view320logo .global320-header_logo_text, #view320logo .global320-main_logo { background: url('../imgs/sprite-global320.png') no-repeat; }
   #view320logo .global320-header_logo_text { background-position: 0 0; height: 28px; width: 123px; }
   #view320logo .global320-main_logo { background-position: 0 -28px; height: 65px; width: 217px; }
@@ -285,10 +357,15 @@ a.redlink { color: #dc1414; font-weight: bold; }
   .header .navigation li { padding: 0 22px 0 10px; }
   /* get started page */
   .pagecontainer .pagewrapper hr { width: 100%; }
-  .pagecontainer .pagewrapper .content { padding: 0 16px 100px 16px; }
+  .pagecontainer .pagewrapper .content { padding: 10 16px 100px 16px; }
   .pagecontainer .pagewrapper .structuretitleholder .path { font-size: 10px; }
   .pagecontainer .pagewrapper .structuretitleholder .title { font-size: 10px; }
-  pre { font-size: 10px; } }
+  pre { font-size: 10px; }
+  .imgholder .img_left, .imgholder .img_right { margin: 0px; max-width: 300px; }
+  .pageactions .goleft { text-align: center; width: 100%; float: none; display: inline-block; }
+  .pageactions .goright { text-align: center; width: 100%; float: none; display: inline-block; }
+  .pageactions .goleft .pagebtn { float: none; }
+  .pageactions .goright .pagebtn { float: none; } }
 .block { display: block !Important; }
 
 ol { padding-left: 15px; }

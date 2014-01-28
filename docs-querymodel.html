@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head prefix="og: http://ogp.me/ns#">
+        <!--<meta charset="utf-8">-->
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>ActorDB | Documentation</title>        
+        <meta name="description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors.">
+        <meta name="viewport" content="width=device-width">
+        <meta property="og:title" content="ActorDB | Documentation" />
+        <meta property="og:description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors." />
+        <meta property="og:site_name" content="ActorDB" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="http://www.actordb.com/" />
+        <meta property="og:image" content="http://www.actordb.com/imgs/actordb_fb_logo.png" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/actordb-website.css">
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="js/vendor/jquery-1.10.1.min.js"></script>
+        <style>
+            .block {
+                display:block !Important;
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+                $("#mobile_menu").click(function(evt){
+                    $(this).siblings(".navigation").toggleClass("block");
+                });
+            });
+        </script>
+        <!--[if gte IE 9]>
+          <style type="text/css">
+            .gradient {filter: none;}
+          </style>
+        <![endif]-->
+    </head>    
+    <body id="view320logo" >
+        <!--[if lt IE 9]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+        <div class="header">
+            <div class="pagewrapper clearfix">
+                <a href="" class="global-header_logo"></a>
+                <a href="" class="global320-header_logo_text global-header_logo_text"></a>
+                <ul class="navigation">
+                    <li ><a href="index.html">Home</a></li>
+                    <li  class="sel"><a href="docs-about.html">Documentation</a></li>
+                    <li><a target="_blank" href="https://www.github.com/biokoda/actordb">Source</a></li>
+                    <li class="  right"><a target="_blank" href="downloads.html">Downloads</a></li>
+                </ul>
+                <span id="mobile_menu" class="menu"></span>
+            </div>
+        </div>
+
+        <div class="pagecontainer">
+    <div class="pagewrapper clearfix">
+        <div class="leftmenu">
+            <div class="menutitle"><a href="docs-about.html">1. ABOUT</a></div>
+            <ul class="menu">
+            <!--    <li><a href="" class="link">1. About</a></li>-->
+            </ul>
+            <div class="menutitle"><a href="docs-howitworks.html">2. HOW IT WORKS</a></div>
+            <ul class="menu">
+                <li><a href="docs-howitworks.html#overview" class="link">2.1 Overview</a></li>
+                <li><a href="docs-howitworks.html#nodesyny" class="link">2.2 Node sync</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-howitworks.html#h_221" class="link">2.2.1 Global state</a></li>
+                        <li><a href="docs-howitworks.html#h_222" class="link">2.2.2 Actors</a></li>
+                        <li><a href="docs-howitworks.html#h_223" class="link">2.2.3 Multi-actor transactions</a></li>
+                    </ul>
+                <li><a href="docs-howitworks.html#dbengine" class="link">2.3 Database engine</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-querymodel.html">3. QUERY MODEL</a></div>
+            <ul class="menu">
+                <li><a href="docs-querymodel.html#query_actor" class="link">3.1 ACTOR statement</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-querymodel.html#h_311" class="link">3.1.1 Single actor</a></li>
+                        <li><a href="docs-querymodel.html#h_312" class="link">3.1.2 Multiple actors</a></li>
+                        <li><a href="docs-querymodel.html#h_313" class="link">3.1.3 All actors of a type</a></li>
+                        <li><a href="docs-querymodel.html#h_314" class="link">3.1.4 Loop over actors</a></li>
+                    </ul>
+                <li><a href="docs-querymodel.html#query_variables" class="link">3.2 Variables</a></li>
+                    <ul class="level3">
+                        <li><a class="link">3.2.1 Appending columns to result</a></li>                        
+                    </ul>
+                <li><a href="docs-querymodel.html#query_pragma" class="link">3.3 PRAGMA statement</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-kvstore.html">4. KEY/VALUE STORE</a></div>
+            <ul class="menu">                                
+            </ul>
+            <div class="menutitle"><a href="docs-examples.html">5. EXAMPLES</a></div>
+            <ul class="menu">
+                <li><a href="docs-examples.html#example_webforum" class="link">5.1 Web forum</a></li>                
+            </ul>
+            <div class="menutitle"><a href="docs-configuration.html">6. CONFIGURATION</a></div>
+            <ul class="menu">
+            </ul>
+        </div>
+        <div class="content">
+
+   				    <h1 id="querymodel" class="pagetitle">3. Query model</h1>
+
+            <h2 id="query_actor" class="pagesubtitle">3.1 ACTOR statement</h2>
+
+            <h3 id="h_311" class="pagesubtitle">3.1.1 Single actor</h3>
+
+            <p class="pagetext">Queries to ActorDB always need to be directed to an actor. For this reason ActorDB uses the "ACTOR" command.</p>
+
+            <p class="pagetext">Basic query, sent as a single string to the database:</p>
+
+            <div class="structure">
+                <pre>
+ACTOR actortype(actorid) create;
+SELECT * FROM sometable;
+                </pre>
+            </div>
+
+            <p class="pagetext">
+actorid - id that you have set for actor.<br/>
+<br/>
+actortype - type of actor. You can have multiple types of actors with completely different schemas.<br/>
+<br/>
+create (flag) - if actorid does not exist, create and actor with this id. If you don't wish to create it, ommit this flag.<br/>
+<br/>
+sometable - a table defined in actortype schema.<br/>
+<br/>
+You can update multiple types of actors in a single query.
+            </p>
+
+            <div class="structure">
+                <pre>
+ACTOR actortype1(actorid1) create;
+INSERT INTO table1 VALUES (1,'some text');
+ACTOR actortype2(actorid2) create;
+INSERT INTO tableX VALUES (3,'something else');
+                </pre>
+            </div>
+
+            <p class="pagetext">
+                This is a transaction over two actors. They will both be updated or none of them will.
+            </p>
+
+            <hr class="hr14colorsmalmargin" />
+
+            <h3 id="h_312" class="pagesubtitle">3.1.2 Multiple actors</h3>            
+
+            <div class="structure">
+                <pre>
+ACTOR actortype(actorid1,actorid2,actorid3) create;
+INSERT INTO sometable VALUES (1,'txt');
+                </pre>
+            </div>
+
+            <p class="pagetext">
+                Insert will execute on all three actors of type "actortype" inside a transaction. If an actor does not exist, it will be created.
+            </p>
+
+            <hr class="hr14colorsmalmargin" />
+
+            <h3 id="h_313" class="pagesubtitle">3.1.3 All actors of a type</h3>            
+
+            <div class="structure">
+                <pre>
+ACTOR type1(*);
+INSERT INTO sometable VALUES (1,'txt');
+                </pre>
+            </div>
+
+            <p class="pagetext">
+                This query will run on all actors of type1. If there are many actors of type1 calling this is not recommended.
+            </p>
+
+            <hr class="hr14colorsmalmargin" />
+
+            <h3 id="h_314" class="pagesubtitle">3.1.4 Loop over actors</h3>            
+
+            <p class="pagetext">
+                When your list of actors over which you wish to run a query is stored in another actor.
+            </p>
+
+<div class="structure">
+                <pre>                    
+ACTOR type1(actor);
+{{ACTORS}}SELECT * FROM table2;
+ACTOR type1(for X.txt in ACTORS) create;
+insert into sometable values (1,'{{X.val}}');
+                </pre>
+            </div>
+
+            <p class="pagetext">
+                What is going on line by line:
+            </p>
+
+            <p class="pagetext">
+                <ol>
+                    <li>1. Select a single actor of type1. It must exist because there is no create flag.</li>
+                    <li>2. Run a select over table2 and store the result in a variable ACTORS</li>
+                    <li>3. For every row in ACTORS, read the .txt column which contains the name of an actor. These actors are of type "type1". If they do not exist, they will be created.</li>
+                    <li>4. For every actor in ACTORS, insert a row into "sometable". Use another column from current row of ACTORS.</li>
+                </ol>
+            </p>
+
+            <p class="pagetext"></p>
+
+            <h2 id="query_variables" class="pagesubtitle">3.2 Variables</h2>
+
+            <p class="pagetext">As mentioned in 3.1.4 ActorDB uses variables to pass data around when doing queries over multiple actors.</p>
+
+            <p class="pagetext">There are also special variables available:</p>
+
+            <p class="pagetext"> ActorDB will replace this with a unique integer id.  is always increasing globally across all servers every time it is used. Calls to one server are guaranteed to always have a bigger id, calls to different servers are not, but are guaranteed to be unique.
+</p>
+
+            <div class="structure">
+                <pre>
+ACTOR type1(actor);
+INSERT INTO table VALUES ({{uniqid}}, 'sometext');
+                </pre>
+            </div>
+
+
+            <p class="pagetext">{{uniqid.X}} will also insert a unique integer value, but can be referenced in multiple places:</p>
+
+
+            <div class="structure">
+                <pre>
+ACTOR type1({{uniqid.myid}}) create;
+INSERT INTO table VALUES (1,'actor created with id {{uniqid.myid}}');
+                </pre>
+            </div>
+
+
+
+            <p class="pagetext">{{curactor}} when executing statements over multiple actors, {{curactor}} will always reference the current executing actor. It will only work in queries over multiple actors.</p>
+
+
+            <div class="structure">
+                <pre>
+ACTOR type1(actor1,actor2,actor3);
+INSERT INTO table VALUES (1,'my id is {{curactor}}')
+                </pre>
+            </div>
+
+
+
+            <p class="pagetext">{{RESULT}} when executing a read query across multiple actors, you have to add the result to this variable:</p>
+
+
+            <div class="structure">
+                <pre>
+ACTOR type1(actor1,actor2,actor3);
+{{RESULT}}SELECT * FROM tablex;
+                </pre>
+            </div>
+
+
+
+            <p class="pagetext">Result set will contain an additional column with every row named "actor", which will contain the name of actor to which result row belongs to. Do not use  {{RESULT}}  in queries to a single actor.
+</p>
+
+            <p class="pagetext"></p>
+
+            <h3 id="h_321" class="pagesubtitle">3.2.1 Appending columns to result</h3>            
+
+            <p class="pagetext">Say you have a forum thread actor. Every post in the thread contains the user id of the user that wrote the message. But when reading the thread you need more than just the user id, you need his username:
+</p>
+
+
+            <div class="structure">
+                <pre>
+ACTOR thread(1);
+{{RESULT}}SELECT * FROM thread;
+ACTOR user(for X.userid in RESULT);
+{{INFO}}SELECT * FROM userinfo WHERE id=1;
+{{X.username=INFO.name}}
+                </pre>
+            </div>
+
+
+            <p class="pagetext">Explanation line by line:</p>
+
+            <p class="pagetext">
+                <ol>
+                    <li>1. Switch to thread actor with id 1</li>
+                    <li>2. Read all posts in thread table and store in "RESULTS" variable</li>
+                    <li>3. Loop over all posts by userid column and switch to user with that id.</li>
+                    <li>4. Read from his userinfo table</li>
+                    <li>5. Take name from "INFO" and store into username column of result. This column does not need to exist in thread table. It will be added.</li>
+
+                </ol>
+            </p>
+
+            <p class="pagetext"></p>
+
+
+            <h2 id="query_pragma" class="pagesubtitle">3.3 PRAGMA statement</h2>
+
+            <p class="pagetext">PRAGMA commands do specific operations or queries over one or many actors.</p>
+
+            <h3 class="pagesubtitle">PRAGMA list</h3>                        
+
+            <p class="pagetext">Will list all actors of a certain type</p>
+
+
+
+            <div class="structure">
+                <pre>
+ACTOR thread(*);
+PRAGMA list;
+                </pre>
+            </div>
+
+
+            <hr class="hr14colorsmalmargin" />
+
+            <h3 class="pagesubtitle">PRAGMA delete</h3>                        
+
+            <p class="pagetext">Will delete all actors listed in "ACTOR" statement.</p>
+
+
+
+            <div class="structure">
+                <pre>
+ACTOR thread(thread1,thread2);
+PRAGMA delete;                
+                </pre>
+            </div>
+
+
+            <hr class="hr14colorsmalmargin" />
+
+            <h3 class="pagesubtitle">PRAGMA exists</h3>                        
+
+            <p class="pagetext">Will return true or false if actor exists. Works only on a single actor.</p>
+
+
+
+            <div class="structure">
+                <pre>
+ACTOR thread(thread1);
+PRAGMA exists;
+                </pre>
+            </div>
+
+
+            <hr class="hr14colorsmalmargin" />
+
+            <h3 class="pagesubtitle">PRAGMA count</h3>                        
+
+            <p class="pagetext">Will count number of existing actors of a type.</p>
+
+
+
+            <div class="structure">
+                <pre>
+ACTOR thread(*);
+PRAGMA count;
+                </pre>
+            </div>
+
+
+            <hr class="hr14colorsmalmargin" />
+
+            <h3 class="pagesubtitle">PRAGMA copy</h3>                        
+
+            <p class="pagetext">Will create a copy of an actor with a different name. Actor listed in "ACTOR" statement is new actor, actor listed in PRAGMA statement is actor that will be copied over. The destination name of actor should not exist. If it does it will either be overwritten or operation will fail, because that actor is actively executing requests.</p>
+
+
+
+            <div class="structure">
+                <pre>
+ACTOR thread(threadCopyTo);
+PRAGMA copy=threadCopyFrom;
+                </pre>
+            </div>
+
+
+<div class="pageactions">
+    <span class="goleft"><a href="docs-howitworks.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2. How it works)</span>
+    <span class="goright">(4. Key/Value store)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="docs-kvstore.html"><span class="pagebtn">Next >></span></a></span>   
+</div>
+
+
+            <p class="pagetext"></p>
+
+
+
+   			<p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+
+        </div>
+    </div>
+</div>
+
+        <div class="footer">
+            <div class="pagewrapper">
+                <div class="linkholder">
+                    <a href="https://www.github.com/biokoda/actordb" class="link">GitHub</a>
+                    <a href="https://github.com/biokoda/actordb/issues" class="link">Issues</a>
+                    <a href="https://github.com/biokoda/actordb/blob/master/README.md" class="link marginrightzero">Changelog</a>
+                </div>
+                <p class="text">Product by Biokoda. <br/ >
+                    Licensed under Mozilla Public License 2.0.
+                </p>
+                <a class="global-footer_logo"></a>        
+            </div>
+        </div>
+
+        <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>-->
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/vendor/jquery.easypiechart.min.js"></script>
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        
+        <script type="text/javascript">
+            var isAtLeastIE11 = !!(navigator.userAgent.match(/Trident/) && !navigator.userAgent.match(/MSIE/));
+            if (isAtLeastIE11) {
+                $("html").addClass("ieedge");
+            }
+            if (navigator.platform.indexOf("Win") != -1 && navigator.userAgent.indexOf("MSIE") != -1 || navigator.platform.indexOf("Win") != -1 && isAtLeastIE11){
+                $("html").addClass("iecomm");
+            } 
+            if (navigator.platform.indexOf("Win") !=-1 && navigator.userAgent.indexOf("Chrome") != -1) {
+                $("html").addClass("winchrome");
+            }
+        </script>
+        <script src="js/actordb-website.js"></script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-47379916-1', 'actordb.com');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

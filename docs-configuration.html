@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head prefix="og: http://ogp.me/ns#">
+        <!--<meta charset="utf-8">-->
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>ActorDB | Documentation</title>        
+        <meta name="description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors.">
+        <meta name="viewport" content="width=device-width">
+        <meta property="og:title" content="ActorDB | Documentation" />
+        <meta property="og:description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors." />
+        <meta property="og:site_name" content="ActorDB" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="http://www.actordb.com/" />
+        <meta property="og:image" content="http://www.actordb.com/imgs/actordb_fb_logo.png" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/actordb-website.css">
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="js/vendor/jquery-1.10.1.min.js"></script>
+        <style>
+            .block {
+                display:block !Important;
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+                $("#mobile_menu").click(function(evt){
+                    $(this).siblings(".navigation").toggleClass("block");
+                });
+            });
+        </script>
+        <!--[if gte IE 9]>
+          <style type="text/css">
+            .gradient {filter: none;}
+          </style>
+        <![endif]-->
+    </head>    
+    <body id="view320logo" >
+        <!--[if lt IE 9]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+        <div class="header">
+            <div class="pagewrapper clearfix">
+                <a href="" class="global-header_logo"></a>
+                <a href="" class="global320-header_logo_text global-header_logo_text"></a>
+                <ul class="navigation">
+                    <li ><a href="index.html">Home</a></li>
+                    <li  class="sel"><a href="docs-about.html">Documentation</a></li>
+                    <li><a target="_blank" href="https://www.github.com/biokoda/actordb">Source</a></li>
+                    <li class="  right"><a target="_blank" href="downloads.html">Downloads</a></li>
+                </ul>
+                <span id="mobile_menu" class="menu"></span>
+            </div>
+        </div>
+
+        <div class="pagecontainer">
+    <div class="pagewrapper clearfix">
+        <div class="leftmenu">
+            <div class="menutitle"><a href="docs-about.html">1. ABOUT</a></div>
+            <ul class="menu">
+            <!--    <li><a href="" class="link">1. About</a></li>-->
+            </ul>
+            <div class="menutitle"><a href="docs-howitworks.html">2. HOW IT WORKS</a></div>
+            <ul class="menu">
+                <li><a href="docs-howitworks.html#overview" class="link">2.1 Overview</a></li>
+                <li><a href="docs-howitworks.html#nodesyny" class="link">2.2 Node sync</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-howitworks.html#h_221" class="link">2.2.1 Global state</a></li>
+                        <li><a href="docs-howitworks.html#h_222" class="link">2.2.2 Actors</a></li>
+                        <li><a href="docs-howitworks.html#h_223" class="link">2.2.3 Multi-actor transactions</a></li>
+                    </ul>
+                <li><a href="docs-howitworks.html#dbengine" class="link">2.3 Database engine</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-querymodel.html">3. QUERY MODEL</a></div>
+            <ul class="menu">
+                <li><a href="docs-querymodel.html#query_actor" class="link">3.1 ACTOR statement</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-querymodel.html#h_311" class="link">3.1.1 Single actor</a></li>
+                        <li><a href="docs-querymodel.html#h_312" class="link">3.1.2 Multiple actors</a></li>
+                        <li><a href="docs-querymodel.html#h_313" class="link">3.1.3 All actors of a type</a></li>
+                        <li><a href="docs-querymodel.html#h_314" class="link">3.1.4 Loop over actors</a></li>
+                    </ul>
+                <li><a href="docs-querymodel.html#query_variables" class="link">3.2 Variables</a></li>
+                    <ul class="level3">
+                        <li><a class="link">3.2.1 Appending columns to result</a></li>                        
+                    </ul>
+                <li><a href="docs-querymodel.html#query_pragma" class="link">3.3 PRAGMA statement</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-kvstore.html">4. KEY/VALUE STORE</a></div>
+            <ul class="menu">                                
+            </ul>
+            <div class="menutitle"><a href="docs-examples.html">5. EXAMPLES</a></div>
+            <ul class="menu">
+                <li><a href="docs-examples.html#example_webforum" class="link">5.1 Web forum</a></li>                
+            </ul>
+            <div class="menutitle"><a href="docs-configuration.html">6. CONFIGURATION</a></div>
+            <ul class="menu">
+            </ul>
+        </div>
+        <div class="content">
+
+   					<h1 id="configuration" class="pagetitle">6. Configuration</h1>
+
+	<h2 id="conf_files" class="pagesubtitle">6.1 ActorDB configuration files</h2>
+
+    <p class="pagetext">ActorDB configuration files:</p>
+
+    <p class="pagetext">
+        <ol>
+            <li>app.config: where to store data, mysql protocol port.</li>
+            <li>vm.args: set name of node (also erlang vm tweak parameters, which you should probably leave default).</li>
+            <li>nodes.yaml: list of all nodes</li>
+            <li>schema.yaml: SQL database schema for every actor type.</li>
+            <li>Once it has a confirmation or abort message it executes it and unlocks itself.</li>
+        </ol>
+    </p>
+
+    <p class="pagetext"></p>
+
+    <p class="pagetext">app.config and vm.args need to be set on every node.</p>
+	
+	<p class="pagetext">nodes.yaml and schema.yaml only need to be set on one node, then sent to ActorDB with actordbctrl command. ActorDB will then store that data and send it to all nodes internally.</p>
+
+
+	<p class="pagetext">On install, default configuration files are placed in /etc/actordb or whichever is equivalent for your platform.</p>	
+
+	<h2 id="conf_nodes" class="pagesubtitle">6.2 nodes.yaml</h2>
+
+	<p class="pagetext">Nodes file is split into two sections. First section lists all servers, second section organizes those servers into groups. This way you can manually organize nodes across different availability zones per cluster.</p>
+
+
+            <div class="structure">
+                <pre>
+# List all servers.
+nodes:
+- node1@192.168.1.2 
+- node2@192.168.1.3
+- node3@192.168.1.4
+
+# Organize servers.
+# Groups of type cluster are actordb data nodes.
+# Groups of other types will be able to communicate with cluster nodes, 
+#  but will not hold actordb data. They can be used as incremental backup nodes (coming soon), 
+#  client connection gateways and transaction managers. 
+groups:
+- name: grp2
+  nodes: [node1,node2,node3]
+  type: cluster
+                </pre>
+            </div>
+
+
+
+	<h2 id="conf_schema" class="pagesubtitle">6.3 schema.yaml</h2>
+
+	<p class="pagetext">Schema file contains the SQL create or alter table commands. The schema can be changed at any time, but only by adding SQL statements to the list. Every time a new actor is created, the entire list of SQL commands will be executed to create the schema. If schema changes while ActorDB is running, actors will be updated by applying the new statements in the list.
+</p>
+
+
+            <div class="structure">
+                <pre>
+# type1, type2 are types of actors. Every line is an update to the schema.
+# Lines SHOULD NEVER BE REMOVED. If lines are removed new actors will 
+#  have an incomplete schema and existing actors will not detect the schema change either.
+# To update the schema add lines for type or add new types.
+
+type1: 
+- CREATE TABLE tab (id INTEGER PRIMARY KEY, txt TEXT)   
+- CREATE TABLE tab1 (id INTEGER PRIMARY KEY, txt TEXT)  
+- ALTER TABLE tab ADD i INTEGER                      
+- CREATE TABLE tabx (id INTEGER PRIMARY KEY, txt TEXT) 
+
+type2:
+- CREATE TABLE asdf (id INTEGER PRIMARY KEY AUTOINCREMENT, txt BLOB)
+
+# typekv is a key-value type. It will not be an actor but a fragmented table across all nodes
+typekv: 
+ type: kv
+ schema: 
+  - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)                </pre>
+            </div>
+
+
+<p class="pagetext"></p>
+
+<h2 id="setup_guide" class="pagesubtitle">6.4 Setup guide</h2>
+
+<h3 class="pagesubtitle">FOR EVERY NODE</h3>            
+
+<p class="pagetext">
+    <ol>
+        <li>1. Install package</li>
+        <li>2. Open /etc/actordb/vm.args and set name for node in format: nodename@ipordomain. Changing the cookie is good practice but not mandatory. Cookie has to be the same on every server.</li>
+        <li>3. OPTIONAL: Open /etc/actordb/app.config and set "main_db_folder" to something other than default. You can also specify additional DB folders on different hard drives.</li>
+        <li>4. Run: sudo actordb start</li>
+    </ol>
+</p>
+
+<h3 class="pagesubtitle">ON ONE NODE</h3>            
+
+<p class="pagetext">
+    <ol>
+        <li>1. Open /etc/actordb/nodes.yaml and list all servers and organize them into groups</li>
+        <li>2. Open /etc/actordb/schema.yaml set your DB schema</li>
+        <li>3. Run: actordbctrl init</li>
+        <li>4. Backup your nodes and schema file.</li>
+    </ol>
+</p>
+
+<p class="pagetext"></p>
+
+<h2 id="changing_schema" class="pagesubtitle">6.5 Changing schema</h2>
+
+<p class="pagetext">
+    <ol>
+        <li>1. Open schema.yaml file. Add statements or types.</li>
+        <li>2. Run: actordbctrl updateschema</li>
+    </ol>
+</p>
+
+<p class="pagetext"></p>
+
+<h2 id="adding_cluster" class="pagesubtitle">6.6 Adding a cluster</h2>
+
+<p class="pagetext">
+    <ol>
+        <li>1. Do steps 6.4.1-6.4.4 for every node in cluster.</li>
+        <li>2. Open nodes.yaml file. Add nodes and create a new group.</li>
+        <li>3. Run: actordbctrl updatenodes</li>
+    </ol>
+</p>
+
+<p class="pagetext"></p>
+
+<h2 id="building_actordb" class="pagesubtitle">6.7 Building ActorDB</h2>
+
+<p class="pagetext">
+    <ol>
+        <li>1. Clone from github</li>
+        <li>2. make dist</li>
+        <li>3. make package</li>
+        <li>4. Release should be generated in: ./package/packages</li>
+    </ol>
+</p>
+
+<p class="pagetext"></p>
+
+<h2 id="running_dev_mode" class="pagesubtitle">6.8 Running ActorDB dev mode</h2>
+
+<p class="pagetext">
+    <ol>
+        <li>1. Clone from github</li>
+        <li>2. Move to actordb folder</li>
+        <li>3. ./startdev.sh</li>
+        <li>4. ./actordbctrl init</li>
+    </ol>
+</p>
+
+<div class="pageactions">
+    <span class="goleft"><a href="docs-examples.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(5. Examples)</span>
+
+</div>
+
+
+   			<p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+
+        </div>
+    </div>
+</div>
+
+        <div class="footer">
+            <div class="pagewrapper">
+                <div class="linkholder">
+                    <a href="https://www.github.com/biokoda/actordb" class="link">GitHub</a>
+                    <a href="https://github.com/biokoda/actordb/issues" class="link">Issues</a>
+                    <a href="https://github.com/biokoda/actordb/blob/master/README.md" class="link marginrightzero">Changelog</a>
+                </div>
+                <p class="text">Product by Biokoda. <br/ >
+                    Licensed under Mozilla Public License 2.0.
+                </p>
+                <a class="global-footer_logo"></a>        
+            </div>
+        </div>
+
+        <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>-->
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/vendor/jquery.easypiechart.min.js"></script>
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        
+        <script type="text/javascript">
+            var isAtLeastIE11 = !!(navigator.userAgent.match(/Trident/) && !navigator.userAgent.match(/MSIE/));
+            if (isAtLeastIE11) {
+                $("html").addClass("ieedge");
+            }
+            if (navigator.platform.indexOf("Win") != -1 && navigator.userAgent.indexOf("MSIE") != -1 || navigator.platform.indexOf("Win") != -1 && isAtLeastIE11){
+                $("html").addClass("iecomm");
+            } 
+            if (navigator.platform.indexOf("Win") !=-1 && navigator.userAgent.indexOf("Chrome") != -1) {
+                $("html").addClass("winchrome");
+            }
+        </script>
+        <script src="js/actordb-website.js"></script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-47379916-1', 'actordb.com');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

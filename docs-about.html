@@ -4,10 +4,10 @@
         <!--<meta charset="utf-8">-->
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>ActorDB | Downloads</title>        
+        <title>ActorDB | Documentation</title>        
         <meta name="description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors.">
         <meta name="viewport" content="width=device-width">
-        <meta property="og:title" content="ActorDB | Downloads" />
+        <meta property="og:title" content="ActorDB | Documentation" />
         <meta property="og:description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors." />
         <meta property="og:site_name" content="ActorDB" />
         <meta property="og:type" content="website" />
@@ -36,7 +36,7 @@
           </style>
         <![endif]-->
     </head>    
-    <body id="view320logo" class="pagebg downloads">
+    <body id="view320logo" >
         <!--[if lt IE 9]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
@@ -46,9 +46,9 @@
                 <a href="" class="global320-header_logo_text global-header_logo_text"></a>
                 <ul class="navigation">
                     <li ><a href="index.html">Home</a></li>
-                    <li ><a href="docs-about.html">Documentation</a></li>
+                    <li  class="sel"><a href="docs-about.html">Documentation</a></li>
                     <li><a target="_blank" href="https://www.github.com/biokoda/actordb">Source</a></li>
-                    <li class=" sel right"><a target="_blank" href="downloads.html">Downloads</a></li>
+                    <li class="  right"><a target="_blank" href="downloads.html">Downloads</a></li>
                 </ul>
                 <span id="mobile_menu" class="menu"></span>
             </div>
@@ -57,40 +57,79 @@
         <div class="pagecontainer">
     <div class="pagewrapper clearfix">
         <div class="leftmenu">
+            <div class="menutitle"><a href="docs-about.html">1. ABOUT</a></div>
+            <ul class="menu">
+            <!--    <li><a href="" class="link">1. About</a></li>-->
+            </ul>
+            <div class="menutitle"><a href="docs-howitworks.html">2. HOW IT WORKS</a></div>
+            <ul class="menu">
+                <li><a href="docs-howitworks.html#overview" class="link">2.1 Overview</a></li>
+                <li><a href="docs-howitworks.html#nodesyny" class="link">2.2 Node sync</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-howitworks.html#h_221" class="link">2.2.1 Global state</a></li>
+                        <li><a href="docs-howitworks.html#h_222" class="link">2.2.2 Actors</a></li>
+                        <li><a href="docs-howitworks.html#h_223" class="link">2.2.3 Multi-actor transactions</a></li>
+                    </ul>
+                <li><a href="docs-howitworks.html#dbengine" class="link">2.3 Database engine</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-querymodel.html">3. QUERY MODEL</a></div>
+            <ul class="menu">
+                <li><a href="docs-querymodel.html#query_actor" class="link">3.1 ACTOR statement</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-querymodel.html#h_311" class="link">3.1.1 Single actor</a></li>
+                        <li><a href="docs-querymodel.html#h_312" class="link">3.1.2 Multiple actors</a></li>
+                        <li><a href="docs-querymodel.html#h_313" class="link">3.1.3 All actors of a type</a></li>
+                        <li><a href="docs-querymodel.html#h_314" class="link">3.1.4 Loop over actors</a></li>
+                    </ul>
+                <li><a href="docs-querymodel.html#query_variables" class="link">3.2 Variables</a></li>
+                    <ul class="level3">
+                        <li><a class="link">3.2.1 Appending columns to result</a></li>                        
+                    </ul>
+                <li><a href="docs-querymodel.html#query_pragma" class="link">3.3 PRAGMA statement</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-kvstore.html">4. KEY/VALUE STORE</a></div>
+            <ul class="menu">                                
+            </ul>
+            <div class="menutitle"><a href="docs-examples.html">5. EXAMPLES</a></div>
+            <ul class="menu">
+                <li><a href="docs-examples.html#example_webforum" class="link">5.1 Web forum</a></li>                
+            </ul>
+            <div class="menutitle"><a href="docs-configuration.html">6. CONFIGURATION</a></div>
+            <ul class="menu">
+            </ul>
         </div>
         <div class="content">
 
-                    <h1 class="downloadstitle">Downloads</h1>                    
-                    <p class="downloadstext16">This table lists ActorDB distributions by platform and version.</p>
-                    <h2 class="downloadstitle">Latest Stable Release (0.5) <span class="smallertext">— 21/Jan/2014</span></h2>
-                    <p class="exposedtext"><a href="https://github.com/biokoda/actordb/blob/e8357b78853da9aedafbfcc9abfc3088e83ac171/README.md" class="redlink">Release Notes</a>, <a href="https://github.com/biokoda/actordb/blob/e8357b78853da9aedafbfcc9abfc3088e83ac171/README.md" class="redlink">Changelog</a>, Source: <a href="https://github.com/biokoda/actordb/archive/0.5.tar.gz" class="redlink">tgz</a> | <a href="https://github.com/biokoda/actordb/archive/0.5.zip" class="redlink">zip</a></p>
-                    <div class="downloadlinks">
-                        <a class="dwnbtn global-download_desktop_btn" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5-1_amd64.deb"><span class="os">Ubuntu</span><span class="dwn">Download</span></a>
-                        <a class="dwnbtn global-download_desktop_btn" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5-OSX-x86_64.tar.gz"><span class="os">Mac OS X</span><span class="dwn">Download</span></a>
-                    </div>
-                        
-                    <h2 class="downloadstitle">Releases (stable)</h2>
+   				<h1 id="about" class="pagetitle">1. About</h1>                    
+<!--<h2 class="pagesubtitle">1. Why</h2>                    -->
 
-                    <ul class="dwntable">
-                        <li class="head clearfix border">
-                            <span class="col2">Ubuntu</span>
-                            <span class="col3">Mac OS X</span>                            
-                        </li>
-                        <li class="clearfix">
-                            <span class="col1"><span class="downloadstitle">0.5<span class="smallertext">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;21/Jan/2014</span></span></span>
-                            <span class="col2"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5-1_amd64.deb">64-bit</a></span>
-                            <span class="col3"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5-OSX-x86_64.tar.gz">64-bit</a></span>
-                        </li>
-                        <li class="clearfix border">
-                            <span class="col1"><p><a href="https://github.com/biokoda/actordb/blob/e8357b78853da9aedafbfcc9abfc3088e83ac171/README.md" class="redlink">Changelog</a><br /><a href="https://github.com/biokoda/actordb/blob/e8357b78853da9aedafbfcc9abfc3088e83ac171/README.md" class="redlink">Release notes</a><br />Source: <a href="https://github.com/biokoda/actordb/archive/0.5.tar.gz" class="redlink">tgz </a>  |   <a href="https://github.com/biokoda/actordb/archive/0.5.zip" class="redlink">zip</a></p></span>
-                            
-                        </li>                        
-                    </ul>
 
-                    <ul class="otherlinks">
-                        <li><a href="https://github.com/biokoda/actordb/blob/e8357b78853da9aedafbfcc9abfc3088e83ac171/README.md">Notes ></a></li>
-                        <li><a href="docs-about.html">Documentation  ></a></li>
-                    </ul>         
+    <p class="pagetext"></p>
+    <p class="pagetext">ActorDB is a distributed SQL database. To understand why this is important we have to start with traditional SQL databases.</p>
+
+    <p class="pagetext">Note that terms node and server will be used interchangeably. </p>
+
+    <p class="pagetext">Traditional SQL databases are monolithic. They work very well in the context of a single server, but are limited to that server. Of course they can work master/slave or master/master, but the entire dataset still needs to be on each server. Even if the dataset is not too large, traditional SQL databases require extremely complex and broad locking mechanisms for transactions. Once the query load is too high or the dataset is too large, some drastic changes need to be made in how you use your database.</p>
+
+    <p class="pagetext">Data will need to be denormalized. Code complexity will have to go up. A lot of time will be spent trying to keep your head above water. Eventually if you still keep growing, you have to turn to database sharding. Dramatically increasing complexity of everything that involves using the database. </p>
+
+    <p class="pagetext">ActorDB on the other hand allows you to start out with a database that is fully normalised within an actor unit and scale that database horizontally over as many servers as you need. No single points of failure or global locks. Transactions only affect the actors that participate in them. </p>
+
+<div class="pageactions">	
+	<span class="goright">(2. How it works)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="docs-howitworks.html"><span class="pagebtn">Next &gt;&gt;</span></a></span>   
+</div>
+
+   			<p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
 
         </div>
     </div>

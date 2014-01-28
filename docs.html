@@ -36,7 +36,7 @@
           </style>
         <![endif]-->
     </head>    
-    <body id="view320logo">
+    <body id="view320logo" >
         <!--[if lt IE 9]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
@@ -46,9 +46,9 @@
                 <a href="" class="global320-header_logo_text global-header_logo_text"></a>
                 <ul class="navigation">
                     <li ><a href="index.html">Home</a></li>
-                    <li  class="sel"><a href="docs.html">Documentation</a></li>
+                    <li  class="sel"><a href="docs-about.html">Documentation</a></li>
                     <li><a target="_blank" href="https://www.github.com/biokoda/actordb">Source</a></li>
-                    <li class="right"><a target="_blank" href="downloads.html">Download</a></li>
+                    <li class="  right"><a target="_blank" href="downloads.html">Downloads</a></li>
                 </ul>
                 <span id="mobile_menu" class="menu"></span>
             </div>
@@ -57,33 +57,50 @@
         <div class="pagecontainer">
     <div class="pagewrapper clearfix">
         <div class="leftmenu">
-            <div class="menutitle"><a href="#about">1. ABOUT</a></div>
+            <div class="menutitle"><a href="docs-about.html">1. ABOUT</a></div>
             <ul class="menu">
             <!--    <li><a href="" class="link">1. About</a></li>-->
             </ul>
-            <div class="menutitle"><a href="#howitworks">2. HOW IT WORKS</a></div>
+            <div class="menutitle"><a href="docs-howitworks.html">2. HOW IT WORKS</a></div>
             <ul class="menu">
-                <li><a href="#overview" class="link">2.1 Overview</a></li>
-                <li><a href="#nodesyny" class="link">2.2 Node synchronisation</a></li>
-                <li><a href="#dbengine" class="link">2.3 Database engine</a></li>
+                <li><a href="docs-howitworks.html#overview" class="link">2.1 Overview</a></li>
+                <li><a href="docs-howitworks.html#nodesyny" class="link">2.2 Node sync</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-howitworks.html#h_221" class="link">2.2.1 Global state</a></li>
+                        <li><a href="docs-howitworks.html#h_222" class="link">2.2.2 Actors</a></li>
+                        <li><a href="docs-howitworks.html#h_223" class="link">2.2.3 Multi-actor transactions</a></li>
+                    </ul>
+                <li><a href="docs-howitworks.html#dbengine" class="link">2.3 Database engine</a></li>
             </ul>
-            <div class="menutitle"><a href="#querymodel">3. QUERY MODEL</a></div>
+            <div class="menutitle"><a href="docs-querymodel.html">3. QUERY MODEL</a></div>
             <ul class="menu">
-                <li><a href="#query_actor" class="link">3.1 ACTOR statement</a></li>
-                <li><a href="#query_variables" class="link">3.2 Variables</a></li>
-                <li><a href="#query_pragma" class="link">3.3 PRAGMA statement</a></li>
+                <li><a href="docs-querymodel.html#query_actor" class="link">3.1 ACTOR statement</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-querymodel.html#h_311" class="link">3.1.1 Single actor</a></li>
+                        <li><a href="docs-querymodel.html#h_312" class="link">3.1.2 Multiple actors</a></li>
+                        <li><a href="docs-querymodel.html#h_313" class="link">3.1.3 All actors of a type</a></li>
+                        <li><a href="docs-querymodel.html#h_314" class="link">3.1.4 Loop over actors</a></li>
+                    </ul>
+                <li><a href="docs-querymodel.html#query_variables" class="link">3.2 Variables</a></li>
+                    <ul class="level3">
+                        <li><a class="link">3.2.1 Appending columns to result</a></li>                        
+                    </ul>
+                <li><a href="docs-querymodel.html#query_pragma" class="link">3.3 PRAGMA statement</a></li>
             </ul>
-            <div class="menutitle"><a href="#kvstore">4. KEY/VALUE STORE</a></div>
-            <ul class="menu">                
+            <div class="menutitle"><a href="docs-kvstore.html">4. KEY/VALUE STORE</a></div>
+            <ul class="menu">                                
             </ul>
-            <div class="menutitle"><a href="#examples">5. EXAMPLES</a></div>
+            <div class="menutitle"><a href="docs-examples.html">5. EXAMPLES</a></div>
             <ul class="menu">
-                <li><a href="#example_webforum" class="link">5.1 Web forum</a></li>                
+                <li><a href="docs-examples.html#example_webforum" class="link">5.1 Web forum</a></li>                
+            </ul>
+            <div class="menutitle"><a href="docs-configuration.html">6. CONFIGURATION</a></div>
+            <ul class="menu">
             </ul>
         </div>
         <div class="content">
 
-            <h1 id="about" class="pagetitle">1. About</h1>                    
+   				            <h1 id="about" class="pagetitle">1. About</h1>                    
             <!--<h2 class="pagesubtitle">1. Why</h2>                    -->
 
 
@@ -723,6 +740,18 @@ INSERT INTO mymessages VALUES ({{uniqid.msgid}},_threadid_);
 
 
             <p class="pagetext"></p>
+
+   			<p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
 
         </div>
     </div>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head prefix="og: http://ogp.me/ns#">
+        <!--<meta charset="utf-8">-->
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>ActorDB | Documentation</title>        
+        <meta name="description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors.">
+        <meta name="viewport" content="width=device-width">
+        <meta property="og:title" content="ActorDB | Documentation" />
+        <meta property="og:description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors." />
+        <meta property="og:site_name" content="ActorDB" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="http://www.actordb.com/" />
+        <meta property="og:image" content="http://www.actordb.com/imgs/actordb_fb_logo.png" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/actordb-website.css">
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="js/vendor/jquery-1.10.1.min.js"></script>
+        <style>
+            .block {
+                display:block !Important;
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+                $("#mobile_menu").click(function(evt){
+                    $(this).siblings(".navigation").toggleClass("block");
+                });
+            });
+        </script>
+        <!--[if gte IE 9]>
+          <style type="text/css">
+            .gradient {filter: none;}
+          </style>
+        <![endif]-->
+    </head>    
+    <body id="view320logo" >
+        <!--[if lt IE 9]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+        <div class="header">
+            <div class="pagewrapper clearfix">
+                <a href="" class="global-header_logo"></a>
+                <a href="" class="global320-header_logo_text global-header_logo_text"></a>
+                <ul class="navigation">
+                    <li ><a href="index.html">Home</a></li>
+                    <li  class="sel"><a href="docs-about.html">Documentation</a></li>
+                    <li><a target="_blank" href="https://www.github.com/biokoda/actordb">Source</a></li>
+                    <li class="  right"><a target="_blank" href="downloads.html">Downloads</a></li>
+                </ul>
+                <span id="mobile_menu" class="menu"></span>
+            </div>
+        </div>
+
+        <div class="pagecontainer">
+    <div class="pagewrapper clearfix">
+        <div class="leftmenu">
+            <div class="menutitle"><a href="docs-about.html">1. ABOUT</a></div>
+            <ul class="menu">
+            <!--    <li><a href="" class="link">1. About</a></li>-->
+            </ul>
+            <div class="menutitle"><a href="docs-howitworks.html">2. HOW IT WORKS</a></div>
+            <ul class="menu">
+                <li><a href="docs-howitworks.html#overview" class="link">2.1 Overview</a></li>
+                <li><a href="docs-howitworks.html#nodesyny" class="link">2.2 Node sync</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-howitworks.html#h_221" class="link">2.2.1 Global state</a></li>
+                        <li><a href="docs-howitworks.html#h_222" class="link">2.2.2 Actors</a></li>
+                        <li><a href="docs-howitworks.html#h_223" class="link">2.2.3 Multi-actor transactions</a></li>
+                    </ul>
+                <li><a href="docs-howitworks.html#dbengine" class="link">2.3 Database engine</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-querymodel.html">3. QUERY MODEL</a></div>
+            <ul class="menu">
+                <li><a href="docs-querymodel.html#query_actor" class="link">3.1 ACTOR statement</a></li>
+                    <ul class="level3">
+                        <li><a href="docs-querymodel.html#h_311" class="link">3.1.1 Single actor</a></li>
+                        <li><a href="docs-querymodel.html#h_312" class="link">3.1.2 Multiple actors</a></li>
+                        <li><a href="docs-querymodel.html#h_313" class="link">3.1.3 All actors of a type</a></li>
+                        <li><a href="docs-querymodel.html#h_314" class="link">3.1.4 Loop over actors</a></li>
+                    </ul>
+                <li><a href="docs-querymodel.html#query_variables" class="link">3.2 Variables</a></li>
+                    <ul class="level3">
+                        <li><a class="link">3.2.1 Appending columns to result</a></li>                        
+                    </ul>
+                <li><a href="docs-querymodel.html#query_pragma" class="link">3.3 PRAGMA statement</a></li>
+            </ul>
+            <div class="menutitle"><a href="docs-kvstore.html">4. KEY/VALUE STORE</a></div>
+            <ul class="menu">                                
+            </ul>
+            <div class="menutitle"><a href="docs-examples.html">5. EXAMPLES</a></div>
+            <ul class="menu">
+                <li><a href="docs-examples.html#example_webforum" class="link">5.1 Web forum</a></li>                
+            </ul>
+            <div class="menutitle"><a href="docs-configuration.html">6. CONFIGURATION</a></div>
+            <ul class="menu">
+            </ul>
+        </div>
+        <div class="content">
+
+   				<h1 id="howitworks" class="pagetitle">2. How it works</h1>
+            
+
+<h2 id="overview" class="pagesubtitle">2.1 Overview</h2>
+<div class="clearfix imgholder">
+    <img class="img_left" src="imgs/single_cluster.png" alt=""/>
+    <img class="img_right" src="imgs/multiple_cluster.png" alt=""/>
+</div>
+    <p class="pagetext"></p>
+    <p class="pagetext">ActorDB is organised into clusters of 3 nodes. There can be as many clusters as you wish. Actors themselves are organised into shards. Logically a shard is a chunk of hash namespace. It is a special type of actor that holds a list of regular actors. Shards live within clusters and so do their actors.</p>
+
+    <p class="pagetext">An actor is a mini fully relational SQL database. It has a master node that processes reads and writes, it has slave nodes on other servers in the cluster that receive writes from master. Writes are replicated using a majority consensus commit. If a server is offline, one of the slaves will automatically become a master for that actor. As long as a majority of servers in a cluster are online, writes will succeed. </p>
+
+    <p class="pagetext">A single actor is not scalable, it is fast enough. The database as a whole is completely horizontally scalable, because actors are independent of each other.</p>
+
+<hr class="hr14color" />
+
+<h2 id="nodesyny" class="pagesubtitle">2.2 Node synchronisation</h2>
+<h3 id="h_221" class="pagesubtitle">2.2.1 Global state</h3>
+    <p class="pagetext">ActorDB is designed around having to do the least possible inter-server synchronisation. That means each server should be as independent as possible and global state and the changing of that global state should be minimised. </p>
+    <p class="pagetext">Global state for ActorDB:</p>
+    <div class="pagetext">
+        <ol>
+            <li>1. List of nodes (changed manually by user).</li>
+            <li>2. Database schema (changed manually by user).</li>
+            <li>3. List of shards and which node owns which shard (caused by change in list of nodes).</li>
+            <li>4. uniqid current max value (set automatically).</li>
+            <li>5. Who is master (changed when it goes offline).</li>
+        </ol>
+    </div>
+
+    <p class="pagetext"></p>
+
+    <p class="pagetext">Servers are synchronised through knowing who the master is and which shard belongs to whom.</p>
+    <p class="pagetext">Data is versioned and atomic. All changes are done through the master. A master does a majority consensus commit to save it. </p>
+
+    <p class="pagetext"></p>
+
+    <div class="pagetext">
+        Sequence of events:
+        <ol>
+            <li>1. Node starts, generates random number which does not change for the duration of its run.</li>
+            <li>2. It connects to all other nodes in cluster to find out what current state is and what their random numbers are.</li>
+            <li>3. If no state, or if can not connect to master it will check if its random number is highest of all.</li>
+            <li>4. If it is not, it waits 5s and goes back to step 2. If it has highest number, it tries to do a majority consensus commit to become master. If successful that node becomes master. </li>
+            <li>5. If there is no list of shards, master node will create them and assign them to servers.</li>
+        </ol>
+    </div>
+
+    <p class="pagetext"></p>
+
+    <p class="pagetext">
+    Shard data is then left unchanged until a new cluster is added. In that case, new nodes will start stealing shards from existing nodes. If there are too few shards they will be split in half. 
+    </p>
+
+    <p class="pagetext">
+    The act of stealing and splitting shards is initiated between the servers themselves and global state is only changed when it is done. When that happens the master is informed, it will fix the list of shards and initiate a majority consensus commit to save it.
+    </p>
+
+    <p class="pagetext">Problematic scenarios:</p>
+
+    <p class="pagetext">
+    Q: A node shuts down in the middle of a commit it has stale or wrong data when it starts again. <br/>
+    A: On startup nodes will not start until they have verified and updated their state.
+    </p>
+
+    <div class="pagetext">
+    Q: A node disconnects in the middle of a commit and later reconnects. It has committed data that was incorrect. <br/>
+    A: The master does periodic rebroadcasts of state. Eventually it will correct itself. But it had bad data for X seconds:
+    <ol>
+        <li>1. Bad data for shard locations: shards have moved someplace else and actor requests will be routed to the wrong place. That is an event that only happens as a result of user action when adding clusters. The way ActorDB is designed that generally should not cause any errors however. For every actor that has moved somewhere else, a marker is left behind where it moved to.</li>
+        <li>2. uniqid max value was wrong. That information is irrelevant to every server other than master. </li>
+        <li>3. Master has changed. Any state changes happen through master, if this reconnected server tries to change state it will connect to what it thinks is the master. If that server is not actually master, it will forward the request to what it thinks is master. That might look like a potential endless loop if there are no actual masters, but that is not the case. A master always emerges when there is a majority, if there is no majority state changes fail.</li>
+    </ol>
+     </div>
+  
+    <p class="pagetext"></p>
+    <p class="pagetext">                        
+    Our current model of handling global state is thus simple, but "should" be sufficient. We are in the process of building more thorough tests at the moment and this model is subject to change if it proves insufficient.</p>
+
+    <hr class="hr14colorsmalmargin" />
+
+    <h3 id="h_222" class="pagesubtitle">2.2.2 Actors</h3>
+
+    <p class="pagetext">All ActorDB requests are always sent to an actor. Steps from receiving request sending request to actor:</p>
+    <div class="pagetext">
+        <ol>
+            <li>1. Calculate a hash of actor name.</li>
+            <li>2. Check the hash table of shards to find which node that actor lives in.</li>
+            <li>3. Send request to what should be master node.</li>
+            <li>4. If what should be master node is actually not, request will be redirected to the actual master.</li>
+        </ol>
+    </div>
+    <p class="pagetext"></p>
+    <p class="pagetext">When a request arrives to an actor on a server which was previously inactive on it:</p>
+    <p class="pagetext">1. Open its isolated database. Read last write numbers. It marks itself an unconfirmed master, because it has a request queued up.<br/>
+2. Verify its state. Ask all other nodes in the cluster what their state is for that actor.
+</p>
+    <p class="pagetext"></p>
+    <p class="pagetext">Possible scenarios:</p>
+    <div class="pagetext">
+        <ol>
+            <li>1. One of them is confirmed master already, current node turns itself into a slave. Any queued up requests are redirected to master.</li>
+            <li>2. No nodes are confirmed or unconfirmed master, it will assume master role.</li>
+<li>3. One or more nodes are unconfirmed masters. Generally this should be a very rare event, because requests always get routed with consistent hashing to specific nodes. But since they are all unconfirmed, they are all currently trying to verify their state at the same time. Every one of them will do a sort of node names and pick the first one.</li>
+<li>4. It finds multiple confirmed masters. This should be impossible. In case it happens through code error, it will tell other nodes to close actor.Note that even if actor somehow gets in this state, write logic will prevent writes coming from the wrong direction (a master receives a write from what it thinks is a slave). The worst case scenario will be a failed write request and not a conflicted actor database.</li>
+        </ol> 
+    </div>
+    <p class="pagetext">
+</p>
+    <p class="pagetext">What if a node was offline for a while and missed some writes? <br/>It will find a node that has the correct version of the database and copy it from there. ActorDB can execute reads and writes to an actor database while copying it over to another node.
+</p>
+    <p class="pagetext"></p>
+    <p class="pagetext"></p>
+
+    <hr class="hr14colorsmalmargin" />
+<h3 id="h_223" class="pagesubtitle">2.2.3 Multi-actor transactions</h3>
+
+<p class="pagetext">Multi-actor transactions need to be ACID compliant. They are executed by a transaction manager. The manager is itself an actor. It has name and a transaction number that is incremented for every transaction.</p>
+<p class="pagetext">Sequence of events from the transaction manager point of view:</p>
+<div class="pagetext">
+    <ol>
+        <li>1. Start transaction by writing the number and state (uncommitted) to transaction table of transaction manager actor.</li>
+<li>2. Go through all actors in the transaction and execute their belonging SQL to check if it can execute, but do not commit it. If actor successfully executes SQL it will lock itself (queue all reads and writes).</li>
+<li>3. All actors returned success. Change state in transaction table for transaction to committed. </li>
+<li>4. Inform all actors that they should commit.</li>
+    </ol>
+</div>
+<p class="pagetext"></p>
+<p class="pagetext">Sequence of events from an actors point of view:</p>
+<div class="pagetext">
+    <ol>
+        <li>1. Actor receives SQL with a transaction ID, transaction number and which node transaction manager belongs to. </li>
+<li>2. Store the actual SQL statement with transaction info to a transaction table (not execute it). </li>
+<li>3. Once it is stored, the SQL will be executed but not committed. If there was no error, return success.</li>
+<li>4. Actor waits for confirm or abort from transaction manager. It will also periodically check back with the transaction manager in case the node where it was running from went down and confirmation message is lost.</li>
+<li>5. Once it has a confirmation or abort message it executes it and unlocks itself.</li>
+    </ol>
+</div>
+<p class="pagetext"></p>
+<p class="pagetext">Problem scenarios:</p>
+<div class="pagetext">
+    <ol>
+        <li>1. Node where transaction manager lives goes down before committing transaction: Actors will be checking back to see what state a transaction is in. If transaction manager actor resumes on another node and sees an uncommitted transaction, it will mark it as aborted. Actors will in turn abort the transaction as well.</li>
+<li>2. Node where transaction manager lives goes down after committing transaction to local state, but before informing actors that transaction was confirmed. Actors checking back will detect a confirmed transaction and commit it.</li>
+<li>3. Node where one or more actors live goes down after confirming that they can execute transaction. The actual SQL statements are stored in their databases. The next time actors start up, they will notice that transaction. Check back with the transaction manager and either commit or abort it.</li>
+    </ol>
+</div>
+<p class="pagetext"></p>
+<p class="pagetext">Multi-actor transactions thus have a significantly higher overhead then single actor transactions.
+</p>
+<p class="pagetext"></p>
+<hr class="hr14color" />
+
+<h2 id="dbengine" class="pagesubtitle">2.3 Database engine</h2>
+
+<p class="pagetext">ActorDB does not reinvent the storage engine. It relies on one of the most well tested and stable pieces of code in use: sqlite</p>
+
+<p class="pagetext">Now if you've had experience with sqlite you are likely thinking that is a terrible idea. Sqlite is not scalable. That is true. Sqlite is not scalable, but it is fast if configured to be. Remember that each actor in ActorDB is completely isolated. Every actor is a completely separate sqlite instance. Sqlite is not where ActorDB scalability comes from.</p>
+
+<div class="pageactions">
+    <span class="goleft"><a href="docs-about.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1. About)</span>
+    <span class="goright">(3. Query model)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="docs-querymodel.html"><span class="pagebtn">Next >></span></a></span>   
+</div>
+
+<p class="pagetext"></p>
+
+
+
+   			<p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+
+        </div>
+    </div>
+</div>
+
+        <div class="footer">
+            <div class="pagewrapper">
+                <div class="linkholder">
+                    <a href="https://www.github.com/biokoda/actordb" class="link">GitHub</a>
+                    <a href="https://github.com/biokoda/actordb/issues" class="link">Issues</a>
+                    <a href="https://github.com/biokoda/actordb/blob/master/README.md" class="link marginrightzero">Changelog</a>
+                </div>
+                <p class="text">Product by Biokoda. <br/ >
+                    Licensed under Mozilla Public License 2.0.
+                </p>
+                <a class="global-footer_logo"></a>        
+            </div>
+        </div>
+
+        <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>-->
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/vendor/jquery.easypiechart.min.js"></script>
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        
+        <script type="text/javascript">
+            var isAtLeastIE11 = !!(navigator.userAgent.match(/Trident/) && !navigator.userAgent.match(/MSIE/));
+            if (isAtLeastIE11) {
+                $("html").addClass("ieedge");
+            }
+            if (navigator.platform.indexOf("Win") != -1 && navigator.userAgent.indexOf("MSIE") != -1 || navigator.platform.indexOf("Win") != -1 && isAtLeastIE11){
+                $("html").addClass("iecomm");
+            } 
+            if (navigator.platform.indexOf("Win") !=-1 && navigator.userAgent.indexOf("Chrome") != -1) {
+                $("html").addClass("winchrome");
+            }
+        </script>
+        <script src="js/actordb-website.js"></script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-47379916-1', 'actordb.com');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>
