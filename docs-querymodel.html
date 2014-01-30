@@ -164,8 +164,7 @@ $(document).ready(function(){
             <div class="structure">
                 <pre>
 ACTOR actortype(actorid) create;
-SELECT * FROM sometable;
-                </pre>
+SELECT * FROM sometable;</pre>
             </div>
 
             <p class="pagetext">
@@ -185,8 +184,7 @@ You can update multiple types of actors in a single query.
 ACTOR actortype1(actorid1) create;
 INSERT INTO table1 VALUES (1,'some text');
 ACTOR actortype2(actorid2) create;
-INSERT INTO tableX VALUES (3,'something else');
-                </pre>
+INSERT INTO tableX VALUES (3,'something else');</pre>
             </div>
 
             <p class="pagetext">
@@ -200,8 +198,7 @@ INSERT INTO tableX VALUES (3,'something else');
             <div class="structure">
                 <pre>
 ACTOR actortype(actorid1,actorid2,actorid3) create;
-INSERT INTO sometable VALUES (1,'txt');
-                </pre>
+INSERT INTO sometable VALUES (1,'txt');</pre>
             </div>
 
             <p class="pagetext">
@@ -215,8 +212,7 @@ INSERT INTO sometable VALUES (1,'txt');
             <div class="structure">
                 <pre>
 ACTOR type1(*);
-INSERT INTO sometable VALUES (1,'txt');
-                </pre>
+INSERT INTO sometable VALUES (1,'txt');</pre>
             </div>
 
             <p class="pagetext">
@@ -236,8 +232,7 @@ INSERT INTO sometable VALUES (1,'txt');
 ACTOR type1(actor);
 {{ACTORS}}SELECT * FROM table2;
 ACTOR type1(for X.txt in ACTORS) create;
-insert into sometable values (1,'{{X.val}}');
-                </pre>
+insert into sometable values (1,'{{X.val}}');</pre>
             </div>
 
             <p class="pagetext">
@@ -267,8 +262,7 @@ insert into sometable values (1,'{{X.val}}');
             <div class="structure">
                 <pre>
 ACTOR type1(actor);
-INSERT INTO table VALUES ({{uniqid}}, 'sometext');
-                </pre>
+INSERT INTO table VALUES ({{uniqid}}, 'sometext');</pre>
             </div>
 
 
@@ -278,8 +272,7 @@ INSERT INTO table VALUES ({{uniqid}}, 'sometext');
             <div class="structure">
                 <pre>
 ACTOR type1({{uniqid.myid}}) create;
-INSERT INTO table VALUES (1,'actor created with id {{uniqid.myid}}');
-                </pre>
+INSERT INTO table VALUES (1,'actor created with id {{uniqid.myid}}');</pre>
             </div>
 
 
@@ -290,8 +283,7 @@ INSERT INTO table VALUES (1,'actor created with id {{uniqid.myid}}');
             <div class="structure">
                 <pre>
 ACTOR type1(actor1,actor2,actor3);
-INSERT INTO table VALUES (1,'my id is {{curactor}}')
-                </pre>
+INSERT INTO table VALUES (1,'my id is {{curactor}}')</pre>
             </div>
 
 
@@ -302,8 +294,7 @@ INSERT INTO table VALUES (1,'my id is {{curactor}}')
             <div class="structure">
                 <pre>
 ACTOR type1(actor1,actor2,actor3);
-{{RESULT}}SELECT * FROM tablex;
-                </pre>
+{{RESULT}}SELECT * FROM tablex;</pre>
             </div>
 
 
@@ -325,8 +316,7 @@ ACTOR thread(1);
 {{RESULT}}SELECT * FROM thread;
 ACTOR user(for X.userid in RESULT);
 {{INFO}}SELECT * FROM userinfo WHERE id=1;
-{{X.username=INFO.name}}
-                </pre>
+{{X.username=INFO.name}}</pre>
             </div>
 
 
@@ -359,8 +349,7 @@ ACTOR user(for X.userid in RESULT);
             <div class="structure">
                 <pre>
 ACTOR thread(*);
-PRAGMA list;
-                </pre>
+PRAGMA list;    </pre>
             </div>
 
 
@@ -375,8 +364,7 @@ PRAGMA list;
             <div class="structure">
                 <pre>
 ACTOR thread(thread1,thread2);
-PRAGMA delete;                
-                </pre>
+PRAGMA delete;</pre>
             </div>
 
 
@@ -391,8 +379,7 @@ PRAGMA delete;
             <div class="structure">
                 <pre>
 ACTOR thread(thread1);
-PRAGMA exists;
-                </pre>
+PRAGMA exists;</pre>
             </div>
 
 
@@ -407,8 +394,7 @@ PRAGMA exists;
             <div class="structure">
                 <pre>
 ACTOR thread(*);
-PRAGMA count;
-                </pre>
+PRAGMA count;</pre>
             </div>
 
 
@@ -423,8 +409,7 @@ PRAGMA count;
             <div class="structure">
                 <pre>
 ACTOR thread(threadCopyTo);
-PRAGMA copy=threadCopyFrom;
-                </pre>
+PRAGMA copy=threadCopyFrom;</pre>
             </div>
 
 

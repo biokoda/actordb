@@ -163,8 +163,7 @@ $(document).ready(function(){
 mykvtype: 
  type: kv
  schema: 
-  - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)
-                </pre>
+  - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)</pre>
             </div>
 
 
@@ -179,8 +178,7 @@ mykvtype:
             <div class="structure">
                 <pre>
 ACTOR mykvtype(mykey);
-insert into actors values ('mykey',{{hash(mykey)}},1);
-                </pre>
+insert into actors values ('mykey',{{hash(mykey)}},1);</pre>
             </div>
 
 
@@ -191,8 +189,7 @@ insert into actors values ('mykey',{{hash(mykey)}},1);
             <div class="structure">
                 <pre>
 ACTOR mykvtype(*);
-{{RESULT}}SELECT * FROM actors;
-                </pre>
+{{RESULT}}SELECT * FROM actors;</pre>
             </div>
 
 
@@ -212,8 +209,7 @@ ACTOR mykvtype(*);
             <div class="structure">
                 <pre>
 ACTOR mykvtype(N);
-UPDATE actors SET val = val+1 WHERE id='N';
-                </pre>
+UPDATE actors SET val = val+1 WHERE id='N';</pre>
             </div>
 
 
@@ -223,8 +219,7 @@ UPDATE actors SET val = val+1 WHERE id='N';
             <div class="structure">
                 <pre>
 ACTOR mykvtype(1,2,3,4,5,6,7,8,9,10,11,12);
-{{RESULT}}SELECT * FROM actors where id='{{curactor}}';
-                </pre>
+{{RESULT}}SELECT * FROM actors where id='{{curactor}}';</pre>
             </div>
 
 

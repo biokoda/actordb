@@ -164,8 +164,7 @@ Landing page    -> subsection1 -> article1
                                                           article2
                                                           ...
                             -> subsection2 -> ...
-                            -> ...
-                </pre>
+                            -> ...</pre>
             </div>
 
 
@@ -191,8 +190,7 @@ thread:
 - CREATE TABLE messages (id INTEGER PRIMARY KEY, txt TEXT, user INTEGER, time DATETIME);
 
 subforum:
-- CREATE TABLE threads (id INTEGER PRIMARY KEY, title TEXT, created DATETIME);
-                </pre>
+- CREATE TABLE threads (id INTEGER PRIMARY KEY, title TEXT, created DATETIME);</pre>
             </div>
 
 
@@ -209,8 +207,7 @@ INSERT INTO messages VALUES ({{uniqid.msgid}}, 'txt', _userid_, datetime('now'))
 ACTOR user(_userid_);
 INSERT INTO mymessages VALUES ({{uniqid.msgid}},{{uniqid.threadid}});
 ACTOR subforum(_subforumid_);
-INSERT INTO threads VALUES ({{uniqid.threadid}},'Thread title',datetime('now'))
-                </pre>
+INSERT INTO threads VALUES ({{uniqid.threadid}},'Thread title',datetime('now'))</pre>
             </div>
 
 
@@ -234,8 +231,7 @@ INSERT INTO threads VALUES ({{uniqid.threadid}},'Thread title',datetime('now'))
             <div class="structure">
                 <pre>
 ACTOR thread(_threadid_);
-SELECT * FROM messages LIMIT 30;
-                </pre>
+SELECT * FROM messages LIMIT 30;</pre>
             </div>
 
             
@@ -249,8 +245,7 @@ SELECT * FROM messages LIMIT 30;
 ACTOR thread(_threadid_);
 INSERT INTO messages VALUES ({{uniqid.msgid}},'I disagree because of reasons.',_userid_,datetime('now'));
 ACTOR user(_userid_)
-INSERT INTO mymessages VALUES ({{uniqid.msgid}},_threadid_);
-                </pre>
+INSERT INTO mymessages VALUES ({{uniqid.msgid}},_threadid_);</pre>
             </div>
 
 
