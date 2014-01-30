@@ -54,49 +54,100 @@
             </div>
         </div>
 
-        <div class="pagecontainer">
+        <script>
+$(document).ready(function(){
+    $(".collapsed > .title").click(function(evt){        
+        $(this).parent().toggleClass("expanded");
+        return false;
+    });
+});
+</script>
+<div class="pagecontainer">
     <div class="pagewrapper clearfix">
         <div class="leftmenu">
-            <div class="menutitle"><a href="docs-about.html">1. ABOUT</a></div>
-            <ul class="menu">
-            <!--    <li><a href="" class="link">1. About</a></li>-->
-            </ul>
-            <div class="menutitle"><a href="docs-howitworks.html">2. HOW IT WORKS</a></div>
-            <ul class="menu">
-                <li><a href="docs-howitworks.html#overview" class="link">2.1 Overview</a></li>
-                <li><a href="docs-howitworks.html#nodesyny" class="link">2.2 Node sync</a></li>
-                    <ul class="level3">
-                        <li><a href="docs-howitworks.html#h_221" class="link">2.2.1 Global state</a></li>
-                        <li><a href="docs-howitworks.html#h_222" class="link">2.2.2 Actors</a></li>
-                        <li><a href="docs-howitworks.html#h_223" class="link">2.2.3 Multi-actor transactions</a></li>
-                    </ul>
-                <li><a href="docs-howitworks.html#dbengine" class="link">2.3 Database engine</a></li>
-            </ul>
-            <div class="menutitle"><a href="docs-querymodel.html">3. QUERY MODEL</a></div>
-            <ul class="menu">
-                <li><a href="docs-querymodel.html#query_actor" class="link">3.1 ACTOR statement</a></li>
-                    <ul class="level3">
-                        <li><a href="docs-querymodel.html#h_311" class="link">3.1.1 Single actor</a></li>
-                        <li><a href="docs-querymodel.html#h_312" class="link">3.1.2 Multiple actors</a></li>
-                        <li><a href="docs-querymodel.html#h_313" class="link">3.1.3 All actors of a type</a></li>
-                        <li><a href="docs-querymodel.html#h_314" class="link">3.1.4 Loop over actors</a></li>
-                    </ul>
-                <li><a href="docs-querymodel.html#query_variables" class="link">3.2 Variables</a></li>
-                    <ul class="level3">
-                        <li><a class="link">3.2.1 Appending columns to result</a></li>                        
-                    </ul>
-                <li><a href="docs-querymodel.html#query_pragma" class="link">3.3 PRAGMA statement</a></li>
-            </ul>
-            <div class="menutitle"><a href="docs-kvstore.html">4. KEY/VALUE STORE</a></div>
-            <ul class="menu">                                
-            </ul>
-            <div class="menutitle"><a href="docs-examples.html">5. EXAMPLES</a></div>
-            <ul class="menu">
-                <li><a href="docs-examples.html#example_webforum" class="link">5.1 Web forum</a></li>                
-            </ul>
-            <div class="menutitle"><a href="docs-configuration.html">6. CONFIGURATION</a></div>
-            <ul class="menu">
-            </ul>
+
+            <div class="l1">
+                <a href="docs-about.html" class="title">
+                    <span class="text">1. ABOUT</span>
+                </a>
+            </div>
+            <div class="l1 collapsed ">
+                <a href="docs-howitworks.html" class="title">
+                    <span class="bullet"></span>
+                    <span class="text">2. HOW IT WORKS</span>
+                </a>
+                <div class="l2">
+                    <a href="docs-howitworks.html#overview" class="title">
+                        <span class="text">2.1 Overview</span>
+                    </a>
+                    <div class="l3 collapsed expanded">
+                        <a href="docs-howitworks.html#nodesyny" class="title">
+                            <span class="bullet"></span>
+                            <span class="text">2.2 Node synchronisation</span>
+                        </a>
+                        <a href="docs-howitworks.html#h_221" class="text last">2.2.1 Global state</a>
+                        <a href="docs-howitworks.html#h_222" class="text last">2.2.2 Actors</a>
+                        <a href="docs-howitworks.html#h_223" class="text last">2.2.3 Multi-actor transactions</a>
+                    </div>
+                    <a href="docs-howitworks.html#dbengine" class="title">
+                        <span class="text">2.3 Database engine</span>
+                    </a>
+                </div>
+            </div>
+            <div class="l1 collapsed expanded">
+                <a href="docs-querymodel.html" class="title">
+                    <span class="bullet"></span>
+                    <span class="text">3. QUERY MODEL</span>
+                </a>
+                <div class="l2">
+                    <div class="l3 collapsed expanded">
+                        <a href="docs-querymodel.html#query_actor" class="title">
+                            <span class="bullet"></span>
+                            <span class="text">3.1 ACTOR statement</span>
+                        </a>
+                        <a href="docs-querymodel.html#h_311" class="last">3.1.1 Single actor</a>
+                        <a href="docs-querymodel.html#h_312" class="last">3.1.2 Multiple actors</a>
+                        <a href="docs-querymodel.html#h_313" class="last">3.1.3 All actors of a type</a>
+                    </div>
+                </div>
+                <div class="l2">
+                    <div class="l3 collapsed expanded">
+                        <a href="docs-querymodel.html#query_variables" class="title">
+                            <span class="bullet"></span>
+                            <span class="text">3.2 Variables</span>
+                        </a>
+                        <a href="" class="last">3.2.1 Appending columns to result</a>
+                        <a href="http://www.actordb.com/docs-querymodel.html#query_pragma" class="last">3.3 Pragma statement</a>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="l1">
+                <a href="docs-kvstore.html" class="title">
+                    <span class="text">4. KEY/VALUE STORE</span>
+                </a>
+            </div>
+           
+            <div class="l1 collapsed ">
+                <a href="docs-examples.html" class="title">
+                    <span class="bullet"></span>
+                    <span>5. EXAMPLES</span>
+                </a>
+                <a href="docs-examples.html" class="last">
+                    <span>Introduction</span>
+                </a>
+                <a href="docs-examples.html#example_webforum" class="last">
+                    <span>5.1 Web forum</span>
+                </a>
+            </div>
+
+            <div class="l1">
+                <a href="docs-configuration.html" class="title">
+                    <span class="text">6. CONFIGURATION</span>
+                </a>
+            </div>
+
         </div>
         <div class="content">
 

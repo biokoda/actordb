@@ -54,7 +54,7 @@ table { height: 100%; width: 100%; margin: 0px; padding: 0px; border-spacing: 0p
 
 td, th { border: none; }
 
-pre { font-size: 14px; font-family: 'gothamlight'; -webkit-border-radius: 0px; -moz-border-radius: 0px; -ms-border-radius: 0px; -o-border-radius: 0px; border-radius: 0px; border: none; border-top: solid 1px #dcdcdc; background: #ebebeb; color: Red; padding: 10px 32px; }
+pre { font-size: 14px; font-family: 'gothamlight'; -webkit-border-radius: 0px; -moz-border-radius: 0px; -ms-border-radius: 0px; -o-border-radius: 0px; border-radius: 0px; border: none; border: solid 1px #cccccc; background: #f6f6f6; color: #141414; padding: 10px 32px; }
 
 .clearfix:before, .clearfix:after { display: table; content: " "; }
 
@@ -186,17 +186,37 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .pagecontainer .pagewrapper { background: url(../imgs/pagecontainer_1280_bg.png) repeat-y -160px top; width: 1265px; box-sizing: border-box; padding: 66px 0 0 0; height: 100%; }
 
-.pagecontainer .pagewrapper .leftmenu { font-family: 'gothambook'; padding: 95px 0 0 0; float: left; width: 200px; height: 300px; }
+.pagecontainer .pagewrapper .leftmenu { color: #141414; font-family: 'gothambook'; font-size: 16px; padding: 95px 0 0 0; float: left; width: 200px; min-height: 300px; }
 
-.pagecontainer .pagewrapper .leftmenu .menutitle > a { margin: 0 0 5px 0; display: block; color: #141414; border-bottom: solid 1px #dcdcdc; font-family: 'gothambook'; font-size: 16px; }
+.pagecontainer .pagewrapper .leftmenu .l1 { margin: 0 0 15px 0; }
 
-.pagecontainer .pagewrapper .leftmenu .menu { padding: 1px 0 30px 15px; }
+.pagecontainer .pagewrapper .leftmenu .title:hover, .pagecontainer .pagewrapper .leftmenu .last:hover { background: #dc1414; color: white; }
 
-.pagecontainer .pagewrapper .leftmenu .menu > a { font-size: 16px; }
+.pagecontainer .pagewrapper .leftmenu .title, .pagecontainer .pagewrapper .leftmenu .last { display: block; position: relative; padding: 5px 0 5px 15px; cursor: pointer; width: auto; }
 
-.pagecontainer .pagewrapper .leftmenu .menu .link { font-size: 16px; text-align: left; cursor: pointer; display: block; color: #141414; font-family: 'gothambook'; width: 100%; min-height: 28px; vertical-align: middle; line-height: 29px; }
+.pagecontainer .pagewrapper .leftmenu a { color: #141414; }
 
-.pagecontainer .pagewrapper .leftmenu .menu .link:hover { background: #dc1414; color: white; }
+.pagecontainer .pagewrapper .leftmenu .title:hover .bullet, .pagecontainer .pagewrapper .leftmenu .collapsed .title:hover .bullet { left: 1px; top: 11px; position: absolute; width: 5px; height: 8px; background: url("../imgs/leftmenu_bullet_collapsed_hover.png"); }
+
+.pagecontainer .pagewrapper .leftmenu .l1 .l2 { display: none; margin: 0 0 0 10px; }
+
+.pagecontainer .pagewrapper .leftmenu .l1.expanded .l2 { display: block; }
+
+.pagecontainer .pagewrapper .leftmenu .title .text { line-height: 20px; }
+
+.pagecontainer .pagewrapper .leftmenu .l1 .last { display: none; margin: 0 0 0 10px; }
+
+.pagecontainer .pagewrapper .leftmenu .collapsed.expanded .bullet, .pagecontainer .pagewrapper .leftmenu .expanded .bullet { left: 1px; top: 11px; position: absolute; display: block; width: 8px; height: 8px; background: url("../imgs/leftmenu_bullet_expanded.png"); }
+
+.pagecontainer .pagewrapper .leftmenu .collapsed .bullet, .pagecontainer .pagewrapper .leftmenu .expanded .collapsed .bullet { display: block; left: 1px; top: 10px; position: absolute; width: 7px; height: 10px; background: url("../imgs/leftmenu_bullet_collapsed.png"); }
+
+.pagecontainer .pagewrapper .leftmenu .expanded .expanded .bullet { left: 1px; top: 11px; position: absolute; display: block; width: 8px; height: 8px; background: url("../imgs/leftmenu_bullet_expanded.png"); }
+
+.pagecontainer .pagewrapper .leftmenu .l1 .l3.expanded .last { display: block; }
+
+.pagecontainer .pagewrapper .leftmenu .expanded .collapsed .last { display: none; }
+
+.pagecontainer .pagewrapper .leftmenu .expanded .last { display: block; }
 
 .pagecontainer .pagewrapper .content { font-family: 'gothamextra_light'; float: left; width: 859px; padding: 30px 30px 100px 30px; border-left: solid 1px #dcdcdc; border-right: solid 1px #dcdcdc; height: 100%; }
 
@@ -220,9 +240,9 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .pagecontainer .pagewrapper hr { width: 100%; height: 1px; background: #dcdcdc; margin: 37px 0; }
 
-.pagecontainer .pagewrapper .structuretitleholder { margin: 65px 0 11px 0; position: relative; height: 28px; vertical-align: middle; border-top: solid 1px #dcdcdc; border-bottom: solid 1px #dcdcdc; background: #ebebeb; }
+.pagecontainer .pagewrapper .structuretitleholder { margin: 65px 0 11px 0; position: relative; height: 28px; vertical-align: middle; border: solid 1px #cccccc; background: #f6f6f6; }
 
-.pagecontainer .pagewrapper .structuretitleholder .path { position: absolute; left: 30px; top: 4px; color: Red; }
+.pagecontainer .pagewrapper .structuretitleholder .path { position: absolute; left: 30px; top: 4px; color: #141414; font-family: 'gothamlight'; }
 
 .pagecontainer .pagewrapper .structuretitleholder .title { text-align: center; display: block; margin: 4px auto 0 auto; font-family: 'gothamlight'; color: #141414; }
 
@@ -248,6 +268,20 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .pageactions .goright .pagebtn { font-family: 'gothambook'; cursor: pointer; color: #cd2026; font-size: 14px; }
 
+.tabscontentholder { position: relative; z-index: 1; padding: 15px 20px; font-family: 'gothambook'; font-size: 14px; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; border-radius: 2px; border: solid 1px #bdc4c9; border-top-left-radius: 0px; }
+
+.tabsholder li { cursor: pointer; position: relative; margin-left: -1px; float: left; color: #dc1414; border: solid 1px #dc1414; border-bottom: none !Important; width: 94px; height: 35px; vertical-align: middle; line-height: 35px; text-align: center; font-size: 18px; font-family: 'gothambook'; }
+
+.tabsholder li:first-child { border-top-left-radius: 4px; margin-left: 0px; }
+
+.tabsholder li:last-child { border-top-right-radius: 4px; }
+
+.tabsholder li.sel { cursor: default; color: #141414; border: solid 1px #bdc4c9; z-index: 2; }
+
+.tabsholder li.sel:before { content: ''; height: 1px; background: white; width: 96px; position: absolute; bottom: -1px; left: -1px; }
+
+.tabsholder li:first-child.sel:before { width: 95px; left: 0px; }
+
 /* downloads page  */
 .downloads h1.downloadstitle { font-size: 30px; font-family: 'gothambook'; color: #141414; }
 
@@ -255,7 +289,7 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .downloads .downloadstitle { font-size: 18px; font-family: 'gothambook'; color: #141414; }
 
-.downloads .downloadstitle .smallertext, .downloads .exposedtext { font-family: 'gothambook'; color: #141414; font-size: 14px; }
+.downloads .downloadstitle .smallertext, .downloads .exposedtext { font-family: 'gothambook'; color: #141414; font-size: 14px; display: inline-block; line-height: 18px; }
 
 .downloads .downloadlinks { text-align: center; margin: 56px 0 50px 0; }
 
@@ -281,15 +315,17 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .downloads .dwntable .col1 { float: left; display: inline-block; width: 278px; padding: 0 10px 0 0; }
 
-.downloads .dwntable .col2 { float: left; display: inline-block; width: 134px; padding: 0 10px 0 0; }
+.downloads .dwntable .col2 { float: right; display: inline-block; width: 134px; padding: 0 10px 0 0; }
 
-.downloads .dwntable .col3 { float: left; display: inline-block; width: 170px; padding: 0 10px 0 0; }
+.downloads .dwntable .col3 { float: right; display: inline-block; width: 170px; padding: 0 10px 0 0; }
 
-.downloads .dwntable .col4 { float: left; display: inline-block; width: 200px; padding: 0 10px 0 0; }
+.downloads .dwntable .col4 { float: right; display: inline-block; width: 200px; padding: 0 10px 0 0; }
 
 .downloads .otherlinks { margin: 110px 0 200px 0; }
 
 .downloads .otherlinks a { display: block; margin: 5px 0; font-size: 18px; font-family: 'gothambook'; color: #141414; }
+
+.dwntable.dwntable320 { display: none; }
 
 /* widths */
 .width160 { width: 160px; }
@@ -329,11 +365,13 @@ a.redlink { color: #dc1414; font-weight: bold; }
   .pagecontainer .pagewrapper .content { float: none; width: auto; padding: 30px 30px 100px 30px; height: auto; }
   .pagecontainer .pagewrapper hr { width: 290px; margin: 37px auto; }
   .pagecontainer .pagewrapper .structuretitleholder .title { text-align: right; padding: 0 30px 0 0; }
-  .downloads .pagecontainer .pagewrapper .content { width: auto; background: none; }
+  .downloads .pagecontainer .pagewrapper .content { width: auto; background: none; font-family: 'gothambook'; }
   .downloads .pagecontainer .pagewrapper, .downloads .pagecontainer { background: none; }
   .downloads .dwntable .col1 { width: 200px; }
   .downloads .dwntable .head { padding-left: 210px !Important; }
   .downloads .dwntable .col4, .downloads .dwntable .col3, .downloads .dwntable .col2 { width: 100px; } }
+@media screen and (min-width: 1px) and (max-width: 335px) { .tabscontentholder { border-top-right-radius: 0px; }
+  .tabsholder li.sel:last-child:before { width: 95px; } }
 @media screen and (min-width: 1px) and (max-width: 639px) { .global320-sprite, #view320logo .global320-header_logo_text, #view320logo .global320-main_logo { background: url('../imgs/sprite-global320.png') no-repeat; }
   #view320logo .global320-header_logo_text { background-position: 0 0; height: 28px; width: 123px; }
   #view320logo .global320-main_logo { background-position: 0 -28px; height: 65px; width: 217px; }
@@ -357,7 +395,7 @@ a.redlink { color: #dc1414; font-weight: bold; }
   .header .navigation li { padding: 0 22px 0 10px; }
   /* get started page */
   .pagecontainer .pagewrapper hr { width: 100%; }
-  .pagecontainer .pagewrapper .content { padding: 10 16px 100px 16px; }
+  .pagecontainer .pagewrapper .content { padding: 10px 16px 100px 16px; }
   .pagecontainer .pagewrapper .structuretitleholder .path { font-size: 10px; }
   .pagecontainer .pagewrapper .structuretitleholder .title { font-size: 10px; }
   pre { font-size: 10px; }
@@ -365,7 +403,19 @@ a.redlink { color: #dc1414; font-weight: bold; }
   .pageactions .goleft { text-align: center; width: 100%; float: none; display: inline-block; }
   .pageactions .goright { text-align: center; width: 100%; float: none; display: inline-block; }
   .pageactions .goleft .pagebtn { float: none; }
-  .pageactions .goright .pagebtn { float: none; } }
+  .pageactions .goright .pagebtn { float: none; }
+  .downloads .downloadlinks .dwnbtn { margin: 0px; }
+  .dwntable { display: none; }
+  .dwntable.dwntable320 { display: block; }
+  .downloadstitle { text-align: center; }
+  .downloads .dwntable .head { padding: 0px; width: auto; padding-left: 0px !Important; }
+  .downloads .dwntable .osholder { width: 100px; float: left; text-align: left; padding: 0 0 30px 0; }
+  .downloads .downloadstitle .smallertext, .downloads .exposedtext { font-size: 14px!Important; }
+  .downloads .dwntable li.border { border-bottom: none; border-top: solid 1px #dcdcdc; padding: 10px 0 0 0; }
+  .downloads .pagecontainer .pagewrapper .content { padding: 50px 10px 0 10px; }
+  .downloads .downloadlinks .dwnbtn, .downloads .downloadlinks .dwnbtn:last-child { display: block; margin: 0 auto 14px auto; }
+  .downloads h1.downloadstitle, .downloads .downloadstitle { text-align: left; line-height: 30px; }
+  .downloads .otherlinks { margin: 10px 0 30px 0; } }
 .block { display: block !Important; }
 
 ol { padding-left: 15px; }
