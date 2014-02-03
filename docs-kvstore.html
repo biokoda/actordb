@@ -160,14 +160,14 @@ $(document).ready(function(){
 
             <div class="structure">
                 <pre>
-mykvtype: 
+counters: 
  type: kv
  schema: 
   - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)</pre>
             </div>
 
 
-            <p class="pagetext">mykvtype is the key/value namespace. You can have multiple namespaces with different table schemas.</p>
+            <p class="pagetext">counters is the key/value namespace. You can have multiple namespaces with different table schemas.</p>
             <p class="pagetext">kv specifies this type as a sharded key/value table.</p>
             <p class="pagetext">Table must be named "actors" and it must have id and hash columns. id is key, hash is hash of id, everything after that is up to you.
 </p>
