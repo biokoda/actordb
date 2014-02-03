@@ -435,3 +435,15 @@ ol li { padding-bottom: 3px; }
 .featurelist .feat .text {
 	font-family: 'verdana';
 }
+
+.skewed_pttrn_red .maintext {
+	font-family: 'verdana';
+}
+
+.skewed_pttrn_red .maintitle {
+	font-family: 'verdana';
+}
+
+.featurelist .feat .title {
+	font-family: 'verdana';
+}
