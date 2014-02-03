@@ -423,3 +423,15 @@ ol { padding-left: 15px; }
 ol li { padding-bottom: 3px; }
 
 .browsepublicfolder .link:hover { border-bottom: solid 1px transparent; }
+
+/* temp overrides */
+.header .navigation .sel a {
+	font-size: 15px;
+}
+
+.header .navigation a {
+	font-size: 15px;
+}
+.featurelist .feat .text {
+	font-family: 'verdana';
+}
