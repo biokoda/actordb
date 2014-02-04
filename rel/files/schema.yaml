@@ -13,3 +13,4 @@ counters:
  type: kv
  schema: 
   - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)
+

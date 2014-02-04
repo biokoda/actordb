@@ -1,7 +1,7 @@
 #!/usr/bin/env escript
 % -mode(compile).
 
-main([]) ->
+main([_]) ->
   io:format("Supported commands: init, updateschema, updatenodes~n");
 main(Args) ->
 	[] = os:cmd(epmd_path() ++ " -daemon"),
