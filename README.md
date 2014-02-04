@@ -39,9 +39,11 @@ Sacrifices
 
 How to configure and run: https://github.com/biokoda/actordb/blob/master/CONFIGURE.md
 
-deb package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5-1_amd64.deb
+deb package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5.1-1_amd64.deb
 
-osx package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5-OSX-x86_64.tar.gz
+osx package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-OSX-x86_64.tar.gz
+
+red hat/centos package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-1.el6.x86_64.rpm
 
 More packages to come...	
 
