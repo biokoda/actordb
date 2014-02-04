@@ -17,7 +17,6 @@ ActorDB is:
 *   Redundant.
 *   Massively concurrent.
 *   No single point of failure.
-*   Based on sqlite (every actor is an sqlite database).
 *   ACID.
 *   Runs over MySQL protocol.
 
@@ -26,7 +25,6 @@ Advantages
 *   Complete horizontal scalability. All nodes are equivalent and you can have as many nodes as you need.
 *   Full featured ACID database.
 *   Suitable for very large datasets over many actors and servers.
-*   Does not reinvent the storage engine and it does not avoid the issue by being RAM only. Sqlite is one of the most well tested, stable and reliable pieces of software in use. Not only that, you can query the actual database files directly with your language of choice. There is an sqlite interface implemented for practically every language.
 *   No special drivers needed. Use the mysql driver of your language of choice. 
 *   Easy to configure and administer. 
 *   No global locks. Only the actors (one or many) involved in a transaction are locked during a write. All other actors are unaffected.
@@ -34,14 +32,17 @@ Advantages
 Sacrifices
 
 *   Decoupled data. You can't run arbitrary queries over your data. But you can still have a full relational database within actors. So you need to organize and split your data model into actors. Read the query model and examples sections to understand how.
-*   Single actor performance is limited to the speed of an sqlite instance (which is still quite fast). If you require a lot of data (many GB) within a single actor, ActorDB may not be the best tool for the job. You can however create copies of actors and implement archiving of old data. If an actor grows to some size, you can: 
+*   If you require a lot of data (> 10 GB) within a single actor, ActorDB may not be the best tool for the job. You can however create copies of actors and implement archiving of old data. If an actor grows to some size, you can: 
 	1. Create a copy of an actor
 	2. Delete old data from original actor
 	3. Keep copy as an archive 
 
 How to configure and run: https://github.com/biokoda/actordb/blob/master/CONFIGURE.md
+
 deb package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5-1_amd64.deb
+
 osx package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5-OSX-x86_64.tar.gz
+
 More packages to come...	
 
 ### 1. Query model
@@ -209,7 +210,7 @@ Expanding should be done by adding a replication cluster, not adding a single no
 
 ### 3. Performance characteristics
 
-ActorDB can work across multiple hard drives in a single node. It can work across as many nodes as you need. Single actor performance is limited to the speed of an sqlite instance (which should be quite fast) and your configured replication level. 
+ActorDB can work across multiple hard drives in a single node. It can work across as many nodes as you need. 
 
 ActorDB is not concurrent within a transaction. Writes to a single actor are fast and independent of other actors. Writes to multiple actors at the same time are O(2+2N). Use them only when you require them for consistency reasons. For optimal performance, structure your database to minimize multi-actor updates. 
 
@@ -221,26 +222,26 @@ ActorDB can also act as a key/value store by maintaining a sharded table across 
 
 In schema.yaml file you can define a table like this:
 
-    mykvtype: 
+    counters: 
      type: kv
      schema: 
       - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)
 
-- mykvtype is the key/value namespace. You can have multiple namespaces with different table schemas.
+- counters is the key/value namespace. You can have multiple namespaces with different table schemas.
 - kv specifies this type as a sharded key/value table.
 - Table must be named "actors" and it must have id and hash columns. id is key, hash is hash of id, everything after that is up to you.
 - Note: Only a single table is supported at the moment.
 
 Inserting a value:
 
-    ACTOR mykvtype(mykey);
+    ACTOR counters(mykey);
     insert into actors values ('mykey',{{hash(mykey)}},1);
 
 Very similar to how actors are queried. First line sets namespace and id. Second line is what gets executed on shard. First two columns must be written like above. If string for key (mykey) is not written the same in all three places, the KV store will not work correctly.
 
 You can return an entire KV namespace with a simple query:
 
-    ACTOR mykvtype(*);
+    ACTOR counters(*);
     {{RESULT}}SELECT * FROM actors;
     
 
@@ -254,12 +255,12 @@ Pick key for increment: N = RandomNumber % 12.
 
 **Increment**
 
-    ACTOR mykvtype(N);
+    ACTOR counters(N);
     UPDATE actors SET val = val+1 WHERE id='N';
 
 **Read counters**
     
-    ACTOR mykvtype(1,2,3,4,5,6,7,8,9,10,11,12);
+    ACTOR counters(1,2,3,4,5,6,7,8,9,10,11,12);
     {{RESULT}}SELECT * FROM actors where id='{{curactor}}';
 
 This will return row for every key. You have sum them manually however.
@@ -333,7 +334,6 @@ and cause all sql statements to be sent to that actor until next ACTOR command.
 ### 6. Planned features
 
 * Incremental backups.
-* Key/Value additional tables. Right now KV store only has a single sharded table. Add additional tables for a hierarchical data structure (which still is tied to a key).
 * Downscaling.
 * Streaming large responses to client.
 * SSL communication
