@@ -1,16 +1,3 @@
-/* fonts */
-@font-face { font-family: 'gothambook'; src: url("../webfonts/gotham-book-webfont.eot"); src: url("../webfonts/gotham-book-webfont.eot?#iefix") format("embedded-opentype"), url("../webfonts/gotham-book-webfont.woff") format("woff"), url("../webfonts/gotham-book-webfont.ttf") format("truetype"), url("../webfonts/gotham-book-webfont.svg#gothambook") format("svg"); font-weight: normal; font-style: normal; }
-
-@font-face { font-family: 'gothamlight'; src: url("../webfonts/gotham-light-webfont.eot"); src: url("../webfonts/gotham-light-webfont.eot?#iefix") format("embedded-opentype"), url("../webfonts/gotham-light-webfont.woff") format("woff"), url("../webfonts/gotham-light-webfont.ttf") format("truetype"), url("../webfonts/gotham-light-webfont.svg#gothamlight") format("svg"); font-weight: normal; font-style: normal; }
-
-@font-face { font-family: 'gothamthin'; src: url("../webfonts/gotham-thin-webfont.eot"); src: url("../webfonts/gotham-thin-webfont.eot?#iefix") format("embedded-opentype"), url("../webfonts/gotham-thin-webfont.woff") format("woff"), url("../webfonts/gotham-thin-webfont.ttf") format("truetype"), url("../webfonts/gotham-thin-webfont.svg#gothamthin") format("svg"); font-weight: normal; font-style: normal; }
-
-@font-face { font-family: 'gothamextra_light'; src: url("../webfonts/gotham-xlight-webfont.eot"); src: url("../webfonts/gotham-xlight-webfont.eot?#iefix") format("embedded-opentype"), url("../webfonts/gotham-xlight-webfont.woff") format("woff"), url("../webfonts/gotham-xlight-webfont.ttf") format("truetype"), url("../webfonts/gotham-xlight-webfont.svg#gothamextra_light") format("svg"); font-weight: normal; font-style: normal; }
-
-@font-face { font-family: 'gothambook_italic'; src: url("../webfonts/gotham-bookita.eot"); src: url("../webfonts/gotham-bookita.eot?#iefix") format("embedded-opentype"), url("../webfonts/gotham-bookita.woff") format("woff"), url("../webfonts/gotham-bookita.ttf") format("truetype"), url("../webfonts/gotham-bookita.svg#gothambook_italic") format("svg"); font-weight: normal; font-style: normal; }
-
-@font-face { font-family: 'gothammedium'; src: url("../webfonts/gotham-medium.eot"); src: url("../webfonts/gotham-medium.eot?#iefix") format("embedded-opentype"), url("../webfonts/gotham-medium.woff") format("woff"), url("../webfonts/gotham-medium.ttf") format("truetype"), url("../webfonts/gotham-medium.svg#gothammedium") format("svg"); font-weight: normal; font-style: normal; }
-
 /* variables */
 /* mixins */
 /* GLOBAL CSS */
@@ -26,7 +13,7 @@ ul.bulletlist li:before { position: absolute; content: ''; width: 6px; height: 6
 
 html { height: 100%; }
 
-body { height: 100%; margin: 0px; font-weight: normal; font-family: 'gothamthin', sans-serif; position: relative; font-size: 14px; color: #141414; }
+body { height: 100%; margin: 0px; font-weight: 400; font-family: 'Lato', sans-serif !Important; position: relative; font-size: 14px; color: #141414; }
 body .global-actor_model_icon { background-position: -150px 0; height: 115px; width: 122px; }
 body .global-customize_icon { background-position: -134px -255px; height: 95px; width: 108px; }
 body .global-download_desktop_btn { background-position: 0 0; height: 60px; width: 150px; }
@@ -54,7 +41,7 @@ table { height: 100%; width: 100%; margin: 0px; padding: 0px; border-spacing: 0p
 
 td, th { border: none; }
 
-pre { font-size: 14px; font-family: 'gothamlight'; -webkit-border-radius: 0px; -moz-border-radius: 0px; -ms-border-radius: 0px; -o-border-radius: 0px; border-radius: 0px; border: none; border: solid 1px #cccccc; background: #f6f6f6; color: #141414; padding: 10px 32px; }
+pre { font-size: 14px; font-family: 'Lato', sans-serif; -webkit-border-radius: 0px; -moz-border-radius: 0px; -ms-border-radius: 0px; -o-border-radius: 0px; border-radius: 0px; border: none; border: solid 1px #cccccc; background: #f6f6f6; color: #141414; padding: 10px 32px; }
 
 .clearfix:before, .clearfix:after { display: table; content: " "; }
 
@@ -88,7 +75,7 @@ pre { font-size: 14px; font-family: 'gothamlight'; -webkit-border-radius: 0px; -
 
 .redgradborbtn:after { height: 33px; width: 1px; position: absolute; top: 0px; right: 0px; content: ''; background: url(../imgs/redgradborbtn_sideborder.png); }
 
-.elightwhite { color: white; font-family: 'gothamextra_light'; }
+.elightwhite { color: white; font-family: 'Lato', sans-serif; font-weight: 300; }
 
 a.redlink { color: #dc1414; font-weight: bold; }
 
@@ -111,7 +98,7 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .header .navigation a { color: white; font-size: 12px; }
 
-.header .navigation .sel a { font-family: 'gothambook'; }
+.header .navigation .sel a { font-weight: 700; }
 
 .header .menu { display: none; border-top: solid 3px white; height: 17px; border-bottom: solid 3px white; float: right; margin: 23px 20px 0 0; cursor: pointer; width: 30px; position: relative; }
 
@@ -122,24 +109,24 @@ a.redlink { color: #dc1414; font-weight: bold; }
 /* -logo & download*/
 .skewed_pttrn { text-align: center; background: url(../imgs/skewed_pattern_bg.png); }
 
-.skewed_pttrn .maintitle { padding: 102px 0 40px 0; text-align: center; font-size: 48px; font-family: 'gothamthin'; }
+.skewed_pttrn .maintitle { padding: 102px 0 40px 0; text-align: center; font-size: 48px; font-weight: 300; }
 
-.skewed_pttrn .maintext { max-width: 780px; text-align: center; font-size: 18px; margin: 0 auto 70px auto; font-family: 'gothamthin'; }
+.skewed_pttrn .maintext { max-width: 780px; text-align: center; font-size: 18px; margin: 0 auto 70px auto; font-weight: 400; }
 
 .skewed_pttrn .circlemiddle { min-height: 605px; text-align: center; min-height: 605px; background: url(../imgs/skewed_pattern_w_circle_bg.png) center top no-repeat; }
 
 .skewed_pttrn .global-main_logo { display: inline-block; margin: 122px 0 75px 0; }
 
-.skewed_pttrn .sitedescription { max-width: 450px; margin: 0 auto 40px auto; font-size: 20px; font-family: 'gothamextra_light'; line-height: 24px; }
+.skewed_pttrn .sitedescription { max-width: 450px; margin: 0 auto 40px auto; font-size: 20px; line-height: 24px; }
 
 .skewed_pttrn .productlinks { text-align: center; margin: 38px 0 0 0; }
 
-.skewed_pttrn .productlinks .link { color: #141414; margin: 0 25px 0 0; font-family: 'gothambook'; }
+.skewed_pttrn .productlinks .link { color: #141414; margin: 0 25px 0 0; }
 
 /* -features */
-.skewed_pttrn_red { padding: 0 0 110px 0; font-family: 'gothamthin'; color: white; background: url(../imgs/skewed_pattern_red_bg.png); }
+.skewed_pttrn_red { padding: 0 0 110px 0; color: white; background: url(../imgs/skewed_pattern_red_bg.png); }
 
-.skewed_pttrn_red .maintitle { padding: 92px 0 40px 0; text-align: center; font-size: 48px; }
+.skewed_pttrn_red .maintitle { padding: 92px 0 40px 0; text-align: center; font-size: 48px; font-weight: 300; }
 
 .skewed_pttrn_red .maintext { text-align: center; font-size: 18px; margin: 0 auto 85px auto; max-width: 780px; }
 
@@ -157,16 +144,16 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .featurelist .feat .iconholder .global-extendable_icon { display: inline-block; position: relative; left: 21px; }
 
-.featurelist .feat .title { margin: 0 0 24px 0; text-align: center; font-size: 30px; }
+.featurelist .feat .title { margin: 0 0 24px 0; text-align: center; font-size: 30px; font-weight: 300; }
 
 .featurelist .feat .text { text-align: center; width: 70%; margin: 0 auto; }
 
 /* -opensource info */
-.skewed_pttrn .columnlist .feat { position: relative; margin: 0 0 130px 0; width: 50%; float: left; font-family: 'gothamthin'; }
+.skewed_pttrn .columnlist .feat { position: relative; margin: 0 0 130px 0; width: 50%; float: left; }
 
 .skewed_pttrn .columnlist .feat.bordermiddle:before { content: ''; width: 1px; height: 140%; background: #969696; position: absolute; right: -1px; top: -10px; }
 
-.skewed_pttrn .columnlist .feat .title { font-size: 30px; margin: 0 0 25px 0; }
+.skewed_pttrn .columnlist .feat .title { font-size: 30px; margin: 0 0 25px 0; font-weight: 300; }
 
 .skewed_pttrn .columnlist .feat .text { width: 70%; margin: 0 auto; }
 
@@ -186,9 +173,9 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .pagecontainer .pagewrapper { background: url(../imgs/pagecontainer_1280_bg.png) repeat-y -160px top; width: 1265px; box-sizing: border-box; padding: 66px 0 0 0; height: 100%; }
 
-.pagecontainer .pagewrapper .leftmenu { color: #141414; font-family: 'gothambook'; font-size: 16px; padding: 95px 0 0 0; float: left; width: 200px; min-height: 300px; }
+.pagecontainer .pagewrapper .leftmenu { color: #141414; font-size: 16px; padding: 95px 0 0 0; float: left; width: 200px; min-height: 300px; }
 
-.pagecontainer .pagewrapper .leftmenu .l1 { margin: 0 0 15px 0; }
+.pagecontainer .pagewrapper .leftmenu .l1 { margin: 0 0 15px 0; font-weight: 700; }
 
 .pagecontainer .pagewrapper .leftmenu .title:hover, .pagecontainer .pagewrapper .leftmenu .last:hover { background: #dc1414; color: white; }
 
@@ -214,23 +201,25 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .pagecontainer .pagewrapper .leftmenu .l1 .l3.expanded .last { display: block; }
 
+.pagecontainer .pagewrapper .leftmenu .l1 .l3 .last { font-weight: 400; }
+
 .pagecontainer .pagewrapper .leftmenu .expanded .collapsed .last { display: none; }
 
 .pagecontainer .pagewrapper .leftmenu .expanded .last { display: block; }
 
-.pagecontainer .pagewrapper .content { font-family: 'gothamextra_light'; float: left; width: 859px; padding: 30px 30px 100px 30px; border-left: solid 1px #dcdcdc; border-right: solid 1px #dcdcdc; height: 100%; }
+.pagecontainer .pagewrapper .content { float: left; width: 859px; padding: 30px 30px 100px 30px; border-left: solid 1px #dcdcdc; border-right: solid 1px #dcdcdc; height: 100%; }
 
-.pagecontainer .pagewrapper .content .pagetitle { font-size: 30px; padding: 25px 0 0 0; font-family: 'gothambook'; }
+.pagecontainer .pagewrapper .content .pagetitle { font-size: 30px; padding: 25px 0 0 0; font-weight: 700; }
 
-.pagecontainer .pagewrapper .content .pagesubtitle { font-size: 18px; font-family: 'gothambook'; }
+.pagecontainer .pagewrapper .content .pagesubtitle { font-size: 18px; font-weight: 700; }
 
-.pagecontainer .pagewrapper .content h3.pagesubtitle { font-size: 14px; font-family: 'gothambook'; }
+.pagecontainer .pagewrapper .content h3.pagesubtitle { font-size: 14px; font-weight: 700; }
 
-.pagecontainer .pagewrapper .content .pagetext { margin: 0 0 20px 0; text-align: justify; font-family: 'gothambook'; }
+.pagecontainer .pagewrapper .content .pagetext { margin: 0 0 20px 0; text-align: justify; }
 
-.pagecontainer .pagewrapper .content .pagetextitalic { font-family: 'gothambook_italic'; padding: 0 0 15px 0; }
+.pagecontainer .pagewrapper .content .pagetextitalic { font-style: italic; padding: 0 0 15px 0; }
 
-.pagecontainer .pagewrapper .content .mediumtext { font-family: 'gothammedium'; }
+.pagecontainer .pagewrapper .content .mediumtext { font-weight: 700; }
 
 .pagecontainer .pagewrapper .content .bulletlist { margin: 0 0 0 20px; text-align: justify; }
 
@@ -242,9 +231,9 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .pagecontainer .pagewrapper .structuretitleholder { margin: 65px 0 11px 0; position: relative; height: 28px; vertical-align: middle; border: solid 1px #cccccc; background: #f6f6f6; }
 
-.pagecontainer .pagewrapper .structuretitleholder .path { position: absolute; left: 30px; top: 4px; color: #141414; font-family: 'gothamlight'; }
+.pagecontainer .pagewrapper .structuretitleholder .path { position: absolute; left: 30px; top: 4px; color: #141414; }
 
-.pagecontainer .pagewrapper .structuretitleholder .title { text-align: center; display: block; margin: 4px auto 0 auto; font-family: 'gothamlight'; color: #141414; }
+.pagecontainer .pagewrapper .structuretitleholder .title { text-align: center; display: block; margin: 4px auto 0 auto; color: #141414; }
 
 .imgholder { padding: 20px 0px 20px 0px; text-align: center; }
 
@@ -256,21 +245,19 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .level3 a { font-size: 14px !Important; }
 
-.gotham { font-family: 'gothambook'; }
-
 .pageactions { margin: 70px 0 0 0; }
 
-.pageactions .goleft { float: left; font-family: 'gothambook'; color: #141414; font-size: 14px; }
+.pageactions .goleft { float: left; color: #141414; font-size: 14px; }
 
-.pageactions .goright { float: right; font-family: 'gothambook'; color: #141414; font-size: 14px; }
+.pageactions .goright { float: right; color: #141414; font-size: 14px; }
 
-.pageactions .goleft .pagebtn { font-family: 'gothambook'; cursor: pointer; color: #cd2026; font-size: 14px; }
+.pageactions .goleft .pagebtn { cursor: pointer; color: #cd2026; font-size: 14px; }
 
-.pageactions .goright .pagebtn { font-family: 'gothambook'; cursor: pointer; color: #cd2026; font-size: 14px; }
+.pageactions .goright .pagebtn { cursor: pointer; color: #cd2026; font-size: 14px; }
 
-.tabscontentholder { position: relative; z-index: 1; padding: 15px 20px; font-family: 'gothambook'; font-size: 14px; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; border-radius: 2px; border: solid 1px #bdc4c9; border-top-left-radius: 0px; }
+.tabscontentholder { position: relative; z-index: 1; padding: 15px 20px; font-size: 14px; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; border-radius: 2px; border: solid 1px #bdc4c9; border-top-left-radius: 0px; }
 
-.tabsholder li { cursor: pointer; position: relative; margin-left: -1px; float: left; color: #dc1414; border: solid 1px #dc1414; border-bottom: none !Important; width: 94px; height: 35px; vertical-align: middle; line-height: 35px; text-align: center; font-size: 18px; font-family: 'gothambook'; }
+.tabsholder li { cursor: pointer; position: relative; margin-left: -1px; float: left; color: #dc1414; border: solid 1px #dc1414; border-bottom: none !Important; width: 94px; height: 35px; vertical-align: middle; line-height: 35px; text-align: center; font-size: 18px; }
 
 .tabsholder li:first-child { border-top-left-radius: 4px; margin-left: 0px; }
 
@@ -283,13 +270,13 @@ a.redlink { color: #dc1414; font-weight: bold; }
 .tabsholder li:first-child.sel:before { width: 95px; left: 0px; }
 
 /* downloads page  */
-.downloads h1.downloadstitle { font-size: 30px; font-family: 'gothambook'; color: #141414; }
+.downloads h1.downloadstitle { font-size: 30px; color: #141414; font-weight: 700; }
 
-.downloads .downloadstext16 { margin: 0 0 13px 0; font-size: 16px; font-family: 'gothambook'; color: #141414; }
+.downloads .downloadstext16 { margin: 0 0 13px 0; font-size: 16px; color: #141414; }
 
-.downloads .downloadstitle { font-size: 18px; font-family: 'gothambook'; color: #141414; }
+.downloads .downloadstitle { font-size: 18px; font-weight: 700; color: #141414; }
 
-.downloads .downloadstitle .smallertext, .downloads .exposedtext { font-family: 'gothambook'; color: #141414; font-size: 14px; display: inline-block; line-height: 18px; }
+.downloads .downloadstitle .smallertext, .downloads .exposedtext { color: #141414; font-size: 14px; display: inline-block; line-height: 18px; }
 
 .downloads .downloadlinks { text-align: center; margin: 56px 0 50px 0; }
 
@@ -297,9 +284,9 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .downloads .downloadlinks .dwnbtn:last-child { margin: 0px; }
 
-.downloads .downloadlinks .dwnbtn .os { margin: 10px 0 0 0; float: left; width: 108px; text-align: center; font-size: 18px; font-family: 'gothambook'; color: white; }
+.downloads .downloadlinks .dwnbtn .os { margin: 10px 0 0 0; float: left; width: 108px; text-align: center; font-size: 18px; color: white; }
 
-.downloads .downloadlinks .dwnbtn .dwn { float: left; width: 108px; text-align: center; font-size: 14px; font-family: 'gothambook'; color: white; }
+.downloads .downloadlinks .dwnbtn .dwn { float: left; width: 108px; text-align: center; font-size: 14px; color: white; }
 
 .downloads .pagecontainer .pagewrapper .content { padding: 50px 30px 0 30px; float: none; margin: 0 auto; background: url(../imgs/pagecontainer_1280_middle_bg.png) repeat-y center top; }
 
@@ -311,7 +298,7 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .downloads .dwntable .head { padding-left: 287px !Important; }
 
-.downloads .dwntable .head span { font-size: 18px; font-family: 'gothambook'; }
+.downloads .dwntable .head span { font-size: 18px; }
 
 .downloads .dwntable .col1 { float: left; display: inline-block; width: 278px; padding: 0 10px 0 0; }
 
@@ -323,7 +310,7 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .downloads .otherlinks { margin: 110px 0 200px 0; }
 
-.downloads .otherlinks a { display: block; margin: 5px 0; font-size: 18px; font-family: 'gothambook'; color: #141414; }
+.downloads .otherlinks a { display: block; margin: 5px 0; font-size: 18px; color: #141414; }
 
 .dwntable.dwntable320 { display: none; }
 
@@ -343,7 +330,7 @@ a.redlink { color: #dc1414; font-weight: bold; }
   .header .navigation, .header .global-header_logo { display: none; }
   .header .navigation { padding: 20px 0; right: 0px; top: 66px; position: absolute; width: 160px; background: #dcdcdc; }
   .header .navigation li { vertical-align: middle; line-height: 30px; cursor: pointer; margin: 0px !Important; text-align: right; height: 32px; width: auto; float: none !important; display: block; padding: 0 27px 0 10px; }
-  .header .navigation li a, .header .navigation li.sel a { font-family: 'gothamextra_light'; font-size: 18px; color: #141414; }
+  .header .navigation li a, .header .navigation li.sel a { font-size: 18px; color: #141414; }
   .header .navigation li:hover { background: #dc1414; }
   .header .navigation li:hover a { color: white; }
   .header .menu, .header .global-header_logo_text { display: block; }
@@ -365,7 +352,7 @@ a.redlink { color: #dc1414; font-weight: bold; }
   .pagecontainer .pagewrapper .content { float: none; width: auto; padding: 30px 30px 100px 30px; height: auto; }
   .pagecontainer .pagewrapper hr { width: 290px; margin: 37px auto; }
   .pagecontainer .pagewrapper .structuretitleholder .title { text-align: right; padding: 0 30px 0 0; }
-  .downloads .pagecontainer .pagewrapper .content { width: auto; background: none; font-family: 'gothambook'; }
+  .downloads .pagecontainer .pagewrapper .content { width: auto; background: none; }
   .downloads .pagecontainer .pagewrapper, .downloads .pagecontainer { background: none; }
   .downloads .dwntable .col1 { width: 200px; }
   .downloads .dwntable .head { padding-left: 210px !Important; }
@@ -423,27 +410,3 @@ ol { padding-left: 15px; }
 ol li { padding-bottom: 3px; }
 
 .browsepublicfolder .link:hover { border-bottom: solid 1px transparent; }
-
-/* temp overrides */
-.header .navigation .sel a {
-	font-size: 15px;
-}
-
-.header .navigation a {
-	font-size: 15px;
-}
-.featurelist .feat .text {
-	font-family: 'verdana';
-}
-
-.skewed_pttrn_red .maintext {
-	font-family: 'verdana';
-}
-
-.skewed_pttrn_red .maintitle {
-	font-family: 'verdana';
-}
-
-.featurelist .feat .title {
-	font-family: 'verdana';
-}

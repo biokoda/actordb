@@ -18,6 +18,7 @@
         <link rel="stylesheet" href="css/actordb-website.css">
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
         <script src="js/vendor/jquery-1.10.1.min.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet' type='text/css'>
         <style>
             .block {
                 display:block !Important;
@@ -48,7 +49,8 @@
                     <li ><a href="index.html">Home</a></li>
                     <li ><a href="docs-about.html">Documentation</a></li>
                     <li><a target="_blank" href="https://www.github.com/biokoda/actordb">Source</a></li>
-                    <li class=" sel right"><a target="_blank" href="downloads.html">Downloads</a></li>
+                    <li class=" sel"><a href="downloads.html">Downloads</a></li>
+                    <!-- <li class=" sel right"><a target="_blank" href="downloads.html">Downloads</a></li> -->
                 </ul>
                 <span id="mobile_menu" class="menu"></span>
             </div>
@@ -59,54 +61,49 @@
         <div class="leftmenu">
         </div>
         <div class="content">
+            <h1 class="downloadstitle">Downloads</h1>                    
+            <p class="downloadstext16">This table lists ActorDB distributions by platform and version.</p>
+            <h2 class="downloadstitle">Latest Stable Release (0.5.1) <span class="smallertext">— 04/Feb/2014</span></h2>
+            <p class="exposedtext"><a href="https://github.com/biokoda/actordb/blob/0.5.1/README.md" class="redlink">Release Notes</a>, <a href="https://github.com/biokoda/actordb/blob/0.5.1/CHANGES.md" class="redlink">Changelog</a>, Source: <a href="https://github.com/biokoda/actordb/archive/0.5.1.tar.gz" class="redlink">tgz</a> | <a href="https://github.com/biokoda/actordb/archive/0.5.1.zip" class="redlink">zip</a></p>
+            <div class="downloadlinks">
+                <a class="dwnbtn global-download_desktop_btn" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5.1-1_amd64.deb"><span class="os">Ubuntu</span><span class="dwn">Download</span></a>
+                <a class="dwnbtn global-download_desktop_btn" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-OSX-x86_64.tar.gz"><span class="os">Mac OS X</span><span class="dwn">Download</span></a>
+                <a class="dwnbtn global-download_desktop_btn" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-1.el6.x86_64.rpm"><span class="os">CentOS</span><span class="dwn">Download</span></a>
+            </div>
+                
+            <h2 class="downloadstitle">Releases (stable)</h2>
 
-                    <h1 class="downloadstitle">Downloads</h1>                    
-                    <p class="downloadstext16">This table lists ActorDB distributions by platform and version.</p>
-                    <h2 class="downloadstitle">Latest Stable Release (0.5.1) <span class="smallertext">— 04/Feb/2014</span></h2>
-                    <p class="exposedtext"><a href="https://github.com/biokoda/actordb/blob/0.5.1/README.md" class="redlink">Release Notes</a>, <a href="https://github.com/biokoda/actordb/blob/0.5.1/CHANGES.md" class="redlink">Changelog</a>, Source: <a href="https://github.com/biokoda/actordb/archive/0.5.1.tar.gz" class="redlink">tgz</a> | <a href="https://github.com/biokoda/actordb/archive/0.5.1.zip" class="redlink">zip</a></p>
-                    <div class="downloadlinks">
-                        <a class="dwnbtn global-download_desktop_btn" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5.1-1_amd64.deb"><span class="os">Ubuntu</span><span class="dwn">Download</span></a>
-                        <a class="dwnbtn global-download_desktop_btn" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-OSX-x86_64.tar.gz"><span class="os">Mac OS X</span><span class="dwn">Download</span></a>
-                        <a class="dwnbtn global-download_desktop_btn" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-1.el6.x86_64.rpm"><span class="os">CentOS</span><span class="dwn">Download</span></a>
-                    </div>
-                        
-                    <h2 class="downloadstitle">Releases (stable)</h2>
-
-                    <ul class="dwntable">
-                        <li class="head clearfix border">
-                            <span class="col2">Ubuntu</span>
-                            <span class="col3">Mac OS X</span>                            
-                            <span class="col4">CentOS</span>
-                        </li>
-
-                        <li class="clearfix">
-                            <span class="col1"><span class="downloadstitle">0.5.1<span class="smallertext">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;04/Feb/2014</span></span></span>
-                            <span class="col2"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5.1-1_amd64.deb">64-bit</a></span>
-                            <span class="col3"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-OSX-x86_64.tar.gz">64-bit</a></span>
-                            <span class="col4"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-1.el6.x86_64.rpm">64-bit</a></span>
-                        </li>
-                        <li class="clearfix border">
-                            <span class="col1"><p><a href="https://github.com/biokoda/actordb/blob/0.5.1/CHANGES.md" class="redlink">Changelog</a><br /><a href="https://github.com/biokoda/actordb/blob/0.5.1/README.md" class="redlink">Readme</a><br />Source: <a href="https://github.com/biokoda/actordb/archive/0.5.1.tar.gz" class="redlink">tgz </a>  |   <a href="https://github.com/biokoda/actordb/archive/0.5.1.zip" class="redlink">zip</a></p></span>
-                            
-                        </li>                        
-
-
-
-                        <li class="clearfix">
-                            <span class="col1"><span class="downloadstitle">0.5<span class="smallertext">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;21/Jan/2014</span></span></span>
-                            <span class="col2"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5-1_amd64.deb">64-bit</a></span>
-                            <span class="col3"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5-OSX-x86_64.tar.gz">64-bit</a></span>
-                        </li>
-                        <li class="clearfix border">
-                            <span class="col1"><p><a href="https://github.com/biokoda/actordb/blob/e8357b78853da9aedafbfcc9abfc3088e83ac171/README.md" class="redlink">Changelog</a><br /><a href="https://github.com/biokoda/actordb/blob/e8357b78853da9aedafbfcc9abfc3088e83ac171/README.md" class="redlink">Release notes</a><br />Source: <a href="https://github.com/biokoda/actordb/archive/0.5.tar.gz" class="redlink">tgz </a>  |   <a href="https://github.com/biokoda/actordb/archive/0.5.zip" class="redlink">zip</a></p></span>
-                            
-                        </li>                        
-                    </ul>
-
-                    <ul class="otherlinks">                        
-                        <li><a href="docs-about.html">Documentation  ></a></li>
-                    </ul>         
-
+            <ul class="dwntable">
+                <li class="head clearfix border">
+                    <span class="col2">Ubuntu</span>
+                    <span class="col3">Mac OS X</span>                            
+                    <span class="col4">CentOS</span>
+                </li>
+            
+                <li class="clearfix">
+                    <span class="col1"><span class="downloadstitle">0.5.1<span class="smallertext">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;04/Feb/2014</span></span></span>
+                    <span class="col2"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5.1-1_amd64.deb">64-bit</a></span>
+                    <span class="col3"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-OSX-x86_64.tar.gz">64-bit</a></span>
+                    <span class="col4"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-1.el6.x86_64.rpm">64-bit</a></span>
+                </li>
+                <li class="clearfix border">
+                    <span class="col1"><p><a href="https://github.com/biokoda/actordb/blob/0.5.1/CHANGES.md" class="redlink">Changelog</a><br /><a href="https://github.com/biokoda/actordb/blob/0.5.1/README.md" class="redlink">Readme</a><br />Source: <a href="https://github.com/biokoda/actordb/archive/0.5.1.tar.gz" class="redlink">tgz </a>  |   <a href="https://github.com/biokoda/actordb/archive/0.5.1.zip" class="redlink">zip</a></p></span>                        
+                </li>                        
+            
+                <li class="clearfix">
+                    <span class="col1"><span class="downloadstitle">0.5<span class="smallertext">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;21/Jan/2014</span></span></span>
+                    <span class="col2"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5-1_amd64.deb">64-bit</a></span>
+                    <span class="col3"><a class="redlink" href="https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5-OSX-x86_64.tar.gz">64-bit</a></span>
+                    <span class="col4"><a class="redlink" href="">64-bit</a></span>
+                </li>
+                <li class="clearfix border">
+                    <span class="col1"><p><a href="https://github.com/biokoda/actordb/blob/e8357b78853da9aedafbfcc9abfc3088e83ac171/README.md" class="redlink">Changelog</a><br /><a href="https://github.com/biokoda/actordb/blob/e8357b78853da9aedafbfcc9abfc3088e83ac171/README.md" class="redlink">Readme</a><br />Source: <a href="https://github.com/biokoda/actordb/archive/0.5.tar.gz" class="redlink">tgz </a>  |   <a href="https://github.com/biokoda/actordb/archive/0.5.zip" class="redlink">zip</a></p></span>                        
+                </li>                        
+                    
+            </ul>
+            <ul class="otherlinks">                        
+                <li><a href="docs-about.html">Documentation  ></a></li>
+            </ul> 
         </div>
     </div>
 </div>
@@ -128,7 +125,6 @@
         <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>-->
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
         <script src="js/vendor/bootstrap.min.js"></script>
-        <script src="js/vendor/jquery.easypiechart.min.js"></script>
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
         
         <script type="text/javascript">
@@ -143,7 +139,7 @@
                 $("html").addClass("winchrome");
             }
         </script>
-        <script src="js/actordb-website.js"></script>
+        <!--<script src="js/actordb-website.js"></script>-->
         <script>
           (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
           (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
