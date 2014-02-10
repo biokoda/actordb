@@ -29,10 +29,19 @@ clean:
 	./rebar clean
 
 
+distclean: clean relclean ballclean
+	./rebar delete-deps
+
 generate:
 	./rebar generate  $(OVERLAY_VARS)
 
 rel: deps compile generate
+
+relclean:
+	rm -rf rel/riak
+
+ballclean:
+	rm -rf $(PKG_ID).tar.gz distdir
 
 ARCH= $(shell uname -m)
 
