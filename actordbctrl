@@ -2,10 +2,18 @@
 -mode(compile).
 
 cmds() ->
-  "Supported commands: init, updateschema (-us), updatenodes (-un), stat (-s)~n".
+  "Supported commands: init, updateschema (-us), updatenodes (-un), stat (-s), help (-h)~n"++
+  "Stat columns:~n"++
+  "allreads - total number of reads since node started~n"++
+  "readsnow - number of reads in the past second~n"++
+  "allwrites - total number of writes since node started~n"++
+  "writesnow - number of writes in the past second~n"++
+  "nactors - total number of actors active~n"++
+  "nactive - number of actors that have been active in the past second~n"++
+  "tmngrs - num_busy_transaction_managers/total_transaction_managers~n".
 
 main([]) ->
-  io:format(cmds());
+  main(["nocmd"]);
 main(Args) ->
 	[] = os:cmd(epmd_path() ++ " -daemon"),
   [Cmd1] = Args,
@@ -28,7 +36,14 @@ main(Args) ->
       ok;
     _ ->
       Cmd = "",
-      io:format("Invalid command.~n"++cmds()),
+      case Cmd1 of
+        "-h" ->
+          io:format(cmds());
+        "help" ->
+          io:format(cmds());
+        _ ->
+          io:format("~nInvalid command.~n~n"++cmds())
+      end,
       halt(1)
   end,
   Dirname = filename:dirname(escript:script_name()),
@@ -65,7 +80,7 @@ main(Args) ->
   case Cmd of
     "stat" ->
       Ref = make_ref(),
-      {ok,Cols} = rpc:call(Node,actordb_cmd,cmd,[stats,describe,ok]),
+      {ok,Cols,_Descr} = rpc:call(Node,actordb_cmd,cmd,[stats,describe,ok]),
       [ok = io:format("~s",[string:right(Val,15,$\s)]) || Val <- tuple_to_list(Cols)],
       io:format("~n"),
       ok = rpc:call(Node,actordb_cmd,cmd,[stats,stats,{Myname,self(),Ref}]),

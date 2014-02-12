@@ -2,10 +2,18 @@
 -mode(compile).
 
 cmds() ->
-  "Supported commands: init, updateschema (-us), updatenodes (-un), stat (-s)~n".
+  "Supported commands: init, updateschema (-us), updatenodes (-un), stat (-s)~n"++
+  "Stat columns:~n"++
+  "allreads - total number of reads since node started~n"++
+  "readsnow - number of reads in the past second~n"++
+  "allwrites - total number of writes since node started~n"++
+  "writesnow - number of writes in the past second~n"++
+  "nactors - total number of actors active~n"++
+  "nactive - number of actors that have been active in the past second~n"++
+  "tmngrs - num_busy_transaction_managers/total_transaction_managers~n".
 
 main([_]) ->
-  io:format(cmds());
+  main([E,"nocmd"]);
 main(Args) ->
 	[] = os:cmd(epmd_path() ++ " -daemon"),
   case Args of
@@ -31,7 +39,14 @@ main(Args) ->
       ok;
     _ ->
       Cmd = "",
-      io:format("Invalid command.~n"++cmds()),
+      case Cmd1 of
+        "-h" ->
+          io:format(cmds());
+        "help" ->
+          io:format(cmds());
+        _ ->
+          io:format("~nInvalid command.~n~n"++cmds())
+      end,
       halt(1)
   end,
   EtcPath2 = "{{platform_etc_dir}}",
