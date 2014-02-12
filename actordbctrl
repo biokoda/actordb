@@ -93,7 +93,14 @@ main(Args) ->
 rec_print_stats(Ref,Cols) ->
   receive
     {Ref,Vals} ->
-      [ok = io:format("~s",[string:right(integer_to_list(Val),15,$\s)]) || Val <- tuple_to_list(Vals)],
+      [begin
+          case is_integer(Val) of
+            true ->
+              ok = io:format("~s",[string:right(integer_to_list(Val),15,$\s)]);
+            false ->
+              ok = io:format("~s",[string:right(Val,15,$\s)])
+          end
+        end || Val <- tuple_to_list(Vals)],
       ok = io:format("~n"),
       rec_print_stats(Ref,Cols)
     after 3000 ->
