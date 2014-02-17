@@ -168,7 +168,7 @@ $(document).ready(function(){
                             <span class="bullet"></span>
                             <span class="text">5. KEY/VALUE STORE</span>
                         </a>
-                        <a href="docs-kvstore.html#about_kv_store" class="last">5.1 About Key/Value store</a>
+                        <a href="docs-kvstore.html#about_kv_store" class="last">5.1 About</a>
                         <a href="docs-kvstore.html#reliable_distributed_counters" class="last">5.2 Use case: reliable distributed counters</a>
                 </div>
                 
@@ -239,8 +239,9 @@ counters:
             </div>
 
 <p class="pagetext">Important:</p>
-            <p class="pagetext">- counters is the key/value namespace. You can have multiple namespaces with different table schemas. But note that only a single table per namespace is supported at the moment.</p>
-            <p class="pagetext">- kv specifies this type as a sharded key/value table and must be present as is!</p>
+            <p class="pagetext">- counters is the key/value namespace. You can have multiple namespaces with different table schemas. You can even have multiple tables that are connected with foreign keys to the actors table.
+</p>
+            <p class="pagetext">- kv specifies this type as a sharded key/value table.</p>
             <p class="pagetext">- table must be named "actors" and it must have id and hash columns. id is key, hash is hash of id, everything after that is up to you.
 </p>
             <br/>
