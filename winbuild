@@ -1,0 +1,61 @@
+#!/usr/bin/env escript
+-mode(compile).
+
+% How to make a windows build:
+% 1. Install erlang and git for windows
+% 2. Add c:\Program Files\erl5.10.x to path
+% 3. clone actordb
+% 4. build rebar for windows, copy the rebar.cmd file to actordb folder
+% 5. rebar get-deps 
+% 6. rebar compile (yamerl is not windows compatible, remove all makefiles and rebar will be able to compile it)
+% 7. winbuild.bat
+% 8. Use win folder.
+
+main(_Args) ->
+  filelib:ensure_dir("win/ebin/"),
+  filelib:ensure_dir("win/priv/"),
+  filelib:ensure_dir("win/data/"),
+  filelib:ensure_dir("win/etc/"),
+  filelib:ensure_dir("win/log/"),
+  
+  [file:copy(F,"win/ebin/"++filename:basename(F)) || F <- filelib:wildcard("deps/*/ebin/*")],
+  [file:copy(F,"win/priv/"++filename:basename(F)) || F <- filelib:wildcard("deps/*/priv/*.dll")],
+  
+  file:copy("LICENSE","win/LICENSE"),
+  [file:copy(F,"win/LICENSE-"++hd(tl(filename:split(filename:dirname(F))))) || F <- filelib:wildcard("deps/*/LICENSE")],
+  
+  file:write_file("win/actordb.bat",run()),
+  file:write_file("win/actordbctrl.bat",ctrl()),
+  file:copy("actordbctrl","win/actordbctrl"),
+
+  file:copy("rel/files/vm.args","win/etc/vm.args"),
+  file:copy("rel/files/nodes.yaml","win/etc/nodes.yaml"),
+  file:copy("rel/files/schema.yaml","win/etc/schema.yaml"),
+  {ok,AppFile} = file:read_file("rel/files/app.config"),
+  AppFile1 = re:replace(AppFile,"{{platform_data_dir}}","data",[global]),
+  AppFile2 = re:replace(AppFile1,"{{platform_log_dir}}","log",[global]),
+  file:write_file("win/etc/app.config",AppFile2),
+  ok.
+
+
+run() ->
+  check("erl.exe") ++
+  "%ERL% -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n".
+
+ctrl() ->
+  check("escript.exe") ++
+  "%ERL% actordbctrl %*\n".  
+
+check(Name) ->
+   "@echo off\n"++
+"setlocal\n"++
+"if exist 'where "++Name++"' (\n"++
+"set ERL="++Name++"\n"++
+") ELSE (\n"++
+"for /f \"delims=\" %%x in ('dir \"C:\\Program Files\\erl5.*\" /on /ad /b') do set erlfolder=%%x\n"++
+"if not defined erlfolder (\n"++
+"echo Erlang not found. Please install 64bit erlang from http://www.erlang.org/download.html\n"++
+"exit /B\n"++
+")\n"++
+"set ERL=\"C:\\Program Files\\%erlfolder%\\bin\\"++Name++"\"\n"++
+")\n".
