@@ -33,11 +33,12 @@ Documentation: http://www.actordb.com/docs-about.html
 
 How to configure and run: http://www.actordb.com/docs-configuration.html
 
-deb package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5.1-1_amd64.deb
+ubuntu/debian package (64bit): https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5.2-1_amd64.deb
 
-osx package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-OSX-x86_64.tar.gz
+osx package (64bit): https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.2-OSX-x86_64.tar.gz
 
-red hat/centos package: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-1.el6.x86_64.rpm
+red hat/centos package (64bit): https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.2-1.el6.x86_64.rpm
 
-More packages to come...	
+windows package (64bit): https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.2-1.el6.x86_64.rpm
+
 
