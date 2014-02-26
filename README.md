@@ -47,6 +47,6 @@ https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.2-1.el6.x86_64.rpm
 
 **windows package (64bit):**
 
-https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.2-1.el6.x86_64.rpm
+https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.2-win-x86_64.zip
 
 
