@@ -102,7 +102,7 @@ doit(Args,Ctx) ->
     "-un" ->
       Cmd = "updatenodes";
     "-s" ->
-      Cmd = "stats";
+      Cmd = "stat";
     "updateschema" = Cmd ->
       ok;
     "updatenodes" = Cmd ->
@@ -159,7 +159,7 @@ doit(Args,Ctx) ->
   case Cmd of
     "stat" ->
       Ref = make_ref(),
-      {ok,Cols,_Descr} = rpc:call(Node,actordb_cmd,cmd,[stats,describe,ok]),
+      {ok,Cols} = rpc:call(Node,actordb_cmd,cmd,[stats,describe,ok]),
       [ok = print(Ctx,"~s",[string:right(Val,15,$\s)]) || Val <- tuple_to_list(Cols)],
       print(Ctx,"~n"),
       ok = rpc:call(Node,actordb_cmd,cmd,[stats,stats,{Myname,self(),Ref}]),
@@ -222,14 +222,14 @@ rec_print_stats(Ctx,Ref,Cols) ->
       ok
   end.
 
-do_confirmation(console) ->
+do_confirmation(X) when X == console; X == winconsole ->
 	case io:fread("Confirm change? (Y/N): ", "~a") of
 		{ok,[y]} ->
 			yes;
 		{ok,[n]} ->
 			no;
 		_ ->
-			do_confirmation(console)
+			do_confirmation(X)
 	end;
 do_confirmation(Dlg) ->
   MD = wxMessageDialog:new(Dlg,"Confirm change?",[{style,?wxYES_NO}]),

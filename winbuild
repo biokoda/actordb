@@ -44,7 +44,8 @@ run() ->
 
 ctrl() ->
   check("escript.exe") ++
-  "%ERL% actordbctrl %*\n".  
+  "%ERL% actordbctrl %*\n"++
+  "pause".  
 
 check(Name) ->
    "@echo off\n"++
