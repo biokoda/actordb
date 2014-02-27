@@ -1,8 +1,12 @@
 #!/usr/bin/env escript
 -mode(compile).
+-include_lib("wx/include/wx.hrl").
 
+
+cmds1() ->
+  "Supported commands: init, updateschema (-us), updatenodes (-un), stat (-s), help (-h)~n".
 cmds() ->
-  "Supported commands: init, updateschema (-us), updatenodes (-un), stat (-s), help (-h)~n"++
+  cmds1()++
   "Stat columns:~n"++
   "allreads - total number of reads since node started~n"++
   "readsnow - number of reads in the past second~n"++
@@ -12,10 +16,85 @@ cmds() ->
   "nactive - number of actors that have been active in the past second~n"++
   "tmngrs - num_busy_transaction_managers/total_transaction_managers~n".
 
+wxev(Dlg) ->
+  receive
+    #wx{id=Id, event=#wxCommand{type=command_button_clicked}} ->
+      case Id >= 1 andalso Id =< 3 of
+        true ->
+          % Txt = wx:typeCast(wxWindow:findWindowById(4, [{parent, Dlg}]),wxTextCtrl),
+          % Btn = wx:typeCast(wxWindow:findWindowById(Id, [{parent, Dlg}]),wxButton),
+          % wxTextCtrl:setValue(Txt,"you pressed "++wxButton:getLabel(Btn)),
+          case Id of
+            1 ->
+              doit(["init"],Dlg);
+            2 ->
+              doit(["updateschema"],Dlg);
+            3 ->
+              doit(["updatenodes"],Dlg)
+          end;
+          % wxev(Dlg);
+        false ->
+          ok
+      end
+  end.
+
 main([]) ->
-  main(["nocmd"]);
+  case os:type() of
+    {win32,_} ->
+      %
+      % To gui or not to gui?
+      %
+      io:format("Command list:~n"++
+                "init - for initializing cluster~n"++
+                "us - update schema (from etc/schema.yaml)~n"++
+                "un - update nodes (from etc/nodes.yaml)~n"++
+                "s - print stats~n"++
+                "q or exit - for exit~n"),
+      Read = io:fread("Command: ", "~s"),
+      io:format("~n"),
+      case Read of
+        {ok,["q"]} ->
+          ok;
+        {ok,["exit"]} ->
+          ok;
+        {ok,["init"]} ->
+          doit(["init"],winconsole);
+        {ok,[Cmd]} ->
+          case ok of
+            ok when Cmd == "us"; Cmd == "un"; Cmd == "s" ->
+              doit(["-"++Cmd],winconsole);
+            _ ->
+              io:format("Invalid command: ~p~n",[Cmd]),
+              main([])
+          end;
+        _ ->
+          ok
+      end;
+
+      % Wx = wx:new(),
+      % Dlg = wxDialog:new(Wx,-1,"Pick command"),
+      % Sizer = wxBoxSizer:new(?wxVERTICAL),
+      % BtnSizer = wxStaticBoxSizer:new(?wxHORIZONTAL, Dlg, [{label, "Commands"}]),
+      % BtnInit = wxButton:new(Dlg, 1, [{label,"Init"}]),
+      % BtnSchema = wxButton:new(Dlg, 2, [{label,"Update schema"}]),
+      % BtnNds = wxButton:new(Dlg, 3, [{label,"Update nodes"}]),
+      % Text = wxTextCtrl:new(Dlg,4,[{style, ?wxDEFAULT bor ?wxTE_MULTILINE bor ?wxTE_READONLY}]),
+      % SzFlags = [{proportion, 0}, {border, 4}, {flag, ?wxALL}],
+      % [wxSizer:add(BtnSizer,B,SzFlags) || B <- [BtnInit,BtnSchema,BtnNds]],
+      % wxSizer:add(Sizer,BtnSizer,SzFlags),
+      % wxSizer:add(Sizer,Text,[{flag, ?wxEXPAND},{proportion, 1}|SzFlags]),
+      % wxDialog:setSizer(Dlg,Sizer),
+      % wxDialog:connect(Dlg,command_button_clicked),
+      % wxDialog:show(Dlg),
+      % wxev(Dlg);
+    _ ->
+      main(["nocmd"])
+  end;
 main(Args) ->
-	[] = os:cmd(epmd_path() ++ " -daemon"),
+  doit(Args,console).
+
+doit(Args,Ctx) ->
+  [] = os:cmd(epmd_path(Ctx) ++ " -daemon"),
   [Cmd1] = Args,
   case Cmd1 of
     "-us" ->
@@ -42,9 +121,9 @@ main(Args) ->
         "help" ->
           io:format(cmds());
         _ ->
-          io:format("~nInvalid command.~n~n"++cmds())
+          print(Ctx,"~nInvalid command.~n~n"++cmds())
       end,
-      halt(1)
+      done(Ctx)
   end,
   Dirname = filename:dirname(escript:script_name()),
   case Dirname of
@@ -65,72 +144,101 @@ main(Args) ->
   [{node,Node},{myname,Myname}] = parse_args(Lines,[]),
 
   case net_kernel:hidden_connect_node(Node) of
-  	true ->
-  		case net_adm:ping(Node) of
-  			pang ->
-  				io:format("ActorDB not responding~n"),
-  				halt(1);
-  			pong ->
-  				ok
-  		end;
-  	_X ->
-  		io:format("ActorDB not running ~n"),
-  		halt(1)
+    true ->
+      case net_adm:ping(Node) of
+        pang ->
+          print(Ctx,"ActorDB not responding~n"),
+          done(Ctx);
+        pong ->
+          ok
+      end;
+    _X ->
+      print(Ctx,"ActorDB not running ~n"),
+      done(Ctx)
   end,
   case Cmd of
     "stat" ->
       Ref = make_ref(),
       {ok,Cols,_Descr} = rpc:call(Node,actordb_cmd,cmd,[stats,describe,ok]),
-      [ok = io:format("~s",[string:right(Val,15,$\s)]) || Val <- tuple_to_list(Cols)],
-      io:format("~n"),
+      [ok = print(Ctx,"~s",[string:right(Val,15,$\s)]) || Val <- tuple_to_list(Cols)],
+      print(Ctx,"~n"),
       ok = rpc:call(Node,actordb_cmd,cmd,[stats,stats,{Myname,self(),Ref}]),
-      rec_print_stats(Ref,Cols);
+      rec_print_stats(Ctx,Ref,Cols);
     _ ->
       case rpc:call(Node,actordb_cmd,cmd,[list_to_atom(Cmd),parse,EtcPath]) of
-      	{ok,nochange} ->
-      		io:format("No changes detected~n");
+        {ok,nochange} ->
+          print(Ctx,"No changes detected~n");
         {ok,Out} ->
-        	io:format("~s~n",[Out]),
-          case do_confirmation() of
+          print(Ctx,"~s~n",[Out]),
+          case do_confirmation(Ctx) of
             yes ->
               Result = rpc:call(Node,actordb_cmd,cmd,[list_to_atom(Cmd),commit,EtcPath]),
-              io:format("~s~n",[Result]);
+              print(Ctx,"~s~n",[Result]),
+              done(Ctx);
             no ->
               ok
           end;
         {_,E} ->
-          io:format("Error: ~s~n",[E]);
+          print(Ctx,"Error: ~s~n",[E]);
         E ->
-          io:format("Error: ~s~n",[E])
+          print(Ctx,"Error: ~s~n",[E])
       end
   end.
 
-rec_print_stats(Ref,Cols) ->
+done(console) ->
+  halt(1);
+done(winconsole) ->
+  main([]),
+  halt(1);
+done(D) ->
+  wxev(D),
+  halt(1).
+
+print(C,F) ->
+  print(C,F,[]).
+print(console,F,A) ->
+  ok = io:format(F,A);
+print(winconsole,F,A) ->
+  ok = io:format(F,A);
+print(Dlg,F,A) ->
+  Txt = wx:typeCast(wxWindow:findWindowById(4, [{parent, Dlg}]),wxTextCtrl),
+  wxTextCtrl:appendText(Txt,io_lib:format(F,A)),
+  ok.
+
+rec_print_stats(Ctx,Ref,Cols) ->
   receive
     {Ref,Vals} ->
       [begin
           case is_integer(Val) of
             true ->
-              ok = io:format("~s",[string:right(integer_to_list(Val),15,$\s)]);
+              ok = print(Ctx,"~s",[string:right(integer_to_list(Val),15,$\s)]);
             false ->
-              ok = io:format("~s",[string:right(Val,15,$\s)])
+              ok = print(Ctx,"~s",[string:right(Val,15,$\s)])
           end
         end || Val <- tuple_to_list(Vals)],
-      ok = io:format("~n"),
-      rec_print_stats(Ref,Cols)
+      print(Ctx,"~n"),
+      rec_print_stats(Ctx,Ref,Cols)
     after 3000 ->
       ok
   end.
 
-do_confirmation() ->
+do_confirmation(console) ->
 	case io:fread("Confirm change? (Y/N): ", "~a") of
 		{ok,[y]} ->
 			yes;
 		{ok,[n]} ->
 			no;
 		_ ->
-			do_confirmation()
-	end.
+			do_confirmation(console)
+	end;
+do_confirmation(Dlg) ->
+  MD = wxMessageDialog:new(Dlg,"Confirm change?",[{style,?wxYES_NO}]),
+  case wxMessageDialog:showModal(MD) of
+    ?wxID_YES ->
+      yes;
+    ?wxID_NO ->
+      no
+  end.
 
 
 
@@ -141,12 +249,22 @@ parse_args(["#"++_|T],L) ->
 parse_args(["-name " ++ Namestr|T],L) ->
 	Curname = rem_spaces(Namestr),
 	Myname = setname(Curname),
-  {ok, _} = net_kernel:start([Myname, longnames]),
+  case node() == 'nonode@nohost' of
+    true ->
+      {ok, _} = net_kernel:start([Myname, longnames]);
+    _ ->
+      ok
+  end,
 	parse_args(T,[{node,list_to_atom(Curname)},{myname,Myname}|L]);
 parse_args(["-sname " ++ Namestr|T],L) ->
 	Curname = rem_spaces(Namestr),
   Myname = setname(Curname),
-	{ok, _} = net_kernel:start([Myname, shortnames]),
+  case node() == 'nonode@nohost' of
+    true ->
+      {ok, _} = net_kernel:start([Myname, shortnames]);
+    _ ->
+      ok
+  end,
 	parse_args(T,[{node,list_to_atom(Curname)},{myname,Myname}|L]);
 parse_args(["-setcookie "++N|T],L) ->
 	erlang:set_cookie(node(), list_to_atom(rem_spaces(N))),
@@ -170,15 +288,15 @@ setname(Namestr) ->
 rem_spaces(Str) ->
 	lists:filter(fun(X) -> X /= $\s end,Str).
 
-epmd_path() ->
+epmd_path(Ctx) ->
   ErtsBinDir = filename:dirname(escript:script_name()),
   Name = "epmd",
   case os:find_executable(Name, ErtsBinDir) of
     false ->
       case os:find_executable(Name) of
         false ->
-          io:format("Could not find epmd.~n"),
-          halt(1);
+          print(Ctx,"Could not find epmd.~n"),
+          done(Ctx);
         GlobalEpmd ->
           GlobalEpmd
       end;
