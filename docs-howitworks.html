@@ -383,6 +383,19 @@ $(document).ready(function(){
 
 <p class="pagetext">Now if you've had experience with sqlite you are likely thinking that is a terrible idea. Sqlite is not scalable. That is true. Sqlite is not scalable, but it is fast if configured to be. Remember that each actor in ActorDB is completely isolated. Every actor is a completely separate sqlite instance. Sqlite is not where ActorDB scalability comes from.</p>
 
+<p class="pagetext">Sqlite provides a list of cases where its use is not recommended (on the bottom of the page).
+<a href="https://www.sqlite.org/whentouse.html">https://www.sqlite.org/whentouse.html</a></p>
+
+<p class="pagetext">
+None of these apply to ActorDB:<br/>
+<b>Client/Server Applications</b> - ActorDB takes care of the network protocol. It is very suitable for a client/server application over the network.<br/>
+<b>High-volume Websites</b> - ActorDB is able to spread the load across as many servers and sqlite instances as you throw at it. It will thus be very suitable for high-volume websites. <br/>
+<b>Very large datasets</b> - As long as you do not have a very large dataset inside a single actor (many GB) and spread the data across many actors, ActorDB will work very well even with petabytes of data.<br/>
+<b>High Concurrency</b> - ActorDB is massively concurrent. Not on the individual actor level, but across the entire database. </p>
+
+
+
+
 <div class="pageactions">
     <span class="goleft"><a href="docs-getstarted.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2. Get started)</span>
     <span class="goright">(4. Query model)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="docs-querymodel.html"><span class="pagebtn">Next >></span></a></span>   
