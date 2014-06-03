@@ -1,6 +1,6 @@
 #!/usr/bin/env escript
 -mode(compile).
--include_lib("wx/include/wx.hrl").
+% -include_lib("wx/include/wx.hrl").
 
 
 cmds1() ->
@@ -16,27 +16,27 @@ cmds() ->
   "nactive - number of actors that have been active in the past second~n"++
   "tmngrs - num_busy_transaction_managers/total_transaction_managers~n".
 
-wxev(Dlg) ->
-  receive
-    #wx{id=Id, event=#wxCommand{type=command_button_clicked}} ->
-      case Id >= 1 andalso Id =< 3 of
-        true ->
-          % Txt = wx:typeCast(wxWindow:findWindowById(4, [{parent, Dlg}]),wxTextCtrl),
-          % Btn = wx:typeCast(wxWindow:findWindowById(Id, [{parent, Dlg}]),wxButton),
-          % wxTextCtrl:setValue(Txt,"you pressed "++wxButton:getLabel(Btn)),
-          case Id of
-            1 ->
-              doit(["init"],Dlg);
-            2 ->
-              doit(["updateschema"],Dlg);
-            3 ->
-              doit(["updatenodes"],Dlg)
-          end;
-          % wxev(Dlg);
-        false ->
-          ok
-      end
-  end.
+wxev(_Dlg) -> ok.
+%   receive
+%     #wx{id=Id, event=#wxCommand{type=command_button_clicked}} ->
+%       case Id >= 1 andalso Id =< 3 of
+%         true ->
+%           % Txt = wx:typeCast(wxWindow:findWindowById(4, [{parent, Dlg}]),wxTextCtrl),
+%           % Btn = wx:typeCast(wxWindow:findWindowById(Id, [{parent, Dlg}]),wxButton),
+%           % wxTextCtrl:setValue(Txt,"you pressed "++wxButton:getLabel(Btn)),
+%           case Id of
+%             1 ->
+%               doit(["init"],Dlg);
+%             2 ->
+%               doit(["updateschema"],Dlg);
+%             3 ->
+%               doit(["updatenodes"],Dlg)
+%           end;
+%           % wxev(Dlg);
+%         false ->
+%           ok
+%       end
+%   end.
 
 main([]) ->
   case os:type() of
@@ -230,15 +230,15 @@ do_confirmation(X) when X == console; X == winconsole ->
 			no;
 		_ ->
 			do_confirmation(X)
-	end;
-do_confirmation(Dlg) ->
-  MD = wxMessageDialog:new(Dlg,"Confirm change?",[{style,?wxYES_NO}]),
-  case wxMessageDialog:showModal(MD) of
-    ?wxID_YES ->
-      yes;
-    ?wxID_NO ->
-      no
-  end.
+	end.
+% do_confirmation(Dlg) ->
+%   MD = wxMessageDialog:new(Dlg,"Confirm change?",[{style,?wxYES_NO}]),
+%   case wxMessageDialog:showModal(MD) of
+%     ?wxID_YES ->
+%       yes;
+%     ?wxID_NO ->
+%       no
+%   end.
 
 
 
