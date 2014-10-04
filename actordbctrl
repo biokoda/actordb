@@ -130,11 +130,11 @@ doit(Args,Ctx) ->
     "." ->
       Upper = filename:absname("../etc"),
       Cur = filename:absname("etc"),
-      case filelib:is_dir(Upper) of
+      case filelib:is_dir(Cur) of
         true ->
-          EtcPath = Upper;
+          EtcPath = Cur;
         false ->
-          EtcPath = Cur
+          EtcPath = Upper
       end;
     _ ->
       EtcPath = filename:absname(filename:join(lists:reverse(tl(lists:reverse(filename:split(Dirname)))))++"/etc")
