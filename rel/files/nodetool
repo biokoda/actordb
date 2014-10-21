@@ -1,4 +1,5 @@
 #!/usr/bin/env escript
+%%! +fnu
 %% -*- mode: erlang;erlang-indent-level: 4;indent-tabs-mode: nil -*-
 %% ex: ft=erlang ts=4 sw=4 et
 %% -------------------------------------------------------------------
@@ -10,6 +11,7 @@
 %% installed by node_package (github.com/basho/node_package)
 
 main(Args) ->
+    io:setopts([{encoding, utf8}]),
     ok = start_epmd(),
     %% Extract the args
     {RestArgs, TargetNode} = process_args(Args, [], undefined),
@@ -29,21 +31,9 @@ main(Args) ->
     %% any commands that don't need a running node
     case RestArgs of
         ["chkconfig", File] ->
-            case file:consult(File) of
-                {ok, _} ->
-                    io:format("ok\n"),
-                    halt(0);
-                {error, {Line, Mod, Term}} ->
-                    io:format(standard_error, 
-                              ["Error on line ", 
-                               file:format_error({Line, Mod, Term}), "\n"], []),
-                    halt(1);
-                {error, R} ->
-                    io:format(standard_error,
-                              ["Error reading config file: ", 
-                               file:format_error(R), "\n"], []),
-                    halt(1)
-            end;
+            chkconfig(File);
+        ["chkconfig", "-config", File|_] ->
+            chkconfig(File);
         _ ->
             ok
     end,
@@ -68,7 +58,7 @@ main(Args) ->
             %% a "pong"
             io:format("pong\n");
         ["stop"] ->
-            io:format("~p\n", [rpc:call(TargetNode, actordb, stop_complete, [], RpcTimeout)]);
+            io:format("~p\n", [rpc:call(TargetNode, init, stop, [], RpcTimeout)]);
         ["restart"] ->
             io:format("~p\n", [rpc:call(TargetNode, init, restart, [], RpcTimeout)]);
         ["reboot"] ->
@@ -169,6 +159,23 @@ append_node_suffix(Name, Suffix) ->
             list_to_atom(lists:concat([Node, Suffix, os:getpid(), "@", Host]));
         [Node] ->
             list_to_atom(lists:concat([Node, Suffix, os:getpid()]))
+    end.
+
+chkconfig(File) ->
+    case file:consult(File) of
+        {ok, _} ->
+            io:format("ok\n"),
+            halt(0);
+        {error, {Line, Mod, Term}} ->
+            io:format(standard_error, 
+                      ["Error on line ", 
+                       file:format_error({Line, Mod, Term}), "\n"], []),
+            halt(1);
+        {error, R} ->
+            io:format(standard_error,
+                      ["Error reading config file: ", 
+                       file:format_error(R), "\n"], []),
+            halt(1)
     end.
 
 

@@ -93,9 +93,12 @@ main([]) ->
 main(Args) ->
   doit(Args,console).
 
-doit(Args,Ctx) ->
+doit([_,_] = Args,Ctx) ->
   [] = os:cmd(epmd_path(Ctx) ++ " -daemon"),
-  [Cmd1] = Args,
+  case Args of
+    [EtcPath1x,Cmd1] ->
+      EtcPath1 = EtcPath1x ++ "/etc"
+  end,
   case Cmd1 of
     "-us" ->
       Cmd = "updateschema";
@@ -125,19 +128,12 @@ doit(Args,Ctx) ->
       end,
       done(Ctx)
   end,
-  Dirname = filename:dirname(escript:script_name()),
-  case Dirname of
-    "." ->
-      Upper = filename:absname("../etc"),
-      Cur = filename:absname("etc"),
-      case filelib:is_dir(Upper) of
-        true ->
-          EtcPath = Upper;
-        false ->
-          EtcPath = Cur
-      end;
-    _ ->
-      EtcPath = filename:absname(filename:join(lists:reverse(tl(lists:reverse(filename:split(Dirname)))))++"/etc")
+  EtcPath2 = "{{platform_etc_dir}}",
+  case filelib:is_file(EtcPath2++"/app.config") of
+    true ->
+      EtcPath = EtcPath2;
+    false ->
+      EtcPath = EtcPath1
   end,
   {ok,VmBin} = file:read_file(EtcPath++"/vm.args"),
   Lines = string:tokens(binary_to_list(VmBin),"\r\n"),
@@ -183,7 +179,9 @@ doit(Args,Ctx) ->
         E ->
           print(Ctx,"Error: ~s~n",[E])
       end
-  end.
+  end;
+doit([Cmd],Ctx) ->
+  doit([".",Cmd],Ctx).
 
 done(console) ->
   halt(1);
