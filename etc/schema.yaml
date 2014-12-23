@@ -12,11 +12,6 @@ type1:
 type2:
 - CREATE TABLE asdf (id INTEGER PRIMARY KEY AUTOINCREMENT, txt BLOB)
 
-alias:
- type: kv
- schema:
-  - CREATE TABLE actors (id TEXT PRIMARY KEY, hash INTEGER, user_id TEXT) WITHOUT ROWID
-
 # counters is a key-value type. It will not be an actor but a fragmented table across all nodes
 counters: 
  type: kv
