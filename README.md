@@ -12,6 +12,7 @@ Homepage: http://www.actordb.com/
 
 ActorDB is:
 
+*   A distributed relational SQL database.
 *   Consistent (not eventually consistent).
 *   Distributed.
 *   Redundant.
@@ -19,6 +20,7 @@ ActorDB is:
 *   No single point of failure.
 *   ACID.
 *   Runs over MySQL protocol.
+*   Replicated safely using the Raft distributed consensus algorithm.
 
 Advantages
 
