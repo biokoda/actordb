@@ -27,6 +27,7 @@ main(_Args) ->
   
   file:write_file("win/actordb.bat",run()),
   file:write_file("win/actordbctrl.bat",ctrl()),
+  file:write_file("win/stop-background-processes.bat",epmd()),
   file:copy("actordbctrl","win/actordbctrl"),
 
   file:copy("rel/files/vm.args","win/etc/vm.args"),
@@ -41,7 +42,14 @@ main(_Args) ->
 
 run() ->
   check("erl.exe") ++
-  "%CD%/erl6.3/bin/werl -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n".
+  % "%CD%/erl6.3/bin/werl -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n".
+  "start \"\" \"%CD%/erl6.3/bin/werl\" -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n"++
+  "exit\n".
+
+epmd() ->
+  check("")++
+  "\"%CD%/erl6.3/erts-6.3/bin/epmd\" -kill\n"++
+  "exit\n".
 
 ctrl() ->
   check("escript.exe") ++
