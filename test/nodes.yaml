@@ -1,0 +1,14 @@
+
+nodes:
+{% for nd in nodes %}
+- {{ nd.distname }}:{{ nd.rpcport }}
+{% endfor %}
+
+
+
+groups:
+{% for grp in groups %}
+- name: {{ grp.name }}
+  nodes: [{{ grp.nodes|join:"," }}]
+  type: cluster
+{% endfor %}

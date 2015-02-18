@@ -1,0 +1,20 @@
+type1:
+- CREATE TABLE tab (id INTEGER PRIMARY KEY, txt TEXT, i INTEGER)
+- CREATE TABLE tab1 (id INTEGER PRIMARY KEY, txt TEXT)
+- CREATE TABLE tab2 (id INTEGER PRIMARY KEY, txt TEXT)
+
+thread:
+- CREATE TABLE thread (id INTEGER PRIMARY KEY, msg TEXT, user INTEGER);
+
+user:
+- CREATE TABLE userinfo (id INTEGER PRIMARY KEY, name TEXT);
+
+counters:
+ type: kv
+ schema:
+ - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER);
+filesystem:
+ type: kv
+ schema:
+ - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, size INTEGER)
+ - CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, fileid TEXT, uid INTEGER, FOREIGN KEY (fileid) REFERENCES actors(id) ON DELETE CASCADE)
