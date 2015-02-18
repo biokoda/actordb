@@ -1,12 +1,13 @@
-**0.9pre1**
+**0.9pre1 - 18 Feb 2015**
 
 - Feature: We have rewritten the replication core of ActorDB. It now uses the Raft algorithm for replication. For global state and individual actor state.
 - Feature: New sqlite driver (actordb_driver). It uses a combined wal file for all actors. This is a giant performance improvement.
 - Bugfix: Use variable as actor name.
 - Bugfix: Reads accross actors add the right actor name to actor column.
+- Bugfix: Mysql protocol do not close connections for invalid ActorDB sql statements.
 
 
-**0.5.2**
+**0.5.2 - 26 Feb 2014**
 
 - Feature: Windows build. It requires 64bit erlang version to be installed from http://www.erlang.org/download.html
 - Change: Simplified and optimized shard rebalancing when adding new nodes.

@@ -1,7 +1,7 @@
 # type1 is a type of actor. Every line is an update to the schema.
 # Lines SHOULD NEVER BE REMOVED. If lines are removed new actors will 
 #  have an incomplete schema.
-# To update the schema add lines for type or add new types.
+# To update the schema add lines for type to the end of list or add new types.
 
 type1: 
 - CREATE TABLE tab (id INTEGER PRIMARY KEY, txt TEXT)   #version 1

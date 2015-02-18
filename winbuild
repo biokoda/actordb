@@ -9,7 +9,8 @@
 % 5. rebar get-deps 
 % 6. rebar compile (yamerl is not windows compatible, remove all makefiles and rebar will be able to compile it)
 % 7. winbuild.bat
-% 8. Use win folder.
+% 8. Take erlang installation and copy it to win folder. Remove erl.ini files in bin and erts/bin folders
+% 9. Use win folder.
 
 main(_Args) ->
   filelib:ensure_dir("win/ebin/"),
@@ -40,11 +41,11 @@ main(_Args) ->
 
 run() ->
   check("erl.exe") ++
-  "%CD%/erl6.2/bin/werl -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n".
+  "%CD%/erl6.3/bin/werl -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n".
 
 ctrl() ->
   check("escript.exe") ++
-  "%CD%/erl6.2/bin/escript.exe actordbctrl %*\n"++
+  "%CD%/erl6.3/bin/escript.exe actordbctrl %*\n"++
   "pause".  
 
 check(_Name) ->
