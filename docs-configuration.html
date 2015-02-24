@@ -275,7 +275,7 @@ groups:
 
 	<h2 id="conf_schema" class="pagesubtitle">7.3 schema.yaml</h2>
 
-	<p class="pagetext">Schema file contains the SQL create or alter table commands. The schema can be changed at any time, but only by adding SQL statements to the list. Every time a new actor is created, the entire list of SQL commands will be executed to create the schema. If schema changes while ActorDB is running, actors will be updated by applying the new statements in the list.
+	<p class="pagetext">Schema file contains the SQL create or alter table commands. The schema can be changed at any time, but only by adding SQL statements <b>to the end of the list</b>. Every time a new actor is created, the entire list of SQL commands will be executed to create the schema. If schema changes while ActorDB is running, actors will be updated by applying the new statements in the list. If you add new statements in the middle of the list, you will have inconsistent schemas.
 </p>
 
 
@@ -374,9 +374,11 @@ typekv:
         <li>1. Clone from github</li>
         <li>2. Move to actordb folder</li>
         <li>3. ./startdev.sh</li>
-        <li>4. ./actordbctrl init</li>
+        <li>4. (in a new terminal) ./actordbctrl init</li>
     </ol>
 </p>
+
+<p class="pagetext">You can now execute commands in the console: actordb:exec("actor type1(actor1) create; select * from tab;").</p>
 
 <div class="pageactions">
     <span class="goleft"><a href="docs-examples.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(6. Examples)</span>

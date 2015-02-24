@@ -243,6 +243,7 @@ $(document).ready(function(){
 <h2 id="nodesyny" class="pagesubtitle">3.2 Node synchronisation</h2>
 <h3 id="h_321" class="pagesubtitle">3.2.1 Global state</h3>
     <p class="pagetext">ActorDB is designed around having to do the least possible inter-server synchronisation. That means each server should be as independent as possible and global state and the changing of that global state should be minimised. </p>
+    <p class="pagetext">Everything in ActorDB is an actor. This includes global state. It is a special actor that lives on up to 7 nodes (over multiple clusters). Those 7 nodes maintain strong consistency using Raft distributed consensus. If ActorDB has more than 7 nodes, the rest get their state by periodic pings from current master node.</p>
     <p class="pagetext">Global state for ActorDB:</p>
     <div class="pagetext">
         <ol>
@@ -250,59 +251,11 @@ $(document).ready(function(){
             <li>2. Database schema (changed manually by user).</li>
             <li>3. List of shards and which node owns which shard (caused by change in list of nodes).</li>
             <li>4. uniqid current max value (set automatically).</li>
-            <li>5. Who is master (changed when it goes offline).</li>
+            <li>5. List of nodes that are part of the global state group.</li>
         </ol>
     </div>
 
     <p class="pagetext"></p>
-
-    <p class="pagetext">Servers are synchronised through knowing who the master is and which shard belongs to whom.</p>
-    <p class="pagetext">Data is versioned and atomic. All changes are done through the master. A master does a majority consensus commit to save it. </p>
-
-    <p class="pagetext"></p>
-
-    <div class="pagetext">
-        Sequence of events:
-        <ol>
-            <li>1. Node starts, generates random number which does not change for the duration of its run.</li>
-            <li>2. It connects to all other nodes in cluster to find out what current state is and what their random numbers are.</li>
-            <li>3. If no state, or if can not connect to master it will check if its random number is highest of all.</li>
-            <li>4. If it is not, it waits 5s and goes back to step 2. If it has highest number, it tries to do a majority consensus commit to become master. If successful that node becomes master. </li>
-            <li>5. If there is no list of shards, master node will create them and assign them to servers.</li>
-        </ol>
-    </div>
-
-    <p class="pagetext"></p>
-
-    <p class="pagetext">
-    Shard data is then left unchanged until a new cluster is added. In that case, new nodes will start stealing shards from existing nodes. If there are too few shards they will be split in half. 
-    </p>
-
-    <p class="pagetext">
-    The act of stealing and splitting shards is initiated between the servers themselves and global state is only changed when it is done. When that happens the master is informed, it will fix the list of shards and initiate a majority consensus commit to save it.
-    </p>
-
-    <p class="pagetext">Problematic scenarios:</p>
-
-    <p class="pagetext">
-    Q: A node shuts down in the middle of a commit it has stale or wrong data when it starts again. <br/>
-    A: On startup nodes will not start until they have verified and updated their state.
-    </p>
-
-    <div class="pagetext">
-    Q: A node disconnects in the middle of a commit and later reconnects. It has committed data that was incorrect. <br/>
-    A: The master does periodic rebroadcasts of state. Eventually it will correct itself. But it had bad data for X seconds:
-    <ol>
-        <li>1. Bad data for shard locations: shards have moved someplace else and actor requests will be routed to the wrong place. That is an event that only happens as a result of user action when adding clusters. The way ActorDB is designed that generally should not cause any errors however. For every actor that has moved somewhere else, a marker is left behind where it moved to.</li>
-        <li>2. uniqid max value was wrong. That information is irrelevant to every server other than master. </li>
-        <li>3. Master has changed. Any state changes happen through master, if this reconnected server tries to change state it will connect to what it thinks is the master. If that server is not actually master, it will forward the request to what it thinks is master. That might look like a potential endless loop if there are no actual masters, but that is not the case. A master always emerges when there is a majority, if there is no majority state changes fail.</li>
-    </ol>
-     </div>
-  
-    <p class="pagetext"></p>
-    <p class="pagetext">                        
-    Our current model of handling global state is thus simple, but "should" be sufficient. We are in the process of building more thorough tests at the moment and this model is subject to change if it proves insufficient.</p>
-
     <hr class="hr14colorsmalmargin" />
 
     <h3 id="h_322" class="pagesubtitle">3.2.2 Actors</h3>
@@ -317,26 +270,12 @@ $(document).ready(function(){
         </ol>
     </div>
     <p class="pagetext"></p>
-    <p class="pagetext">When a request arrives to an actor on a server which was previously inactive on it:</p>
-    <p class="pagetext">1. Open its isolated database. Read last write numbers. It marks itself an unconfirmed master, because it has a request queued up.<br/>
-2. Verify its state. Ask all other nodes in the cluster what their state is for that actor.
-</p>
+    <p class="pagetext">Actors are replicated using the Raft distributed consensus protocol. The way we have integrated Raft with the database engine is by replicating the WAL (write-ahead log). Every write to the database is an append to WAL. For every append we send that data to the entire cluster to be replicated. Pages are simply inserted to WAL on all nodes. This means the master executes the SQL, but the slaves just append to WAL. </p>
     <p class="pagetext"></p>
-    <p class="pagetext">Possible scenarios:</p>
-    <div class="pagetext">
-        <ol>
-            <li>1. One of them is confirmed master already, current node turns itself into a slave. Any queued up requests are redirected to master.</li>
-            <li>2. No nodes are confirmed or unconfirmed master, it will assume master role.</li>
-<li>3. One or more nodes are unconfirmed masters. Generally this should be a very rare event, because requests always get routed with consistent hashing to specific nodes. But since they are all unconfirmed, they are all currently trying to verify their state at the same time. Every one of them will do a sort of node names and pick the first one.</li>
-<li>4. It finds multiple confirmed masters. This should be impossible. In case it happens through code error, it will tell other nodes to close actor.Note that even if actor somehow gets in this state, write logic will prevent writes coming from the wrong direction (a master receives a write from what it thinks is a slave). The worst case scenario will be a failed write request and not a conflicted actor database.</li>
-        </ol> 
-    </div>
-    <p class="pagetext">
-</p>
-    <p class="pagetext">What if a node was offline for a while and missed some writes? <br/>It will find a node that has the correct version of the database and copy it from there. ActorDB can execute reads and writes to an actor database while copying it over to another node.
-</p>
+    <p class="pagetext">If a server is very stale or is added new, ActorDB will first send the base actor file to the new server, then it will send the WAL pages (if there are any). </p>
     <p class="pagetext"></p>
-    <p class="pagetext"></p>
+    <p class="pagetext">We use a combined WAL file for all actors. This means even with potentially thousands of actors doing writes at the same time, the server will not be appending to thousands of files at once. All writes are appends to the same file and that performs very well. </p>
+    <p class="pagetext">You can even configure the server to use multiple independent hard drives. ActorDB will balance actors across hard drives and they will each have their own write-ahead log.</p>
 
     <hr class="hr14colorsmalmargin" />
 <h3 id="h_323" class="pagesubtitle">3.2.3 Multi-actor transactions</h3>
@@ -379,15 +318,19 @@ $(document).ready(function(){
 
 <h2 id="dbengine" class="pagesubtitle">3.3 Database engine</h2>
 
-<p class="pagetext">ActorDB does not reinvent the storage engine. It relies on one of the most well tested and stable pieces of code in use: sqlite</p>
+<p class="pagetext">ActorDB does not reinvent the storage engine. It relies on one of the most well tested and stable pieces of code in use: SQLite</p>
 
-<p class="pagetext">Now if you've had experience with sqlite you are likely thinking that is a terrible idea. Sqlite is not scalable. That is true. Sqlite is not scalable, but it is fast if configured to be. Remember that each actor in ActorDB is completely isolated. Every actor is a completely separate sqlite instance. Sqlite is not where ActorDB scalability comes from.</p>
+<p class="pagetext">Remember that SQLite is not itself a separate program. It is a software library which is a part of ActorDB. Running many or just one actor on a server does not make a difference.</p>
+
+<p class="pagetext">Now if you've had experience with SQLite you may be thinking that is a terrible idea. SQLite is not scalable. That is true. SQLite is not scalable, but it is fast if configured to be. Remember that each actor in ActorDB is completely isolated. Every actor is a completely separate sqlite instance. SQLite is not where ActorDB scalability comes from.</p>
+
+<p class="pagetext">ActorDB can easily handle thousands of requests per second for a single actor. For our purposes SQLite</p>
 
 <p class="pagetext">
-Sqlite provides a list of cases where its use is not recommended. <b>None of them apply to ActorDB</b> (<a href="https://www.sqlite.org/whentouse.html">https://www.sqlite.org/whentouse.html</a>).<br/>
+SQLite provides a list of cases where its use is not recommended. <b>None of them apply to ActorDB</b> (<a href="https://www.sqlite.org/whentouse.html">https://www.sqlite.org/whentouse.html</a>).<br/>
 <br/>
 <b>Client/Server Applications</b> - ActorDB takes care of the network protocol. It is very suitable for a client/server application over the network.<br/>
-<b>High-volume Websites</b> - ActorDB is able to spread the load across as many servers and sqlite instances as you throw at it. It will thus be very suitable for high-volume websites. <br/>
+<b>High-volume Websites</b> - ActorDB is able to spread the load across as many servers and SQLite instances as you throw at it. It will thus be very suitable for high-volume websites. <br/>
 <b>Very large datasets</b> - As long as you do not have a very large dataset inside a single actor (many GB) and spread the data across many actors, ActorDB will work very well even with petabytes of data.<br/>
 <b>High Concurrency</b> - ActorDB is massively concurrent. Not on the individual actor level, but across the entire database. </p>
 

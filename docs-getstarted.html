@@ -227,20 +227,8 @@ $(document).ready(function(){
 
             <h2 id="download_run" class="pagesubtitle">2.1 Download ActorDB</h2>
 
-            <p class="pagetext">This tutorial presumes you know how to use terminal.</p>
-
-            <p class="pagetext">If you are on OSX:</p>
-            <div class="structure">
-                <pre>
-https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.5.1-OSX-x86_64.tar.gz</pre>
-            </div>
-
-            <p class="pagetext">or if you are on Ubuntu/Debian:</p>
-
-            <div class="structure">
-                <pre>
-https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.5.1-1_amd64.deb</pre>
-            </div>
+            <p class="pagetext"> <a href="http://www.actordb.com/downloads.html">Download ActorDB</a></p>
+            
 
             <br/>
 <p class="pagetext">
@@ -248,7 +236,7 @@ If you are on OSX then open terminal and move into the directory where you downl
 
             <div class="structure">
                 <pre>
-tar -zxvf *.tar.gz</pre>
+tar -zxvf actordb*.tar.gz</pre>
             </div>
 
 
@@ -257,7 +245,7 @@ If you are on Ubuntu/Debian open terminal and move into the directory where you 
 
             <div class="structure">
                 <pre>
-dpkg -i actordb_0.5.1-1_amd64.deb</pre>
+dpkg -i actordb*.deb</pre>
             </div>
 
 
@@ -394,7 +382,7 @@ mysql> SELECT * FROM tab;
 
             <div class="structure">
 <pre>mysql> ACTOR type1(music);
-mysql> SELECT * FROM tab;
+mysql> UPDATE tab SET i=i+1 WHERE id=1;
 </pre>
             </div>
 

@@ -238,6 +238,31 @@ $(document).ready(function(){
 
     <p class="pagetext">ActorDB on the other hand allows you to start out with a database that is fully normalised within an actor unit and scale that database horizontally over as many servers as you need. No single points of failure or global locks. Transactions only affect the actors that participate in them. </p>
 
+    <p class="pagetext">ActorDB is:</p>
+    <p class="pagetext">
+        <ol>
+            <li>- A distributed relational SQL database.</li>
+            <li>- Strongly consistent (not eventually consistent).</li>
+            <li>- Massively concurrent.</li>
+            <li>- With no single point of failure.</li>
+            <li>- With no global read or write locks. </li>
+            <li>- Horizontally scalable to hundreds of nodes and petabytes of data.</li>
+        </ol>
+    </p>
+
+    <p class="pagetext">It achieves this with:</p>
+    <p class="pagetext">
+        <ol>
+            <li>- Raft distributed consensus algorithm.</li>
+            <li>- An existing battle tested and stable SQL database engine.</li>
+            <li>- Splitting your dataset into small independent chunks. Inspired by the "Actor model":http://en.wikipedia.org/wiki/Actor_model </li>
+        </ol>
+    </p>
+
+    <p class="pagetext">Key/Value stores generally sacrifice consistency and rich queries to achieve scalability. Document stores have richer query capabilities, but are not as scalable as Key/Value stores. They also often run on database engines less battle tested than other database types. </p>
+
+    <p class="pagetext">ActorDB is a relational SQL database, but it requires a different way of organizing your data. A much smaller sacrifice than other new database technologies. It requires a slightly different way of thinking, but is much more powerful than Key/Value databases or document stores. It is both familiar and new.</p>
+
 <div class="pageactions">	
 	<span class="goright">(2. Get started)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="docs-getstarted.html"><span class="pagebtn">Next &gt;&gt;</span></a></span>   
 </div>
