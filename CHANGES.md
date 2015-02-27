@@ -1,3 +1,7 @@
+**0.9pre2 - 27 Feb 2015**
+
+- Bugfix: Sometimes driver crashed when closing program. This did not affect any data.
+
 **0.9pre1 - 18 Feb 2015**
 
 - Feature: We have rewritten the replication core of ActorDB. It now uses the Raft algorithm for replication. For global state and individual actor state.
