@@ -1,3 +1,7 @@
+**0.9pre3 - 3 Mar 2015**
+
+- Bugfix: Sometimes initialized database did not start completely when restarted.
+
 **0.9pre2 - 27 Feb 2015**
 
 - Bugfix: Sometimes driver crashed when closing program. This did not affect any data.
