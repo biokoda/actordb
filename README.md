@@ -33,6 +33,8 @@ Advantages
 
 Documentation: http://www.actordb.com/docs-about.html
 
+Story: http://blog.biokoda.com/post/112206754025/why-we-built-actordb
+
 How to configure and run: http://www.actordb.com/docs-configuration.html
 
 Change log: https://github.com/biokoda/actordb/blob/master/CHANGES.md
