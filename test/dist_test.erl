@@ -261,7 +261,7 @@ addclusters(Path,Nd1,Nodes) ->
 	Grps = [[{name,butil:ds_val(name,Ndi)},{nodes,[butil:ds_val(name,Ndi)]}] || Ndi <- Nodes1],
 	DistName = detest:add_node(NI,cfg({Nodes1,Grps})),
 	rpc:call(Nd1,actordb_cmd,cmd,[updatenodes,commit,Path++"/node1/etc"],3000),
-	ok = wait_modified_tree(Nd1,nodes(connected),30000),
+	ok = wait_modified_tree(DistName,nodes(connected),30000),
 	addclusters(Path,Nd1,Nodes1).
 % -define(ND4,[{name,node4},{rpcport,45554}]).
 % -define(ONEGRP(XX),[[{name,"grp1"},{nodes,[butil:ds_val(name,Nd) || Nd <- XX]}]]).
