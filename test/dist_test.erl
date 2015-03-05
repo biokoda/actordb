@@ -263,10 +263,6 @@ addclusters(Path,Nd1,Nodes) ->
 	rpc:call(Nd1,actordb_cmd,cmd,[updatenodes,commit,Path++"/node1/etc"],3000),
 	ok = wait_modified_tree(DistName,nodes(connected),30000),
 	addclusters(Path,Nd1,Nodes1).
-% -define(ND4,[{name,node4},{rpcport,45554}]).
-% -define(ONEGRP(XX),[[{name,"grp1"},{nodes,[butil:ds_val(name,Nd) || Nd <- XX]}]]).
-% -define(TWOGRPS(X,Y),[[{name,"grp1"},{nodes,[butil:ds_val(name,Nd) || Nd <- X]}],
-%                       [{name,"grp2"},{nodes,[butil:ds_val(name,Nd) || Nd <- Y]}]]).
 
 
 wait_crash(L) ->
