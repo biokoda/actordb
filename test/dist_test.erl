@@ -22,7 +22,7 @@ numactors() ->
 %                                       "--suppressions=../otp/erts/emulator/valgrind/suppress.standard --show-possibly-lost=no"}]}
 cfg(Args) ->
 	case Args of
-		[TT|_] when TT == "single"; TT == "addsecond"; TT == "endless1" ->
+		[TT|_] when TT == "single"; TT == "addsecond"; TT == "endless1"; TT == "addclusters" ->
 			Nodes = [?ND1],
 			Groups = ?ONEGRP(Nodes);
 		["multicluster"|_] ->
@@ -31,6 +31,8 @@ cfg(Args) ->
 		[TT|_] when TT == "addthentake"; TT == "addcluster"; TT == "endless2" ->
 			Nodes = [?ND1,?ND2],
 			Groups = ?ONEGRP(Nodes);
+		{Nodes,Groups} ->
+			ok;
 		_ ->
 			Nodes = [?ND1,?ND2,?ND3],
 			Groups = ?ONEGRP(Nodes)
@@ -46,7 +48,7 @@ cfg(Args) ->
 		{per_node_cfg,["test/app.config"]},
 		% cmd is appended to erl execute command, it should execute your app.
 		% It can be set for every node individually. Add it to that list if you need it, it will override this value.
-		{cmd,"-s actordb_core"},
+		{cmd,"-s actordb_core +S 2 +A 2"},
 		
 		% optional command to start erlang with
 		% {erlcmd,"../otp/bin/cerl -valgrind"},
@@ -62,7 +64,7 @@ cfg(Args) ->
          {app_wait_timeout,60000*5},
 		
 		% which app to wait for to consider node started
-		{wait_for,actordb_core},
+		{wait_for_app,actordb_core},
 		% What RPC to execute for stopping nodes (optional, def. is {init,stop,[]})
 		{stop,{actordb_core,stop_complete,[]}},
 		{nodes,Nodes}
@@ -219,8 +221,53 @@ run(Param,"endless"++Num) ->
 	Pids = [spawn_monitor(fun() -> rseed(N),writer(Home,Nd1,N,0) end) || N <- lists:seq(1,8000)],
 	lager:info("Test will run until you stop it or something crashes."),
 	wait_crash(Ndl);
+run(Param,"addclusters") ->
+	Nd1 = butil:ds_val(node1,Param),
+	Ndl = [Nd1],
+	"ok" = rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
+	ok = wait_tree(Nd1,60000),
+	AdNodesProc = spawn_link(fun() -> addclusters(butil:ds_val(path,Param),Nd1,[?ND1]) end),
+	make_actors(0),
+	AdNodesProc ! done;
 run(Param,Nm) ->
 	lager:info("Unknown test type ~p",[Nm]).
+
+make_actors(N) when N > 10000 ->
+	ok;
+make_actors(N) ->
+	case exec(nodes(connected),<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
+			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:rand_bytes(128)))/binary,"',1);">>) of
+		{ok,_} ->
+			ok;
+		Err ->
+			exit(Err)
+	end,
+	timer:sleep(100),
+	make_actors(N+1).
+
+
+% We will keep adding single node clusters to the network. Cluster name is same as node name
+addclusters(Path,Nd1,Nodes) ->
+	receive
+		done ->
+			exit(normal)
+	after 0 ->
+		ok
+	end,
+	timer:sleep(1000),
+	Port = 50000 + length(Nodes),
+	NI = [{name,butil:toatom("node"++butil:tolist(Port))},{rpcport,Port}],
+	Nodes1 = [NI|Nodes],
+	Grps = [[{name,butil:ds_val(name,Ndi)},{nodes,[butil:ds_val(name,Ndi)]}] || Ndi <- Nodes1],
+	DistName = detest:add_node(NI,cfg({Nodes1,Grps})),
+	rpc:call(Nd1,actordb_cmd,cmd,[updatenodes,commit,Path++"/node1/etc"],3000),
+	ok = wait_modified_tree(Nd1,nodes(connected),30000),
+	addclusters(Path,Nd1,Nodes1).
+% -define(ND4,[{name,node4},{rpcport,45554}]).
+% -define(ONEGRP(XX),[[{name,"grp1"},{nodes,[butil:ds_val(name,Nd) || Nd <- XX]}]]).
+% -define(TWOGRPS(X,Y),[[{name,"grp1"},{nodes,[butil:ds_val(name,Nd) || Nd <- X]}],
+%                       [{name,"grp2"},{nodes,[butil:ds_val(name,Nd) || Nd <- Y]}]]).
+
 
 wait_crash(L) ->
 	wait_crash(L,element(2,os:timestamp()),0).
@@ -257,7 +304,7 @@ checkhome(Home) ->
 	end.
 writer(Home,Nd,N,RC) ->
 	checkhome(Home),
-	% Sleep a random amount from 0 to 30s
+	% Sleep a random amount from 0 to ..
 	SleepFor = random:uniform(10000),
 	timer:sleep(butil:ceiling(SleepFor)),
 	checkhome(Home),
