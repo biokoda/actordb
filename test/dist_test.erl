@@ -22,7 +22,7 @@ numactors() ->
 %                                       "--suppressions=../otp/erts/emulator/valgrind/suppress.standard --show-possibly-lost=no"}]}
 cfg(Args) ->
 	case Args of
-		[TT|_] when TT == "single"; TT == "addsecond"; TT == "endless1"; TT == "addclusters" ->
+		[TT|_] when TT == "single"; TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql" ->
 			Nodes = [?ND1],
 			Groups = ?ONEGRP(Nodes);
 		["multicluster"|_] ->
@@ -108,6 +108,20 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 	basic_write(Ndl),
 	basic_read(Ndl),
 	copyactor(Ndl);
+run(Param,"mysql") ->
+	true = code:add_path("test/mysql.ez"),
+	Nd1 = butil:ds_val(node1,Param),
+	rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
+	ok = wait_tree(Nd1,10000),
+	
+	[_,Host] = string:tokens(butil:tolist(Nd1),"@"),
+	MyOpt = [{host,Host},{port,butil:ds_val(rpcport,?ND1)-10000},{user,"user"},{password,"password"},{database,"actordb"}],
+	{ok,Pid} = mysql:start_link(MyOpt),
+	ok = mysql:query(Pid, <<"actor type1(ac1) create;INSERT INTO tab VALUES (111,'aaaa',1);">>),
+	ok = mysql:query(Pid, <<"PREPARE stmt1 () FOR type1 AS select * from tab;">>),
+	PrepRes = mysql:query(Pid,<<"actor type1(ac1);EXECUTE stmt1 ();">>),
+	io:format("PrepRes ~p~n",[PrepRes]),
+	ok;
 run(Param,"addsecond") ->
 	[Nd1,Path] = butil:ds_vals([node1,path],Param),
 	Ndl = [Nd1],
