@@ -119,7 +119,7 @@ run(Param,"mysql") ->
 	{ok,Pid} = mysql:start_link(MyOpt),
 	ok = mysql:query(Pid, <<"actor type1(ac1) create;INSERT INTO tab VALUES (111,'aaaa',1);">>),
 	ok = mysql:query(Pid, <<"PREPARE stmt1 () FOR type1 AS select * from tab;">>),
-	PrepRes = mysql:query(Pid,<<"actor type1(ac1);EXECUTE stmt1 ();">>),
+	{ok,_Cols,_Rows} = PrepRes = mysql:query(Pid,<<"actor type1(ac1);EXECUTE stmt1 ();">>),
 	io:format("PrepRes ~p~n",[PrepRes]),
 	ok;
 run(Param,"addsecond") ->
