@@ -3,6 +3,7 @@
 
 -module(dist_test).
 -export([cfg/1,setup/1,cleanup/1,run/1]).
+-export([killconns/0]).
 -define(INF(F,Param),io:format("~p ~p:~p ~s~n",[ltime(),?MODULE,?LINE,io_lib:fwrite(F,Param)])).
 -define(INF(F),?INF(F,[])).
 -define(NUMACTORS,100).
@@ -14,6 +15,7 @@ numactors() ->
 -define(ND2,[{name,node2},{rpcport,45552}]).
 -define(ND3,[{name,node3},{rpcport,45553}]).
 -define(ND4,[{name,node4},{rpcport,45554}]).
+-define(ND5,[{name,node5},{rpcport,45555}]).
 -define(ONEGRP(XX),[[{name,"grp1"},{nodes,[butil:ds_val(name,Nd) || Nd <- XX]}]]).
 -define(TWOGRPS(X,Y),[[{name,"grp1"},{nodes,[butil:ds_val(name,Nd) || Nd <- X]}],
                       [{name,"grp2"},{nodes,[butil:ds_val(name,Nd) || Nd <- Y]}]]).
@@ -31,6 +33,10 @@ cfg(Args) ->
 		[TT|_] when TT == "addthentake"; TT == "addcluster"; TT == "endless2" ->
 			Nodes = [?ND1,?ND2],
 			Groups = ?ONEGRP(Nodes);
+		["repl"|_] ->
+			Nodes = [?ND1,?ND2,?ND3,?ND4,?ND5],
+			Groups = [[{name,"grp1"},{nodes,[node1]}],[{name,"grp2"},{nodes,[node2]}],[{name,"grp3"},{nodes,[node3]}],
+			          [{name,"grp4"},{nodes,[node4]}],[{name,"grp5"},{nodes,[node5]}]];
 		{Nodes,Groups} ->
 			ok;
 		_ ->
@@ -39,13 +45,13 @@ cfg(Args) ->
 	end,
 	[
 		% these dtl files get nodes value as a parameter and whatever you add here.
-		{global_cfg,[{"test/nodes.yaml",[{groups,Groups}]},
+		{global_cfg,[{"test/etc/nodes.yaml",[{groups,Groups}]},
 		             % schema does not need additional any parameters.
-		             "test/schema.yaml"]},
+		             "test/etc/schema.yaml"]},
 		% Config files per node. For every node, its property list is added when rendering.
 		% if name contains app.config or vm.args it gets automatically added to run node command
 		% do not set cookie or name of node in vm.args this is set by detest
-		{per_node_cfg,["test/app.config"]},
+		{per_node_cfg,["test/etc/app.config"]},
 		% cmd is appended to erl execute command, it should execute your app.
 		% It can be set for every node individually. Add it to that list if you need it, it will override this value.
 		{cmd,"-s actordb_core +S 2 +A 2"},
@@ -243,104 +249,32 @@ run(Param,"addclusters") ->
 	AdNodesProc = spawn_link(fun() -> addclusters(butil:ds_val(path,Param),Nd1,[?ND1]) end),
 	make_actors(0),
 	AdNodesProc ! done;
+run(Param,"repl") ->
+	[Nd1,Nd2,Nd3,Nd4,Nd5|_] = Ndl = butil:ds_vals([node1,node2,node3,node4,node5],Param),
+	Nd1ip = dist_to_ip(Nd1),
+	Nd2ip = dist_to_ip(Nd2),
+	Nd3ip = dist_to_ip(Nd3),
+	Nd4ip = dist_to_ip(Nd4),
+	Nd5ip = dist_to_ip(Nd5),
+	rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
+	ok = wait_tree(Nd1,10000),
+	% nd1 should be leader
+	Isolate = damocles:isolate_between_interfaces([Nd1ip, Nd2ip], [Nd3ip,Nd4ip,Nd5ip]),
+	rpc:call(Nd1,?MODULE,killconns,[]),
+	timer:sleep(100),
+	ok = rpc:call(Nd1,actordb_sharedstate,write_global,[key,123],3000),
+	%supervisor:which_children(ranch_sup).
+	%write_global(Key,Val)
+	ok;
 run(Param,Nm) ->
 	lager:info("Unknown test type ~p",[Nm]).
 
-make_actors(N) when N > 10000 ->
-	ok;
-make_actors(N) ->
-	case exec(nodes(connected),<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
-			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:rand_bytes(128)))/binary,"',1);">>) of
-		{ok,_} ->
-			ok;
-		Err ->
-			exit(Err)
-	end,
-	timer:sleep(100),
-	make_actors(N+1).
+
+% Called on nodes
+killconns() ->
+	L = supervisor:which_children(ranch_server:get_connections_sup(bkdcore_in)),
+	[exit(Pid,stop) || {bkdcore_rpc,Pid,worker,[bkdcore_rpc]} <- L].
 
 
-% We will keep adding single node clusters to the network. Cluster name is same as node name
-addclusters(Path,Nd1,Nodes) ->
-	receive
-		done ->
-			exit(normal)
-	after 0 ->
-		ok
-	end,
-	timer:sleep(1000),
-	Port = 50000 + length(Nodes),
-	NI = [{name,butil:toatom("node"++butil:tolist(Port))},{rpcport,Port}],
-	Nodes1 = [NI|Nodes],
-	Grps = [[{name,butil:ds_val(name,Ndi)},{nodes,[butil:ds_val(name,Ndi)]}] || Ndi <- Nodes1],
-	DistName = detest:add_node(NI,cfg({Nodes1,Grps})),
-	rpc:call(Nd1,actordb_cmd,cmd,[updatenodes,commit,Path++"/node1/etc"],3000),
-	ok = wait_modified_tree(DistName,nodes(connected),30000),
-	addclusters(Path,Nd1,Nodes1).
 
-
-wait_crash(L) ->
-	wait_crash(L,element(2,os:timestamp()),0).
-wait_crash(L,Sec,N) ->
-	case L -- nodes(connected) of
-		[] ->
-			receive
-				{'DOWN',_Ref,_,_Pid,Reason} when Reason /= normal ->
-					lager:error("Crash with reason ~p",[Reason])
-			after 30 ->
-				Sec1 = element(2,os:timestamp()),
-				case Sec of
-					Sec1 ->
-						ok;
-					_ ->
-						lager:info("Writes so far: ~p, insec ~p",[butil:ds_val(wnum,writecounter),butil:ds_val(wnum_sec,writecounter)]),
-						butil:ds_add(wnum_sec,0,writecounter)
-				end,
-				wait_crash(L,Sec1,N+1)
-			end;
-		L1 ->
-			lager:error("Stopping. Nodes gone: ~p",[L1])
-	end.
-
-rseed(N) ->
-	{A,B,C} = now(),
-	random:seed(A*erlang:phash2(["writer",now(),self()]),B+erlang:phash2([1,2,3,N]),C*N).
-checkhome(Home) ->
-	case erlang:is_process_alive(Home) of
-		true ->
-			ok;
-		false ->
-			exit(normal)
-	end.
-writer(Home,Nd,N,RC) ->
-	checkhome(Home),
-	% Sleep a random amount from 0 to ..
-	SleepFor = random:uniform(10000),
-	timer:sleep(butil:ceiling(SleepFor)),
-	checkhome(Home),
-	Start = os:timestamp(),
-	case exec([Nd],<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
-			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:rand_bytes(128)))/binary,"',1);">>) of
-		{ok,_} ->
-			ok;
-		Err ->
-			exit(Err)
-	end,
-	Stop = os:timestamp(),
-	Diff = timer:now_diff(Stop,Start) div 1000,
-	% when quitting ets table may be gone so die quitely
-	case catch ets:update_counter(writecounter,wnum,1) of
-		X when is_integer(X) ->
-			ok;
-		_ ->
-			exit(normal)
-	end,
-	case catch ets:update_counter(writecounter,wnum_sec,1) of
-		X1 when is_integer(X1) ->
-			ok;
-		_ ->
-			exit(normal)
-	end,
-	%lager:info("Write complete for ~p, runcount=~p, slept_for=~p, exec_time=~ps  ~pms",[N,RC,SleepFor,Diff div 1000, Diff rem 1000]),
-	writer(Home,Nd,N,RC+1).
 

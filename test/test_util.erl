@@ -174,11 +174,107 @@ kv_readwrite(Ndl) ->
 
 	ok.
 
+make_actors(N) when N > 10000 ->
+	ok;
+make_actors(N) ->
+	case exec(nodes(connected),<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
+			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:rand_bytes(128)))/binary,"',1);">>) of
+		{ok,_} ->
+			ok;
+		Err ->
+			exit(Err)
+	end,
+	timer:sleep(100),
+	make_actors(N+1).
+
+writer(Home,Nd,N,RC) ->
+	checkhome(Home),
+	% Sleep a random amount from 0 to ..
+	SleepFor = random:uniform(10000),
+	timer:sleep(butil:ceiling(SleepFor)),
+	checkhome(Home),
+	Start = os:timestamp(),
+	case exec([Nd],<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
+			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:rand_bytes(128)))/binary,"',1);">>) of
+		{ok,_} ->
+			ok;
+		Err ->
+			exit(Err)
+	end,
+	Stop = os:timestamp(),
+	Diff = timer:now_diff(Stop,Start) div 1000,
+	% when quitting ets table may be gone so die quitely
+	case catch ets:update_counter(writecounter,wnum,1) of
+		X when is_integer(X) ->
+			ok;
+		_ ->
+			exit(normal)
+	end,
+	case catch ets:update_counter(writecounter,wnum_sec,1) of
+		X1 when is_integer(X1) ->
+			ok;
+		_ ->
+			exit(normal)
+	end,
+	%lager:info("Write complete for ~p, runcount=~p, slept_for=~p, exec_time=~ps  ~pms",[N,RC,SleepFor,Diff div 1000, Diff rem 1000]),
+	writer(Home,Nd,N,RC+1).
+
+% We will keep adding single node clusters to the network. Cluster name is same as node name
+addclusters(Path,Nd1,Nodes) ->
+	receive
+		done ->
+			exit(normal)
+	after 0 ->
+		ok
+	end,
+	timer:sleep(1000),
+	Port = 50000 + length(Nodes),
+	NI = [{name,butil:toatom("node"++butil:tolist(Port))},{rpcport,Port}],
+	Nodes1 = [NI|Nodes],
+	Grps = [[{name,butil:ds_val(name,Ndi)},{nodes,[butil:ds_val(name,Ndi)]}] || Ndi <- Nodes1],
+	DistName = detest:add_node(NI,cfg({Nodes1,Grps})),
+	rpc:call(Nd1,actordb_cmd,cmd,[updatenodes,commit,Path++"/node1/etc"],3000),
+	ok = wait_modified_tree(DistName,nodes(connected),30000),
+	addclusters(Path,Nd1,Nodes1).
+
+wait_crash(L) ->
+	wait_crash(L,element(2,os:timestamp()),0).
+wait_crash(L,Sec,N) ->
+	case L -- nodes(connected) of
+		[] ->
+			receive
+				{'DOWN',_Ref,_,_Pid,Reason} when Reason /= normal ->
+					lager:error("Crash with reason ~p",[Reason])
+			after 30 ->
+				Sec1 = element(2,os:timestamp()),
+				case Sec of
+					Sec1 ->
+						ok;
+					_ ->
+						lager:info("Writes so far: ~p, insec ~p",[butil:ds_val(wnum,writecounter),butil:ds_val(wnum_sec,writecounter)]),
+						butil:ds_add(wnum_sec,0,writecounter)
+				end,
+				wait_crash(L,Sec1,N+1)
+			end;
+		L1 ->
+			lager:error("Stopping. Nodes gone: ~p",[L1])
+	end.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % 
 % 	UTILITY FUNCTIONS
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+checkhome(Home) ->
+	case erlang:is_process_alive(Home) of
+		true ->
+			ok;
+		false ->
+			exit(normal)
+	end.
+rseed(N) ->
+	{A,B,C} = now(),
+	random:seed(A*erlang:phash2(["writer",now(),self()]),B+erlang:phash2([1,2,3,N]),C*N).
 flatnow() ->
 	{MS,S,MiS} = now(),
 	MS*1000000000000 + S*1000000 + MiS.
@@ -263,3 +359,6 @@ wait_modified_tree(Nd,All,StopAt) ->
 dist_to_bkdnm(Nm) ->
 	[BN|_] = string:tokens(atom_to_list(Nm),"@"),
 	butil:tobin(BN).
+dist_to_ip(Nm) ->
+	[_,IP] = string:tokens(atom_to_list(Nm),"@"),
+	IP.
