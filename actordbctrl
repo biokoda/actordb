@@ -226,6 +226,10 @@ do_confirmation(X) when X == console; X == winconsole ->
 			yes;
 		{ok,[n]} ->
 			no;
+    {ok,['Y']} ->
+      yes;
+    {ok,['N']} ->
+      no;
 		_ ->
 			do_confirmation(X)
 	end.
