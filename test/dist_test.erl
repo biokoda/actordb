@@ -3,7 +3,7 @@
 
 -module(dist_test).
 -export([cfg/1,setup/1,cleanup/1,run/1]).
--export([killconns/0]).
+-export([killconns/0,call_start/1,call_receive/1]).
 -define(INF(F,Param),io:format("~p ~p:~p ~s~n",[ltime(),?MODULE,?LINE,io_lib:fwrite(F,Param)])).
 -define(INF(F),?INF(F,[])).
 -define(NUMACTORS,100).
@@ -82,6 +82,7 @@ setup(Param) ->
 
 % Nodes have been closed
 cleanup(_Param) ->
+	os:cmd("iptables --flush"),
 	ok.
 
 run(Param) ->
@@ -258,17 +259,53 @@ run(Param,"repl") ->
 	Nd5ip = dist_to_ip(Nd5),
 	rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
 	ok = wait_tree(Nd1,10000),
-	% nd1 should be leader
-	Isolate = damocles:isolate_between_interfaces([Nd1ip, Nd2ip], [Nd3ip,Nd4ip,Nd5ip]),
-	rpc:call(Nd1,?MODULE,killconns,[]),
-	timer:sleep(100),
-	ok = rpc:call(Nd1,actordb_sharedstate,write_global,[key,123],3000),
-	%supervisor:which_children(ranch_sup).
-	%write_global(Key,Val)
+	timer:sleep(1000),
+	
+	lager:info("Isolating node1,node2, me ~p",[node()]),
+	isolate([Nd1ip,Nd2ip],[Nd3ip,Nd4ip,Nd5ip]),
+	%rpc:call(Nd1,?MODULE,killconns,[]),
+	%rpc:call(Nd2,?MODULE,killconns,[]),
+	%rpc:call(Nd3,?MODULE,killconns,[]),
+	%rpc:call(Nd4,?MODULE,killconns,[]),
+	%rpc:call(Nd5,?MODULE,killconns,[]),
+	
+	%damocles:isolate_between_interfaces([Nd1ip, Nd2ip], [Nd3ip,Nd4ip,Nd5ip]),
+	
+	% nd1 should be leader but now it can only communicate with node2
+	{badrpc,_} = rpc:call(Nd1,actordb_sharedstate,write_global,[key,123],5000),
+	lager:info("Abandoned call, trying in ~p",[Nd3]),
+	{ok,_} = rpc:call(Nd3,actordb_sharedstate,write_global,[key1,321],2000),
+	lager:info("Write success. Restoring network. Do we have abandoned write?"),
+	%damocles:restore_all_interfaces(),
+	cleanup(1),
+	123 = rpc:call(Nd1,actordb_sharedstate,read,[<<"global">>,key],15000),
+	321 = rpc:call(Nd1,actordb_sharedstate,read,[<<"global">>,key1],15000),
+	lager:info("REACHED END SUCCESSFULLY"),
+	%{ok,_} = rpc:call(Nd1,?MODULE,call_start,[node2],10000),
+	%{ok,_} = rpc:call(Nd1,?MODULE,call_start,[node3],10000),
 	ok;
 run(Param,Nm) ->
 	lager:info("Unknown test type ~p",[Nm]).
 
+
+isolate([],_) ->
+	ok;
+isolate([[_|_]|_] = ToIsolate, [[_|_]|_] = IsolateFrom) ->
+	[begin
+		Cmd1 = "iptables -A INPUT  -m conntrack --ctstate NEW,ESTABLISHED,RELATED --ctorigsrc "++F++" --ctorigdst "++hd(ToIsolate)++"  -j DROP",
+		Cmd2 = "iptables -A INPUT  -m conntrack --ctstate NEW,ESTABLISHED,RELATED --ctorigsrc "++hd(ToIsolate)++" --ctorigdst "++F++"  -j DROP",
+		lager:info("~s: ~s",[Cmd1,os:cmd(Cmd1)]),
+		lager:info("~s: ~s",[Cmd2,os:cmd(Cmd2)])
+		%Cmd3 = "iptables -A OUTPUT  -m conntrack --ctstate NEW,ESTABLISHED,RELATED -s "++F++" -d "++hd(ToIsolate)++"  -j DROP",
+		%Cmd4 = "iptables -A OUTPUT  -m conntrack --ctstate NEW,ESTABLISHED,RELATED -s "++hd(ToIsolate)++" -d "++F++"  -j DROP",
+		%lager:info("~s: ~s",[Cmd3,os:cmd(Cmd3)]),
+		%lager:info("~s: ~s",[Cmd4,os:cmd(Cmd4)])
+	end || F <- IsolateFrom],
+	isolate(tl(ToIsolate),IsolateFrom);
+isolate([_|_] = ToIsolate, IsolateFrom) when is_integer(hd(ToIsolate)) ->
+	isolate([ToIsolate],IsolateFrom);
+isolate(ToIsolate, [_|_] = IsolateFrom) when is_integer(hd(IsolateFrom)) ->
+	isolate(ToIsolate,[IsolateFrom]).
 
 % Called on nodes
 killconns() ->
@@ -277,4 +314,12 @@ killconns() ->
 
 
 
+% This module is loaded inside every executed node. So we can rpc to these functions on every node.
+call_start(Nd) ->
+	lager:info("Calling from=~p to=~p, at=~p, connected=~p~n",[node(), Nd, time(),nodes(connected)]),
+	%{ok,_} = rpc:call(Nd,?MODULE,call_receive,[node()],1000).
+	{ok,_} = bkdcore_rpc:call(butil:tobin(Nd),{?MODULE,call_receive,[bkdcore:node_name()]}).
 
+call_receive(From) ->
+	lager:info("Received call on=~p from=~p, at=~p~n",[node(), From, time()]),
+	{ok,node()}.
