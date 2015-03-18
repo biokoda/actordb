@@ -4,7 +4,7 @@
 
 
 cmds1() ->
-  "Supported commands: init, updateschema (-us), updatenodes (-un), stat (-s), help (-h)~n".
+  "Supported commands:~ninit~nupdateschema (-us)~nupdatenodes (-un)~nstat (-s)~nhelp (-h)~n~n".
 cmds() ->
   cmds1()++
   "Stat columns:~n"++
