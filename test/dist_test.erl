@@ -1,9 +1,12 @@
+% This Source Code Form is subject to the terms of the Mozilla Public
+% License, v. 2.0. If a copy of the MPL was not distributed with this
+% file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 % ./detest test/dist_test.erl single
 % ./detest test/dist_test.erl cluster
 
 -module(dist_test).
 -export([cfg/1,setup/1,cleanup/1,run/1]).
--export([killconns/0,call_start/1,call_receive/1]).
 -define(INF(F,Param),io:format("~p ~p:~p ~s~n",[ltime(),?MODULE,?LINE,io_lib:fwrite(F,Param)])).
 -define(INF(F),?INF(F,[])).
 -define(NUMACTORS,100).
@@ -33,10 +36,6 @@ cfg(Args) ->
 		[TT|_] when TT == "addthentake"; TT == "addcluster"; TT == "endless2" ->
 			Nodes = [?ND1,?ND2],
 			Groups = ?ONEGRP(Nodes);
-		["repl"|_] ->
-			Nodes = [?ND1,?ND2,?ND3,?ND4,?ND5],
-			Groups = [[{name,"grp1"},{nodes,[node1]}],[{name,"grp2"},{nodes,[node2]}],[{name,"grp3"},{nodes,[node3]}],
-			          [{name,"grp4"},{nodes,[node4]}],[{name,"grp5"},{nodes,[node5]}]];
 		{Nodes,Groups} ->
 			ok;
 		_ ->
@@ -82,7 +81,6 @@ setup(Param) ->
 
 % Nodes have been closed
 cleanup(_Param) ->
-	os:cmd("iptables --flush"),
 	ok.
 
 run(Param) ->
@@ -250,76 +248,10 @@ run(Param,"addclusters") ->
 	AdNodesProc = spawn_link(fun() -> addclusters(butil:ds_val(path,Param),Nd1,[?ND1]) end),
 	make_actors(0),
 	AdNodesProc ! done;
-run(Param,"repl") ->
-	[Nd1,Nd2,Nd3,Nd4,Nd5|_] = Ndl = butil:ds_vals([node1,node2,node3,node4,node5],Param),
-	Nd1ip = dist_to_ip(Nd1),
-	Nd2ip = dist_to_ip(Nd2),
-	Nd3ip = dist_to_ip(Nd3),
-	Nd4ip = dist_to_ip(Nd4),
-	Nd5ip = dist_to_ip(Nd5),
-	rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
-	ok = wait_tree(Nd1,10000),
-	timer:sleep(1000),
-	
-	lager:info("Isolating node1,node2, me ~p",[node()]),
-	isolate([Nd1ip,Nd2ip],[Nd3ip,Nd4ip,Nd5ip]),
-	%rpc:call(Nd1,?MODULE,killconns,[]),
-	%rpc:call(Nd2,?MODULE,killconns,[]),
-	%rpc:call(Nd3,?MODULE,killconns,[]),
-	%rpc:call(Nd4,?MODULE,killconns,[]),
-	%rpc:call(Nd5,?MODULE,killconns,[]),
-	
-	%damocles:isolate_between_interfaces([Nd1ip, Nd2ip], [Nd3ip,Nd4ip,Nd5ip]),
-	
-	% nd1 should be leader but now it can only communicate with node2
-	{badrpc,_} = rpc:call(Nd1,actordb_sharedstate,write_global,[key,123],5000),
-	lager:info("Abandoned call, trying in ~p",[Nd3]),
-	{ok,_} = rpc:call(Nd3,actordb_sharedstate,write_global,[key1,321],2000),
-	lager:info("Write success. Restoring network. Do we have abandoned write?"),
-	%damocles:restore_all_interfaces(),
-	cleanup(1),
-	123 = rpc:call(Nd1,actordb_sharedstate,read,[<<"global">>,key],15000),
-	321 = rpc:call(Nd1,actordb_sharedstate,read,[<<"global">>,key1],15000),
-	lager:info("REACHED END SUCCESSFULLY"),
-	%{ok,_} = rpc:call(Nd1,?MODULE,call_start,[node2],10000),
-	%{ok,_} = rpc:call(Nd1,?MODULE,call_start,[node3],10000),
-	ok;
 run(Param,Nm) ->
 	lager:info("Unknown test type ~p",[Nm]).
 
 
-isolate([],_) ->
-	ok;
-isolate([[_|_]|_] = ToIsolate, [[_|_]|_] = IsolateFrom) ->
-	[begin
-		Cmd1 = "iptables -A INPUT  -m conntrack --ctstate NEW,ESTABLISHED,RELATED --ctorigsrc "++F++" --ctorigdst "++hd(ToIsolate)++"  -j DROP",
-		Cmd2 = "iptables -A INPUT  -m conntrack --ctstate NEW,ESTABLISHED,RELATED --ctorigsrc "++hd(ToIsolate)++" --ctorigdst "++F++"  -j DROP",
-		lager:info("~s: ~s",[Cmd1,os:cmd(Cmd1)]),
-		lager:info("~s: ~s",[Cmd2,os:cmd(Cmd2)])
-		%Cmd3 = "iptables -A OUTPUT  -m conntrack --ctstate NEW,ESTABLISHED,RELATED -s "++F++" -d "++hd(ToIsolate)++"  -j DROP",
-		%Cmd4 = "iptables -A OUTPUT  -m conntrack --ctstate NEW,ESTABLISHED,RELATED -s "++hd(ToIsolate)++" -d "++F++"  -j DROP",
-		%lager:info("~s: ~s",[Cmd3,os:cmd(Cmd3)]),
-		%lager:info("~s: ~s",[Cmd4,os:cmd(Cmd4)])
-	end || F <- IsolateFrom],
-	isolate(tl(ToIsolate),IsolateFrom);
-isolate([_|_] = ToIsolate, IsolateFrom) when is_integer(hd(ToIsolate)) ->
-	isolate([ToIsolate],IsolateFrom);
-isolate(ToIsolate, [_|_] = IsolateFrom) when is_integer(hd(IsolateFrom)) ->
-	isolate(ToIsolate,[IsolateFrom]).
-
-% Called on nodes
-killconns() ->
-	L = supervisor:which_children(ranch_server:get_connections_sup(bkdcore_in)),
-	[exit(Pid,stop) || {bkdcore_rpc,Pid,worker,[bkdcore_rpc]} <- L].
 
 
 
-% This module is loaded inside every executed node. So we can rpc to these functions on every node.
-call_start(Nd) ->
-	lager:info("Calling from=~p to=~p, at=~p, connected=~p~n",[node(), Nd, time(),nodes(connected)]),
-	%{ok,_} = rpc:call(Nd,?MODULE,call_receive,[node()],1000).
-	{ok,_} = bkdcore_rpc:call(butil:tobin(Nd),{?MODULE,call_receive,[bkdcore:node_name()]}).
-
-call_receive(From) ->
-	lager:info("Received call on=~p from=~p, at=~p~n",[node(), From, time()]),
-	{ok,node()}.
