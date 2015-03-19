@@ -5,7 +5,7 @@
 % Execute with: ./detest test/repl_test.erl
 -module(dist_test).
 -export([cfg/1,setup/1,cleanup/1,run/1]).
-%-export([killconns/0,call_start/1,call_receive/1]).
+-export([killconns/0]).
 -define(INF(F,Param),io:format("~p ~p:~p ~s~n",[ltime(),?MODULE,?LINE,io_lib:fwrite(F,Param)])).
 -define(INF(F),?INF(F,[])).
 -define(NUMACTORS,100).
@@ -62,62 +62,53 @@ setup(Param) ->
 
 % Nodes have been closed
 cleanup(_Param) ->
+	[detest:cmd(Nd,"iptables --flush") || Nd <- [?ND1,?ND2,?ND3,?ND4,?ND5]],
 	ok.
 
 run(Param) ->
 	[Nd1,Nd2,Nd3,Nd4,Nd5|_] = Ndl = butil:ds_vals([node1,node2,node3,node4,node5],Param),
 	lager:info("Calling node to init ~p, connected to: ~p",[Nd1,nodes(connected)]),
-	ok = rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],10000),
+	"ok" = rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],10000),
 	ok = wait_tree(Nd1,10000),
 	timer:sleep(1000),
 	
 	lager:info("Isolating node1,node2, me ~p",[node()]),
-	isolate([?ND1,?ND2],[?ND3,?ND4,?ND5]),
-	%rpc:call(Nd1,?MODULE,killconns,[]),
-	%rpc:call(Nd2,?MODULE,killconns,[]),
-	%rpc:call(Nd3,?MODULE,killconns,[]),
-	%rpc:call(Nd4,?MODULE,killconns,[]),
-	%rpc:call(Nd5,?MODULE,killconns,[]),
-	
-	%damocles:isolate_between_interfaces([Nd1ip, Nd2ip], [Nd3ip,Nd4ip,Nd5ip]),
+	isolate([?ND1,?ND2],[?ND3,?ND4,?ND5]),	
+	rpc:call(Nd1,?MODULE,killconns,[]),
+	rpc:call(Nd2,?MODULE,killconns,[]),
+	rpc:call(Nd3,?MODULE,killconns,[]),
+	rpc:call(Nd4,?MODULE,killconns,[]),
+	rpc:call(Nd5,?MODULE,killconns,[]),
+	timer:sleep(2000),
 	
 	% nd1 should be leader but now it can only communicate with node2
 	{badrpc,_} = rpc:call(Nd1,actordb_sharedstate,write_global,[key,123],5000),
 	lager:info("Abandoned call, trying in ~p",[Nd3]),
-	{ok,_} = rpc:call(Nd3,actordb_sharedstate,write_global,[key1,321],2000),
-	lager:info("Write success. Restoring network. Do we have abandoned write?"),
-	%damocles:restore_all_interfaces(),
-	%cleanup(1),
-	123 = rpc:call(Nd1,actordb_sharedstate,read,[<<"global">>,key],15000),
-	321 = rpc:call(Nd1,actordb_sharedstate,read,[<<"global">>,key1],15000),
+	[1,2,3,4,5,6,7,8,9,10] = rpc:call(Nd3,lists,seq,[1,10],5000),
+	ok = rpc:call(Nd3,actordb_sharedstate,write_global,[key1,321],8000),
+	
+
+	%123 = rpc:call(Nd1,actordb_sharedstate,read,[<<"global">>,key],15000),
+	321 = rpc:call(Nd3,actordb_sharedstate,read,[<<"global">>,key1],15000),
 	lager:info("REACHED END SUCCESSFULLY"),
-	%{ok,_} = rpc:call(Nd1,?MODULE,call_start,[node2],10000),
-	%{ok,_} = rpc:call(Nd1,?MODULE,call_start,[node3],10000),
 	ok.
 
 
 isolate([ToIsolate|T], [_|_] = IsolateFrom) ->
 	[begin
-		Cmd = "iptables -A INPUT -s "++butil:tolist(butil:ds_val(name,F))++" -j DROP",
-		lager:info("On node=~p, running: ~s",[butil:ds_val(name,ToIsolate),Cmd]),
-		detest:cmd(ToIsolate,Cmd)
+		Cmd1 = "iptables -A INPUT -s "++butil:tolist(butil:ds_val(name,F))++" -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j DROP",
+		Cmd2 = "iptables -A OUTPUT -s "++butil:tolist(butil:ds_val(name,ToIsolate))++" -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j DROP",
+		lager:info("On node=~p, running: ~s",[butil:ds_val(name,ToIsolate),Cmd1]),
+		lager:info("On node=~p, running: ~s",[butil:ds_val(name,F),Cmd2]),
+		detest:cmd(ToIsolate,Cmd1),
+		detest:cmd(F,Cmd2)
 	end || F <- IsolateFrom],
 	isolate(T,IsolateFrom);
 isolate([],_) ->
 	ok.
 
 
-% Called on nodes
-%killconns() ->
-%	L = supervisor:which_children(ranch_server:get_connections_sup(bkdcore_in)),
-%	[exit(Pid,stop) || {bkdcore_rpc,Pid,worker,[bkdcore_rpc]} <- L].
-
-% This module is loaded inside every executed node. So we can rpc to these functions on every node.
-%call_start(Nd) ->
-%	lager:info("Calling from=~p to=~p, at=~p, connected=~p~n",[node(), Nd, time(),nodes(connected)]),
-	%{ok,_} = rpc:call(Nd,?MODULE,call_receive,[node()],1000).
-%	{ok,_} = bkdcore_rpc:call(butil:tobin(Nd),{?MODULE,call_receive,[bkdcore:node_name()]}).
-
-%call_receive(From) ->
-%	lager:info("Received call on=~p from=~p, at=~p~n",[node(), From, time()]),
-%	{ok,node()}.
+% Called on nodes. Kills all RPC connections.
+killconns() ->
+	L = supervisor:which_children(ranch_server:get_connections_sup(bkdcore_in)),
+	[exit(Pid,stop) || {bkdcore_rpc,Pid,worker,[bkdcore_rpc]} <- L].
