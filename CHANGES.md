@@ -1,3 +1,11 @@
+**0.9pre4 - 24 Mar 2015**
+
+- Bugfix: New driver had improper Raft handling on conflicts
+- Bugfix: Driver/sqlite settings were improper, resulting in slowdowns when creating new actors
+- Bugfix: Cluster latency detection was not working
+- Feature: Basic thrift interface
+
+
 **0.9pre3 - 3 Mar 2015**
 
 - Bugfix: Sometimes initialized database did not start completely when restarted.
