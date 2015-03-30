@@ -19,7 +19,7 @@ ActorDB is:
 *   Massively concurrent.
 *   No single point of failure.
 *   ACID.
-*   Runs over MySQL protocol.
+*   Connectable over MySQL protocol and Thrift.
 *   Replicated safely using the Raft distributed consensus algorithm.
 
 Advantages
