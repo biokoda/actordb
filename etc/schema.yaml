@@ -1,9 +1,9 @@
 # type1, type2 are types of actors. Every line is an update to the schema.
-# Lines SHOULD NEVER BE REMOVED. If lines are removed new actors will 
+# Lines SHOULD NEVER BE REMOVED. If lines are removed new actors will
 #  have an incomplete schema.
 # To update the schema add lines for type or add new types.
 
-type1: 
+type1:
 - CREATE TABLE tab (id INTEGER PRIMARY KEY, txt TEXT)   #version 1
 - CREATE TABLE tab1 (id INTEGER PRIMARY KEY, txt TEXT)  #version 2
 - ALTER TABLE tab ADD i INTEGER                         #version 3
@@ -13,21 +13,23 @@ type2:
 - CREATE TABLE asdf (id INTEGER PRIMARY KEY AUTOINCREMENT, txt BLOB)
 
 # counters is a key-value type. It will not be an actor but a fragmented table across all nodes
-counters: 
+counters:
  type: kv
- schema: 
+ schema:
   - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)
 
-# Another KV type but with multiple tables. 
-# actors - Primary table that must exist for every kv type. 
+# Another KV type but with multiple tables.
+# actors - Primary table that must exist for every kv type.
 # 		   It is the root table that all other tables need to be linked to with foreign keys.
-# users - Secondary table linked to actors with a foreign key set to ON DELETE CASCADE. 
+# users - Secondary table linked to actors with a foreign key set to ON DELETE CASCADE.
 #         ON DELETE CASCADE must be present or actordb will not work correctly.
 filesystem:
  type: kv
  schema:
   - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, size INTEGER)
   - CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, fileid TEXT, uid INTEGER, FOREIGN KEY (fileid) REFERENCES actors(id) ON DELETE CASCADE)
+
+
   # The above schema is an example for a sort of distributed filesystem that keeps track which users have a file. actors(id) is sha of file contents.
 
   # How to insert data (fileid is 'filesha'):

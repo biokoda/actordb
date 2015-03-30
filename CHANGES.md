@@ -1,3 +1,7 @@
+**0.9pre5 - 30 Mar 2015**
+- Bugfix: Raft replication bugfix
+
+
 **0.9pre4 - 24 Mar 2015**
 
 - Bugfix: New driver had improper Raft handling on conflicts
