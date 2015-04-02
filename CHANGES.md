@@ -1,5 +1,9 @@
+**0.9pre7 - 2 Apr 2015**
+- Bugfix: Manually setting cache size was a limit to transaction size.
+
+
 **0.9pre6 - 31 Mar 2015**
-- Bugfix: Rename two thrift values as they had language conflicts
+- Bugfix: Rename two thrift values as they had language conflicts.
 
 
 **0.9pre5 - 30 Mar 2015**
