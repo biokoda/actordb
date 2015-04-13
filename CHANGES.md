@@ -1,3 +1,9 @@
+**0.9pre8 - 13 Apr 2015**
+- Bugfix: Transaction size bugfix, 0.9pre7 turns out just made it more rare to appear.
+- Bugfix: If actor was deleted, pragma exists still returned true.
+- Bugfix: Actor delete did not complete if schema had an autoincrement
+
+
 **0.9pre7 - 2 Apr 2015**
 - Bugfix: Manually setting cache size was a limit to transaction size.
 
