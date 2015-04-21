@@ -54,20 +54,20 @@ cfg(Args) ->
 		% cmd is appended to erl execute command, it should execute your app.
 		% It can be set for every node individually. Add it to that list if you need it, it will override this value.
 		{cmd,"-s actordb_core +S 2 +A 2"},
-		
+
 		% optional command to start erlang with
 		% {erlcmd,"../otp/bin/cerl -valgrind"},
-		
+
 		% optional environment variables for erlang
 		%{erlenv,[{"VALGRIND_MISC_FLAGS","-v --leak-check=full --tool=memcheck --track-origins=no  "++
         %                               "--suppressions=../otp/erts/emulator/valgrind/suppress.standard --show-possibly-lost=no"}]},
-        
+
         % in ms, how long to wait to connect to node. If running with valgrind it takes a while.
          {connect_timeout,60000},
-        
+
         % in ms, how long to wait for application start once node is started
          {app_wait_timeout,60000*5},
-		
+
 		% which app to wait for to consider node started
 		{wait_for_app,actordb_core},
 		% What RPC to execute for stopping nodes (optional, def. is {init,stop,[]})
@@ -112,13 +112,27 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 	kv_readwrite(Ndl),
 	basic_write(Ndl),
 	basic_read(Ndl),
-	copyactor(Ndl);
+	copyactor(Ndl),
+	[detest:stop_node(Nd) || Nd <- [Nd1,Nd2,Nd3,Nd4], Nd /= undefined],
+	detest:add_node(?ND1),
+	case TType of
+		"cluster" ->
+			detest:add_node(?ND2),
+			detest:add_node(?ND3);
+		"multicluster" ->
+			detest:add_node(?ND2),
+			detest:add_node(?ND3),
+			detest:add_node(?ND4);
+		_ ->
+			ok
+	end,
+	basic_write(Ndl);
 run(Param,"mysql") ->
 	true = code:add_path("test/mysql.ez"),
 	Nd1 = butil:ds_val(node1,Param),
 	rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
 	ok = wait_tree(Nd1,10000),
-	
+
 	[_,Host] = string:tokens(butil:tolist(Nd1),"@"),
 	MyOpt = [{host,Host},{port,butil:ds_val(rpcport,?ND1)-10000},{user,"user"},{password,"password"},{database,"actordb"}],
 	{ok,Pid} = mysql:start_link(MyOpt),
@@ -250,8 +264,3 @@ run(Param,"addclusters") ->
 	AdNodesProc ! done;
 run(Param,Nm) ->
 	lager:info("Unknown test type ~p",[Nm]).
-
-
-
-
-
