@@ -43,7 +43,7 @@ multiupdate_write(Ndl) ->
 
 	?debugFmt("multiupdate fail insert",[]),
 	% Fail test
-	?assertMatch(ok,exec(Ndl,["actor thread(first) create;",
+	?assertMatch({ok,{changes,_,_}},exec(Ndl,["actor thread(first) create;",
 							  "insert into thread values (1,'a1',10);",
 							  "actor thread(second) create;",
 							  "insert into thread values (1,'a1',10);"])),
@@ -68,15 +68,15 @@ multiupdate_write(Ndl) ->
 				"actor type1(foreach X.txt in ACTORS) create;",
 				"insert into tab2 values ({{uniqid.s}},'{{X.txt}}');"]),
 	% ?debugFmt("Res ~p~n",[Res]),
-	?assertMatch(ok,Res),
+	?assertMatch({ok,{changes,_,_}},Res),
 
 	?debugFmt("multiupdates delete actors",[]),
-	?assertMatch(ok,exec(Ndl,["actor type1(ac100,ac99,ac98,ac97,ac96);PRAGMA delete;"])),
+	?assertMatch({ok,{changes,0,5}},exec(Ndl,["actor type1(ac100,ac99,ac98,ac97,ac96);PRAGMA delete;"])),
 	?debugFmt("Deleting individual actor",[]),
 	?assertMatch(ok,exec(Ndl,["actor type1(ac95);PRAGMA delete;"])),
 
 	?debugFmt("multiupdates creating thread",[]),
-	?assertMatch(ok,exec(Ndl,["actor thread(1) create;",
+	?assertMatch({ok,{changes,_,_}},exec(Ndl,["actor thread(1) create;",
 					"INSERT INTO thread VALUES (100,'message',10);",
 					"INSERT INTO thread VALUES (101,'secondmsg',20);",
 					"actor user(10) create;",
@@ -143,7 +143,7 @@ kv_readwrite(Ndl) ->
 					  		  {<<"id1">>,_,1,<<"id1">>}]}]},
 			exec(Ndl,ReadSome)),
 	?debugFmt("Increment first 5",[]),
-	?assertMatch(ok,exec(Ndl,["actor counters(id1,id2,id3,id4,id5);",
+	?assertMatch({ok,{changes,_,_}},exec(Ndl,["actor counters(id1,id2,id3,id4,id5);",
 					"UPDATE actors SET val = val+1 WHERE id='{{curactor}}';"])),
 	?debugFmt("Select first 5 again ~p",[exec(Ndl,ReadSome)]),
 	?assertMatch({ok,[{columns,_},
@@ -155,14 +155,14 @@ kv_readwrite(Ndl) ->
 			 exec(Ndl,ReadSome)),
 	?debugFmt("delete 5 and 4",[]),
 	% Not the right way to delete but it works (not transactional)
-	?assertMatch(ok,exec(Ndl,["actor counters(id5,id4);PRAGMA delete;"])),
+	?assertMatch({ok,{changes,_,_}},exec(Ndl,["actor counters(id5,id4);PRAGMA delete;"])),
 	?assertMatch({ok,[{columns,_},
 					  {rows,[{<<"id3">>,_,4,<<"id3">>},
 						  {<<"id2">>,_,3,<<"id2">>},
 						  {<<"id1">>,_,2,<<"id1">>}]}]},
 			 exec(Ndl,ReadSome)),
 	% the right way
-	?assertMatch(ok,exec(Ndl,["actor counters(id3,id2);DELETE FROM actors WHERE id='{{curactor}}';"])),
+	?assertMatch({ok,{changes,_,_}},exec(Ndl,["actor counters(id3,id2);DELETE FROM actors WHERE id='{{curactor}}';"])),
 	?assertMatch({ok,[{columns,_},
 					  {rows,[{<<"id1">>,_,2,<<"id1">>}]}]},
 			 exec(Ndl,ReadSome)),
