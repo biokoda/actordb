@@ -40,7 +40,7 @@ multiupdate_write(Ndl) ->
 	?assertMatch({ok,_},exec(Ndl,["actor type1(all) create;",
 							  "insert into tab2 values (1,'a1');",
 							  "insert into tab2 values (2,'a2');"])),
-	
+
 	?debugFmt("multiupdate fail insert",[]),
 	% Fail test
 	?assertMatch(ok,exec(Ndl,["actor thread(first) create;",
@@ -59,7 +59,7 @@ multiupdate_write(Ndl) ->
 	?assertMatch({ok,[{columns,{<<"id">>,<<"msg">>,<<"user">>}},
                       {rows,[{1,<<"a1">>,10}]}]},
                  exec(Ndl,["actor thread(second);select * from thread;"])),
-	
+
 	?debugFmt("multiupdates foreach insert",[]),
 	% Select everything from tab2 for actor "all".
 	% Actorname is in .txt column, for every row take that actor and insert value with same unique integer id.
@@ -123,7 +123,7 @@ kv_readwrite(Ndl) ->
 		 "insert into actors values ('id",butil:tolist(N),"',{{hash(id",butil:tolist(N),")}},",
 		 	butil:tolist(N),");"])|| N <- lists:seq(1,1)]]),
 	[?assertMatch({ok,_},exec(Ndl,["actor counters(id",butil:tolist(N),");",
-		 "insert into actors values ('id",butil:tolist(N),"',{{hash(id",butil:tolist(N),")}},",butil:tolist(N),");"])) 
+		 "insert into actors values ('id",butil:tolist(N),"',{{hash(id",butil:tolist(N),")}},",butil:tolist(N),");"]))
 				|| N <- lists:seq(1,numactors())],
 	[?assertMatch({ok,[{columns,_},{rows,[{_,_,N}]}]},
 					exec(Ndl,["actor counters(id",butil:tolist(N),");",
@@ -172,7 +172,7 @@ kv_readwrite(Ndl) ->
 	% Multiple tables test
 	[?assertMatch({ok,_},exec(Ndl,["actor filesystem(id",butil:tolist(N),");",
 		 "insert into actors values ('id",butil:tolist(N),"',{{hash(id",butil:tolist(N),")}},",butil:tolist(N),");",
-		 "insert into users (fileid,uid) values ('id",butil:tolist(N),"',",butil:tolist(N),");"])) 
+		 "insert into users (fileid,uid) values ('id",butil:tolist(N),"',",butil:tolist(N),");"]))
 				|| N <- lists:seq(1,numactors())],
 
 	ok.
@@ -190,10 +190,10 @@ make_actors(N) ->
 	timer:sleep(100),
 	make_actors(N+1).
 
-writer(Home,Nd,N,RC) ->
+writer(Home,Nd,N,SleepMax,RC) ->
 	checkhome(Home),
 	% Sleep a random amount from 0 to ..
-	SleepFor = random:uniform(10000),
+	SleepFor = random:uniform(SleepMax),
 	timer:sleep(butil:ceiling(SleepFor)),
 	checkhome(Home),
 	Start = os:timestamp(),
@@ -220,7 +220,7 @@ writer(Home,Nd,N,RC) ->
 			exit(normal)
 	end,
 	%lager:info("Write complete for ~p, runcount=~p, slept_for=~p, exec_time=~ps  ~pms",[N,RC,SleepFor,Diff div 1000, Diff rem 1000]),
-	writer(Home,Nd,N,RC+1).
+	writer(Home,Nd,N,SleepMax,RC+1).
 
 % We will keep adding single node clusters to the network. Cluster name is same as node name
 addclusters(Path,Nd1,Nodes) ->
@@ -263,10 +263,10 @@ wait_crash(L,Sec,N) ->
 			lager:error("Stopping. Nodes gone: ~p",[L1])
 	end.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 % 	UTILITY FUNCTIONS
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 checkhome(Home) ->
 	case erlang:is_process_alive(Home) of

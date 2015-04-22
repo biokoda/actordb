@@ -238,6 +238,8 @@ run(Param,"failednodes") ->
 	basic_write(Ndl);
 run(Param,"endless"++Num) ->
 	Nd1 = butil:ds_val(node1,Param),
+	NWriters = 1000,
+	WriterMaxSleep = 1000,
 	case butil:toint(Num) of
 		1 ->
 			Ndl = [Nd1];
@@ -251,7 +253,7 @@ run(Param,"endless"++Num) ->
 	ets:new(writecounter, [named_table,public,set,{write_concurrency,true}]),
 	butil:ds_add(wnum,0,writecounter),
 	butil:ds_add(wnum_sec,0,writecounter),
-	Pids = [spawn_monitor(fun() -> rseed(N),writer(Home,Nd1,N,0) end) || N <- lists:seq(1,8000)],
+	Pids = [spawn_monitor(fun() -> rseed(N),writer(Home,Nd1,N,10000,0) end) || N <- lists:seq(1,NWriters)],
 	lager:info("Test will run until you stop it or something crashes."),
 	wait_crash(Ndl);
 run(Param,"addclusters") ->
