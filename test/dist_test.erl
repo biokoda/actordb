@@ -63,10 +63,10 @@ cfg(Args) ->
         %                               "--suppressions=../otp/erts/emulator/valgrind/suppress.standard --show-possibly-lost=no"}]},
 
         % in ms, how long to wait to connect to node. If running with valgrind it takes a while.
-         {connect_timeout,60000},
+         {connect_timeout,10000},
 
         % in ms, how long to wait for application start once node is started
-         {app_wait_timeout,60000*5},
+         {app_wait_timeout,10000*5},
 
 		% which app to wait for to consider node started
 		{wait_for_app,actordb_core},
@@ -239,7 +239,7 @@ run(Param,"failednodes") ->
 run(Param,"endless"++Num) ->
 	Nd1 = butil:ds_val(node1,Param),
 	NWriters = 1000,
-	WriterMaxSleep = 1000,
+	WriterMaxSleep = 10,
 	case butil:toint(Num) of
 		1 ->
 			Ndl = [Nd1];
@@ -253,7 +253,7 @@ run(Param,"endless"++Num) ->
 	ets:new(writecounter, [named_table,public,set,{write_concurrency,true}]),
 	butil:ds_add(wnum,0,writecounter),
 	butil:ds_add(wnum_sec,0,writecounter),
-	Pids = [spawn_monitor(fun() -> rseed(N),writer(Home,Nd1,N,10000,0) end) || N <- lists:seq(1,NWriters)],
+	Pids = [spawn_monitor(fun() -> rseed(N),writer(Home,Nd1,N,WriterMaxSleep,0) end) || N <- lists:seq(1,NWriters)],
 	lager:info("Test will run until you stop it or something crashes."),
 	wait_crash(Ndl);
 run(Param,"addclusters") ->
