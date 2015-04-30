@@ -1,3 +1,7 @@
+**0.9pre9 - 30 Apr 2015**
+- Bugfix: Bugfix replication with noop append entries could cause a follower to never catchup
+
+
 **0.9pre8 - 13 Apr 2015**
 - Bugfix: Transaction size bugfix, 0.9pre7 turns out just made it more rare to appear.
 - Bugfix: If actor was deleted, pragma exists still returned true.
