@@ -1,6 +1,7 @@
 **0.9pre9 - 30 Apr 2015**
 - Bugfix: Bugfix replication with noop append entries could cause a follower to never catchup
-
+- Improvement: Added {error,consensus_timeout} when queries are unable to be processed because not enough nodes are available.
+- Improvement: Multiactor updates now return how many actors have been changed.
 
 **0.9pre8 - 13 Apr 2015**
 - Bugfix: Transaction size bugfix, 0.9pre7 turns out just made it more rare to appear.
