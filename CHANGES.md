@@ -1,12 +1,17 @@
+**0.9 - 7 May 2015**
+- Bugfix: Pragma exists was still creating actor files when actor did not actually exist.
+- Bugfix: Add timeout to recovery process so that it can get started again if leader changes.
+
+
 **0.9pre9 - 30 Apr 2015**
-- Bugfix: Bugfix replication with noop append entries could cause a follower to never catchup
+- Bugfix: Bugfix replication with noop append entries could cause a follower to never catchup.
 - Improvement: Added {error,consensus_timeout} when queries are unable to be processed because not enough nodes are available.
 - Improvement: Multiactor updates now return how many actors have been changed.
 
 **0.9pre8 - 13 Apr 2015**
 - Bugfix: Transaction size bugfix, 0.9pre7 turns out just made it more rare to appear.
 - Bugfix: If actor was deleted, pragma exists still returned true.
-- Bugfix: Actor delete did not complete if schema had an autoincrement
+- Bugfix: Actor delete did not complete if schema had an autoincrement.
 
 
 **0.9pre7 - 2 Apr 2015**
