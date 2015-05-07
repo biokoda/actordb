@@ -38,6 +38,12 @@ cfg(Args) ->
 			Groups = ?ONEGRP(Nodes);
 		{Nodes,Groups} ->
 			ok;
+		[] = Nodes = Groups ->
+			io:format("ERROR:~n"),
+			io:format("No test type provided. Available tests: "++
+			"single, cluster, multicluster, mysql, addsecond, missingnode, addthentake, addcluster, failednodes,"++
+			"endless1, endless2, addclusters~n~n"),
+			throw(noparam);
 		_ ->
 			Nodes = [?ND1,?ND2,?ND3],
 			Groups = ?ONEGRP(Nodes)
@@ -84,13 +90,7 @@ cleanup(_Param) ->
 	ok.
 
 run(Param) ->
-	case butil:ds_val(args,Param) of
-		[TestType|_] ->
-			ok;
-		_ ->
-			lager:info("No test type provided. Running basic cluster test"),
-			TestType = "cluster"
-	end,
+	[TestType|_] = butil:ds_val(args,Param),
 	run(Param,TestType),
 	ok.
 
@@ -218,7 +218,7 @@ run(Param,"failednodes") ->
 	Nd1 = butil:ds_val(node1,Param),
 	Nd2 = butil:ds_val(node2,Param),
 	Nd3 = butil:ds_val(node3,Param),
-	Ndl = [Nd1,Nd2,Nd3],
+	Ndl = [Nd1],
 	rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
 	ok = wait_tree(Nd1,10000),
 	basic_write(Ndl),
