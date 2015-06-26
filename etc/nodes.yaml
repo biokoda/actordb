@@ -6,11 +6,11 @@ nodes:
 #- node4@192.168.1.4:4382
 
 
-# Nodes need to be organized into groups. 
+# Nodes need to be organized into groups.
 # Groups of type cluster are actordb data nodes.
-# Groups of other types will be able to communicate with cluster nodes, 
-#  but will not hold actordb data. They can be used as incremental backup nodes (coming soon), 
-#  client connection gateways and transaction managers. 
+# Groups of other types will be able to communicate with cluster nodes,
+#  but will not hold actordb data. They can be used as incremental backup nodes (coming soon),
+#  client connection gateways and transaction managers.
 groups:
 - name: grp1
   nodes: [testnd]

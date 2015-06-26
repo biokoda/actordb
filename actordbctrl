@@ -38,12 +38,29 @@ wxev(_Dlg) -> ok.
 %       end
 %   end.
 
+dopipe(Req,Resp) ->
+    receive
+        {_, {data, Data}} ->
+            Line = string:tokens(binary_to_list(Data),"\n"),
+            case Line of
+                ["q"] ->
+                    ok;
+                _ ->
+                    port_command(Resp, [string:tokens(binary_to_list(Data),"\n"),<<"\n">>]),
+                    dopipe(Req,Resp)
+            end;
+        X ->
+            port_command(Resp, [io_lib:fwrite("~p",[X]),<<"\n">>]),
+            io:format("Received ~p~n",[X])
+    end.
+
+main(["pipe", Req,Resp]) ->
+    ReqPipe = open_port(Req, [in,eof,binary]),
+    RespPipe = open_port(Resp, [out,eof,binary]),
+    dopipe(ReqPipe, RespPipe);
 main([]) ->
   case os:type() of
     {win32,_} ->
-      %
-      % To gui or not to gui?
-      %
       io:format("Command list:~n"++
                 "init - for initializing cluster~n"++
                 "us - update schema (from etc/schema.yaml)~n"++
@@ -305,4 +322,3 @@ epmd_path(Ctx) ->
     Epmd ->
       Epmd
   end.
-
