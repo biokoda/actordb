@@ -54,7 +54,7 @@ dopipe(Req,Resp) ->
             io:format("Received ~p~n",[X])
     end.
 
-main(["pipe", Req,Resp]) ->
+main(["pipe", Req,Resp|Args]) ->
     ReqPipe = open_port(Req, [in,eof,binary]),
     RespPipe = open_port(Resp, [out,eof,binary]),
     dopipe(ReqPipe, RespPipe);

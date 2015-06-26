@@ -23,7 +23,7 @@ const char *prompt = "actordb>";
 char *pipe_req = "/tmp/actordb.req";
 char *pipe_resp = "/tmp/actordb.resp";
 
-pid_t popen2(char* prog, int *infp, int *outfp)
+pid_t popen2(char* argv[], int argc, int *infp, int *outfp)
 {
 	int p_stdin[2], p_stdout[2];
 	pid_t pid;
@@ -36,14 +36,22 @@ pid_t popen2(char* prog, int *infp, int *outfp)
 		return pid;
 	else if (pid == 0)
 	{
-		char *args[] = {prog, "pipe", pipe_req, pipe_resp, NULL};
+		char *args[argc+2];
+		int i;
+		args[0] = argv[1];
+		args[1] = "pipe";
+		args[2] = pipe_req;
+		args[3] = pipe_resp;
+		for (i = 2; i < argc; i++)
+			args[i-2+4] = argv[i];
+		args[i] = NULL;
 
 		close(p_stdin[WRITE]);
 		dup2(p_stdin[READ], READ);
 		close(p_stdout[READ]);
 		dup2(p_stdout[WRITE], WRITE);
 		// execl("/bin/sh", "sh", "-c", command, NULL);
-		execvp(prog,args);
+		execvp(argv[1],args);
 		exit(1);
 	}
 
@@ -103,7 +111,7 @@ int main(int argc, char *argv[])
 	resp = open(pipe_resp,O_RDONLY | O_NONBLOCK);
 	if (resp == -1)
 		return 0;
-	if (popen2(argv[1], &infp, &outfp) <= 0)
+	if (popen2(argv, argc, &infp, &outfp) <= 0)
 	{
 		printf("Unable to exec your-program-B\n");
 		return 0;
