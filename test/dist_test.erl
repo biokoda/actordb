@@ -238,7 +238,7 @@ run(Param,"failednodes") ->
 	basic_write(Ndl);
 run(Param,"endless"++Num) ->
 	Nd1 = butil:ds_val(node1,Param),
-	NWriters = 1000,
+	NWriters = 5000,
 	WriterMaxSleep = 10,
 	case butil:toint(Num) of
 		1 ->

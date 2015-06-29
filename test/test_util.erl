@@ -197,8 +197,15 @@ writer(Home,Nd,N,SleepMax,RC) ->
 	timer:sleep(butil:ceiling(SleepFor)),
 	checkhome(Home),
 	Start = os:timestamp(),
+	case get(bin) of
+		undefined ->
+			Bin = base64:encode(crypto:rand_bytes(128)),
+			put(bin,Bin);
+		Bin ->
+			ok
+	end,
 	case exec([Nd],<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
-			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:rand_bytes(128)))/binary,"',1);">>) of
+			(integer_to_binary(flatnow()))/binary,",'",(Bin)/binary,"',1);">>) of
 		{ok,_} ->
 			ok;
 		Err ->
