@@ -55,8 +55,10 @@ dopipe(Req,Resp) ->
     end.
 
 main(["pipe", Req,Resp|_Args]) ->
+    file:write_file("out","start??",[append]),
     ReqPipe = open_port(Req, [in,eof,binary]),
     RespPipe = open_port(Resp, [out,eof,binary]),
+    file:write_file("out","dopipe!",[append]),
     dopipe(ReqPipe, RespPipe);
 main([]) ->
   case os:type() of
@@ -108,6 +110,7 @@ main([]) ->
       main(["nocmd"])
   end;
 main(Args) ->
+file:write_file("out",io_lib:fwrite("~p~n",[Args]),[append]),
   doit(Args,console).
 
 doit([_,_] = Args,Ctx) ->

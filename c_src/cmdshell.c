@@ -44,7 +44,7 @@ pid_t popen2(char* argv[], int argc, int *infp, int *outfp)
 		args[3] = pipe_resp;
 		for (i = 2; i < argc; i++)
 			args[i-2+4] = argv[i];
-		args[i] = NULL;
+		args[i-2+4] = NULL;
 
 		close(p_stdin[WRITE]);
 		dup2(p_stdin[READ], READ);
