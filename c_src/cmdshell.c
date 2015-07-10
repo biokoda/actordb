@@ -81,15 +81,6 @@ static void rl_handler(char* line)
 	}
 	add_history(line);
 
-	if (req == 0)
-	{
-		req = open(pipe_req,O_WRONLY);
-		if (req == -1)
-		{
-			running = 0;
-			return;
-		}
-	}
 	if (write(req, line, strlen(line)) < 0)
 		running = 0;
 }
@@ -114,6 +105,12 @@ int main(int argc, char *argv[])
 	if (popen2(argv, argc, &infp, &outfp) <= 0)
 	{
 		printf("Unable to exec your-program-B\n");
+		return 0;
+	}
+	req = open(pipe_req,O_WRONLY);
+	if (req == -1)
+	{
+		running = 0;
 		return 0;
 	}
 	rl_callback_handler_install(prompt, &rl_handler);
