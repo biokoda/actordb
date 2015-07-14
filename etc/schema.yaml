@@ -7,7 +7,7 @@ type1:
 - CREATE TABLE tab (id INTEGER PRIMARY KEY, txt TEXT)   #version 1
 - CREATE TABLE tab1 (id INTEGER PRIMARY KEY, txt TEXT)  #version 2
 - ALTER TABLE tab ADD i INTEGER                         #version 3
-- CREATE TABLE tabx (id INTEGER PRIMARY KEY CHECK (typeof(id) == 'integer'), txt TEXT CHECK (typeof(id) == 'text'))  #version 4,
+- CREATE TABLE tabx (id INTEGER PRIMARY KEY CHECK (typeof(id) == 'integer'), txt TEXT CHECK (typeof(id) == 'text'))  #version 4
 
 type2:
 - CREATE TABLE asdf (id INTEGER PRIMARY KEY AUTOINCREMENT, txt BLOB)
