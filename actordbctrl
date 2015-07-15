@@ -88,7 +88,6 @@ handle_data(Statement) ->
       Ctx = get(ctx),
       case rpc:call(get(node),actordb_cmd,cmd,[Statement]) of
         Out ->
-          file:write_file("out",term_to_binary(Out),[write]),
           print(Ctx,"~p~n",[Out])
       end;
     _ -> handle_data([])
