@@ -72,7 +72,7 @@ cfg(Args) ->
          {connect_timeout,10000},
 
         % in ms, how long to wait for application start once node is started
-         {app_wait_timeout,10000*5},
+         {app_wait_timeout,10000},
 
 		% which app to wait for to consider node started
 		{wait_for_app,actordb_core},

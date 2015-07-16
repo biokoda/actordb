@@ -1,3 +1,14 @@
+**0.9.1 - ?????**
+- Feature: ActorDB now uses LMDB as a storage engine. SQLite is still the SQL engine. Performace is vastly improved. Old versions are automatically imported. Old files will be left intact. A new file named lmdb will appear in every storage folder and it will contain all data.
+- Feature: Seperate Read/Write threads for improved concurrency.
+- Feature: Added LIMIT and OFFSET to pragma list: "actor type1(*);PRAGMA list LIMIT 1000 OFFSET 10;"
+- Feature: ActorDB shell to manage the database. 
+- Feature: Expanded thrift interface. 
+- Feature: Expanded configuration options in app.config. 
+- Feature: Added fsync flag to queries. Writes with fsync will be synced to disk before response is sent to client. You can set fsync to safe in app.config, which will have the same result for all writes.
+- Bugfix: MySQL console bugfix for pragma statements. 
+
+
 **0.9 - 7 May 2015**
 - Bugfix: Pragma exists was still creating actor files when actor did not actually exist.
 - Bugfix: Add timeout to recovery process so that it can get started again if leader changes.
