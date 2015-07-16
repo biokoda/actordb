@@ -1,0 +1,42 @@
+#!/usr/bin/env escript
+-mode(compile).
+-include_lib("wx/include/wx.hrl").
+
+main([]) ->
+	Wx = wx:new(),
+	Dlg = wxDialog:new(Wx,-1,"ActorDB Shell",[{size,{640,480}},{style,?wxRESIZE_BORDER bor ?wxDEFAULT_DIALOG_STYLE}]),
+	Sizer = wxBoxSizer:new(?wxVERTICAL),
+	TextDisplay = wxTextCtrl:new(Dlg,4,[{style, ?wxTE_MULTILINE bor ?wxTE_READONLY}]),
+	TextInput = wxTextCtrl:new(Dlg,5,[{style, ?wxDEFAULT bor ?wxHSCROLL bor ?wxTE_PROCESS_ENTER}]),
+	SzFlags = [{proportion, 0}, {border, 4}, {flag, ?wxALL}],
+	wxSizer:add(Sizer,TextDisplay,[{flag, ?wxEXPAND},{proportion, 1}|SzFlags]),
+	wxSizer:add(Sizer,TextInput,[{proportion, 0},{border, 4}, {flag, ?wxEXPAND}]),
+	wxTextCtrl:setEditable(TextInput,true),
+	wxDialog:setSizer(Dlg,Sizer),
+	wxDialog:show(Dlg),
+	wxWindow:setFocus(TextInput),
+	wxEvtHandler:connect(TextInput,command_text_enter),
+	wxEvtHandler:connect(TextInput,key_down,[{skip,true}]),
+	loop(TextDisplay,TextInput).
+
+loop(Disp,Input) ->
+	receive
+		Wx when Wx#wx.obj == Input ->
+			Cmd = Wx#wx.event,
+			case Cmd of
+				#wxKey{keyCode = ?WXK_UP} ->
+					io:format("UP~n");
+				#wxKey{keyCode = ?WXK_DOWN} ->
+					io:format("DOWN~n");
+				#wxKey{} ->
+					ok;
+				_ ->
+					wxTextCtrl:clear(Input),
+					% io:format("~p~n",[Cmd#wxCommand.cmdString]),
+					wxTextCtrl:writeText(Disp,Cmd#wxCommand.cmdString),
+					wxTextCtrl:writeText(Disp,"\n")
+			end,
+			loop(Disp,Input)
+	after 5000 ->
+		ok
+	end.
