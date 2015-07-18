@@ -4,7 +4,7 @@
 
 
 cmds1() ->
-  "Supported commands:~ninit~nupdateschema (-us)~nupdatenodes (-un)~nstat (-s)~nhelp (-h)~n~n".
+  "Supported commands:~ninit (init)~nupdateschema (us)~nupdatenodes (un)~nstat (s)~nhelp (h)~n~n".
 cmds() ->
   cmds1()++
   "Stat columns:~n"++
@@ -16,29 +16,19 @@ cmds() ->
   "nactive - number of actors that have been active in the past second~n"++
   "tmngrs - num_busy_transaction_managers/total_transaction_managers~n".
 
-wxev(_Dlg) -> ok.
-%   receive
-%     #wx{id=Id, event=#wxCommand{type=command_button_clicked}} ->
-%       case Id >= 1 andalso Id =< 3 of
-%         true ->
-%           % Txt = wx:typeCast(wxWindow:findWindowById(4, [{parent, Dlg}]),wxTextCtrl),
-%           % Btn = wx:typeCast(wxWindow:findWindowById(Id, [{parent, Dlg}]),wxButton),
-%           % wxTextCtrl:setValue(Txt,"you pressed "++wxButton:getLabel(Btn)),
-%           case Id of
-%             1 ->
-%               doit(["init"],Dlg);
-%             2 ->
-%               doit(["updateschema"],Dlg);
-%             3 ->
-%               doit(["updatenodes"],Dlg)
-%           end;
-%           % wxev(Dlg);
-%         false ->
-%           ok
-%       end
-%   end.
+-define(COMMANDS,
+          "Command list:\n"++
+          "init - for initializing cluster\n"++
+          "us - update schema (from etc/schema.yaml)\n"++
+          "un - update nodes (from etc/nodes.yaml)\n"++
+          "s - print stats\n"++
+          "m - enter management console\n"++
+          "h - help\n"++
+          "q - for exit\n").
 
-dopipe(Req,Resp) ->
+-define(COMMAND_LIST,[<<"init">>,<<"us">>,<<"un">>,<<"s">>,<<"m">>,<<"h">>,<<"q">>]).
+
+dopipe(Req,Resp,Args) ->
     receive
         {_, {data, Data}} ->
             Line = string:tokens(binary_to_list(Data),"\n"),
@@ -46,69 +36,71 @@ dopipe(Req,Resp) ->
                 ["q"] ->
                     ok;
                 _ ->
-                    port_command(Resp, [string:tokens(binary_to_list(Data),"\n"),<<"\n">>]),
-                    dopipe(Req,Resp)
+                    handle_data(Data),
+                    dopipe(Req,Resp,Args)
             end;
         X ->
             port_command(Resp, [io_lib:fwrite("~p",[X]),<<"\n">>]),
             io:format("Received ~p~n",[X])
     end.
 
-main(["pipe", Req,Resp|_Args]) ->
+main(["pipe", Req,Resp|Args]) ->
     ReqPipe = open_port(Req, [in,eof,binary]),
     RespPipe = open_port(Resp, [out,eof,binary]),
-    dopipe(ReqPipe, RespPipe);
-main([]) ->
+    put(resp,RespPipe),
+    case Args of
+      [] ->
+        port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
+        dopipe(ReqPipe, RespPipe, Args);
+      _ ->
+        handle_data(Args),
+        dopipe(ReqPipe, RespPipe, Args)
+    end.
+
+handle_data(Args) when is_binary(Args) ->
+  handle_data([binary_to_list(Args)]);
+
+handle_data(["init"] = Args) ->
+  put(m,false),
+  handle_os(Args);
+handle_data(["us"] = Args) ->
+  put(m,false),
+  handle_os(Args);
+handle_data(["un"] = Args) ->
+  put(m,false),
+  handle_os(Args);
+handle_data(["s"] = Args) ->
+  put(m,false),
+  handle_os(Args);
+handle_data(["m"] = _Args) ->
+  handle_os(["m"]),
+  put(m,true),
+  port_command(get(resp), [<<"\n\r\n">>,"ActorDB Account Management mode",<<"\n\n\r\n">>]);
+handle_data(["h"] = _Args) ->
+  put(m,false),
+  port_command(get(resp), [?COMMANDS,<<"\r\n">>]);
+handle_data([])->
+  put(m,false),
+  port_command(get(resp), [?COMMANDS,<<"\r\n">>]);
+handle_data(Statement) ->
+  case get(m) of
+    true ->
+      Ctx = get(ctx),
+      case rpc:call(get(node),actordb_cmd,cmd,[Statement]) of
+        Out ->
+          print(Ctx,"~p~n",[Out])
+      end;
+    _ -> handle_data([])
+  end.
+
+
+handle_os(Args)->
   case os:type() of
     {win32,_} ->
-      io:format("Command list:~n"++
-                "init - for initializing cluster~n"++
-                "us - update schema (from etc/schema.yaml)~n"++
-                "un - update nodes (from etc/nodes.yaml)~n"++
-                "s - print stats~n"++
-                "q or exit - for exit~n"),
-      Read = io:fread("Command: ", "~s"),
-      io:format("~n"),
-      case Read of
-        {ok,["q"]} ->
-          ok;
-        {ok,["exit"]} ->
-          ok;
-        {ok,["init"]} ->
-          doit(["init"],winconsole);
-        {ok,[Cmd]} ->
-          case ok of
-            ok when Cmd == "us"; Cmd == "un"; Cmd == "s" ->
-              doit(["-"++Cmd],winconsole);
-            _ ->
-              io:format("Invalid command: ~p~n",[Cmd]),
-              main([])
-          end;
-        _ ->
-          ok
-      end;
-
-      % Wx = wx:new(),
-      % Dlg = wxDialog:new(Wx,-1,"Pick command"),
-      % Sizer = wxBoxSizer:new(?wxVERTICAL),
-      % BtnSizer = wxStaticBoxSizer:new(?wxHORIZONTAL, Dlg, [{label, "Commands"}]),
-      % BtnInit = wxButton:new(Dlg, 1, [{label,"Init"}]),
-      % BtnSchema = wxButton:new(Dlg, 2, [{label,"Update schema"}]),
-      % BtnNds = wxButton:new(Dlg, 3, [{label,"Update nodes"}]),
-      % Text = wxTextCtrl:new(Dlg,4,[{style, ?wxDEFAULT bor ?wxTE_MULTILINE bor ?wxTE_READONLY}]),
-      % SzFlags = [{proportion, 0}, {border, 4}, {flag, ?wxALL}],
-      % [wxSizer:add(BtnSizer,B,SzFlags) || B <- [BtnInit,BtnSchema,BtnNds]],
-      % wxSizer:add(Sizer,BtnSizer,SzFlags),
-      % wxSizer:add(Sizer,Text,[{flag, ?wxEXPAND},{proportion, 1}|SzFlags]),
-      % wxDialog:setSizer(Dlg,Sizer),
-      % wxDialog:connect(Dlg,command_button_clicked),
-      % wxDialog:show(Dlg),
-      % wxev(Dlg);
+      doit(Args,winconsole);
     _ ->
-      main(["nocmd"])
-  end;
-main(Args) ->
-  doit(Args,console).
+      doit(Args,console)
+  end.
 
 doit([_,_] = Args,Ctx) ->
   [] = os:cmd(epmd_path(Ctx) ++ " -daemon"),
@@ -116,35 +108,7 @@ doit([_,_] = Args,Ctx) ->
     [EtcPath1x,Cmd1] ->
       EtcPath1 = EtcPath1x ++ "/etc"
   end,
-  case Cmd1 of
-    "-us" ->
-      Cmd = "updateschema";
-    "-un" ->
-      Cmd = "updatenodes";
-    "-s" ->
-      Cmd = "stat";
-    "updateschema" = Cmd ->
-      ok;
-    "updatenodes" = Cmd ->
-      ok;
-    "stat" = Cmd ->
-      ok;
-    "stats" ->
-      Cmd = "stat";
-    "init" = Cmd ->
-      ok;
-    _ ->
-      Cmd = "",
-      case Cmd1 of
-        "-h" ->
-          io:format(cmds());
-        "help" ->
-          io:format(cmds());
-        _ ->
-          print(Ctx,"~nInvalid command.~n~n"++cmds())
-      end,
-      done(Ctx)
-  end,
+  Cmd = set_action(Cmd1,Ctx),
   EtcPath2 = "{{platform_etc_dir}}",
   case filelib:is_file(EtcPath2++"/app.config") of
     true ->
@@ -155,25 +119,25 @@ doit([_,_] = Args,Ctx) ->
   {ok,VmBin} = file:read_file(EtcPath++"/vm.args"),
   Lines = string:tokens(binary_to_list(VmBin),"\r\n"),
   [{node,Node},{myname,Myname}] = parse_args(Lines,[]),
-
   case net_kernel:hidden_connect_node(Node) of
     true ->
       case net_adm:ping(Node) of
         pang ->
-          print(Ctx,"ActorDB not responding~n"),
-          done(Ctx);
+          print(Ctx,"ActorDB not responding~n");
         pong ->
+          put(node,Node),
+          put(ctx,Ctx),
           ok
       end;
     _X ->
-      print(Ctx,"ActorDB not running ~n"),
-      done(Ctx)
+      print(Ctx,"ActorDB not running ~n")
   end,
   case Cmd of
+    "m" -> ok;
     "stat" ->
       Ref = make_ref(),
       {ok,Cols} = rpc:call(Node,actordb_cmd,cmd,[stats,describe,ok]),
-      [ok = print(Ctx,"~s",[string:right(Val,15,$\s)]) || Val <- tuple_to_list(Cols)],
+      [print(Ctx,"~s",[string:right(Val,15,$\s)]) || Val <- tuple_to_list(Cols)],
       print(Ctx,"~n"),
       ok = rpc:call(Node,actordb_cmd,cmd,[stats,stats,{Myname,self(),Ref}]),
       rec_print_stats(Ctx,Ref,Cols);
@@ -186,8 +150,7 @@ doit([_,_] = Args,Ctx) ->
           case do_confirmation(Ctx) of
             yes ->
               Result = rpc:call(Node,actordb_cmd,cmd,[list_to_atom(Cmd),commit,EtcPath]),
-              print(Ctx,"~s~n",[Result]),
-              done(Ctx);
+              print(Ctx,"~s~n",[Result]);
             no ->
               ok
           end;
@@ -200,25 +163,12 @@ doit([_,_] = Args,Ctx) ->
 doit([Cmd],Ctx) ->
   doit([".",Cmd],Ctx).
 
-done(console) ->
-  halt(1);
-done(winconsole) ->
-  main([]),
-  halt(1);
-done(D) ->
-  wxev(D),
-  halt(1).
-
 print(C,F) ->
   print(C,F,[]).
 print(console,F,A) ->
-  ok = io:format(F,A);
+  port_command(get(resp), [io_lib:format(F,A),<<"\r\n">>]);
 print(winconsole,F,A) ->
-  ok = io:format(F,A);
-print(Dlg,F,A) ->
-  Txt = wx:typeCast(wxWindow:findWindowById(4, [{parent, Dlg}]),wxTextCtrl),
-  wxTextCtrl:appendText(Txt,io_lib:format(F,A)),
-  ok.
+  port_command(get(resp), [io_lib:format(F,A),<<"\r\n">>]).
 
 rec_print_stats(Ctx,Ref,Cols) ->
   receive
@@ -226,9 +176,9 @@ rec_print_stats(Ctx,Ref,Cols) ->
       [begin
           case is_integer(Val) of
             true ->
-              ok = print(Ctx,"~s",[string:right(integer_to_list(Val),15,$\s)]);
+              print(Ctx,"~s",[string:right(integer_to_list(Val),15,$\s)]);
             false ->
-              ok = print(Ctx,"~s",[string:right(Val,15,$\s)])
+              print(Ctx,"~s",[string:right(Val,15,$\s)])
           end
         end || Val <- tuple_to_list(Vals)],
       print(Ctx,"~n"),
@@ -238,28 +188,19 @@ rec_print_stats(Ctx,Ref,Cols) ->
   end.
 
 do_confirmation(X) when X == console; X == winconsole ->
-	case io:fread("Confirm change? (Y/N): ", "~a") of
-		{ok,[y]} ->
-			yes;
-		{ok,[n]} ->
-			no;
-    {ok,['Y']} ->
-      yes;
-    {ok,['N']} ->
-      no;
-		_ ->
-			do_confirmation(X)
-	end.
-% do_confirmation(Dlg) ->
-%   MD = wxMessageDialog:new(Dlg,"Confirm change?",[{style,?wxYES_NO}]),
-%   case wxMessageDialog:showModal(MD) of
-%     ?wxID_YES ->
-%       yes;
-%     ?wxID_NO ->
-%       no
-%   end.
-
-
+  print(X,"Confirm change? (Y/N): "),
+  receive
+      {_, {data, Data}} ->
+        case Data of
+          <<"y">> -> yes;
+          <<"Y">> -> yes;
+          <<"n">> -> no;
+          <<"N">> -> no;
+          _ -> do_confirmation(X)
+        end;
+      _ ->
+          do_confirmation(X)
+  end.
 
 parse_args([" "++Rem|T],L) ->
 	parse_args([Rem|T],L);
@@ -314,11 +255,41 @@ epmd_path(Ctx) ->
     false ->
       case os:find_executable(Name) of
         false ->
-          print(Ctx,"Could not find epmd.~n"),
-          done(Ctx);
+          print(Ctx,"Could not find epmd.~n");
         GlobalEpmd ->
           GlobalEpmd
       end;
     Epmd ->
       Epmd
+  end.
+
+set_action(Cmd1,Ctx)->
+  case Cmd1 of
+    "m" ->
+      "m";
+    "us" ->
+      "updateschema";
+    "un" ->
+      "updatenodes";
+    "s" ->
+      "stat";
+    "updateschema" = Cmd ->
+      Cmd;
+    "updatenodes" = Cmd ->
+      Cmd;
+    "stat" = Cmd ->
+      Cmd;
+    "stats" ->
+      "stat";
+    "init" = Cmd ->
+      Cmd;
+    _ ->
+      case Cmd1 of
+        "h" ->
+          io:format(cmds());
+        "help" ->
+          io:format(cmds());
+        _ ->
+          print(Ctx,"~nInvalid command.~n~n"++cmds())
+      end
   end.
