@@ -131,6 +131,7 @@ int main(int argc, char *argv[])
 		}
 		else if (FD_ISSET(resp, &fdread))
 		{
+			int offset = 0;
 			sread = read(resp, buf, sizeof(buf));
 			if (sread <= 0 && errno == EWOULDBLOCK)
 				continue;
@@ -141,12 +142,37 @@ int main(int argc, char *argv[])
 				printf("\n");
 				break;
 			}
-
 			buf[sread] = 0;
+			if (buf[0] == '~' && buf[1] == '~')
+			{
+				int i = 0;
+				for (i = 0; i < sread; i++)
+				{
+					if (buf[i] == '\n' || buf[i] == '\r')
+					{
+						buf[i] = 0;
+						break;
+					}
+				}
+				rl_set_prompt(buf+2);
+				rl_redisplay();
+
+				for (; i < sread; i++)
+				{
+					if (buf[i] >= '!')
+						break;
+				}
+				if (i == sread)
+					continue;
+
+				offset = i;
+				sread = strlen(buf+offset);
+			}
+
 			rl_save_prompt();
 			rl_replace_line("",0);
 			rl_redisplay();
-			printf("%.*s",sread,buf);
+			printf("%.*s",sread,buf+offset);
 			rl_clear_message();
 			rl_restore_prompt();
 			rl_redisplay();
