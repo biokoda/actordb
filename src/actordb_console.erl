@@ -54,32 +54,32 @@ cmd(P,Bin,Tuple) ->
 		{use,Name} ->
 			case string:to_lower(binary_to_list(Name)) of
 				"actordb" ->
-					change_prompt(P#dp{curdb = actordb});
+					print_help(change_prompt(P#dp{curdb = actordb}));
 				"users" ->
-					change_prompt(P#dp{curdb = users});
+					print_help(change_prompt(P#dp{curdb = users}));
 				"config" ->
-					change_prompt(P#dp{curdb = config});
+					print_help(change_prompt(P#dp{curdb = config}));
 				"schema" ->
-					change_prompt(P#dp{curdb = schema})
+					print_help(change_prompt(P#dp{curdb = schema}))
 			end;
 		#show{} = R ->
 			cmd_show(P,R);
 		rollback ->
-			P#dp{buffer = []};
+			change_prompt(P#dp{buffer = []});
 		commit ->
-			send_query(P#dp{buffer = []},lists:reverse(P#dp.buffer));
+			change_prompt(send_query(P#dp{buffer = []},lists:reverse(P#dp.buffer)));
 		create_table ->
-			cmd_create(P,Bin);
+			change_prompt(cmd_create(P,Bin));
 		#select{} = R ->
 			cmd_select(P,R,Bin);
 		#insert{} = R ->
-			cmd_insert(P,R,Bin);
+			change_prompt(cmd_insert(P,R,Bin));
 		#update{} = R ->
-			cmd_update(P,R,Bin);
+			change_prompt(cmd_update(P,R,Bin));
 		#delete{} = R ->
-			cmd_delete(P,R,Bin);
+			change_prompt(cmd_delete(P,R,Bin));
 		_ when is_tuple(Tuple), is_tuple(element(1,Tuple)), is_binary(element(2,Tuple)) ->
-			cmd(cmd(P,element(1,Tuple)), element(2,Tuple));
+			cmd(cmd(P,Bin,element(1,Tuple)), element(2,Tuple));
 		_ ->
 			print(P,"Unrecognized command.")
 	end.
@@ -132,19 +132,22 @@ print(P,F,A) ->
 	port_command(P#dp.resp, [io_lib:format(F,A),<<"\r\n">>]),
 	P.
 
-change_prompt(#dp{env = test} = P) ->
-	P;
 change_prompt(P) ->
 	case P#dp.curdb of
 		actordb ->
-			print_help(print(P,"~~~~actordb>"));
+			print(P,"~~~~actordb"++uncommited(P)++">");
 		config ->
-			print_help(print(P,"~~~~actordb:config>"));
+			print(P,"~~~~actordb:config"++uncommited(P)++">");
 		users ->
-			print_help(print(P,"~~~~actordb:users>"));
+			print(P,"~~~~actordb:users"++uncommited(P)++">");
 		schema ->
-			print_help(print(P,"~~~~actordb:schema>"))
+			print(P,"~~~~actordb:schema"++uncommited(P)++">")
 	end.
+
+uncommited(#dp{buffer = []}) ->
+	"";
+uncommited(P) ->
+	" ("++integer_to_list(length(P#dp.buffer))++")".
 
 print_help(#dp{env = test} = P) ->
 	P;
@@ -173,7 +176,13 @@ dopipe(P) ->
 				["q"] ->
 					ok;
 				_ ->
-					dopipe(cmd(P,Data))
+					case catch cmd(P,Data) of
+						#dp{} = NP ->
+							dopipe(NP);
+						X ->
+							port_command(P#dp.resp, [io_lib:fwrite("~p",[X]),<<"\n">>]),
+							dopipe(P)
+					end
 			end;
 		X ->
 			port_command(P#dp.resp, [io_lib:fwrite("~p",[X]),<<"\n">>]),
