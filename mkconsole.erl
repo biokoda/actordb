@@ -2,8 +2,10 @@
 
 
 main(BinFiles1) ->
-  BinFiles = ["deps/actordb_core/ebin/actordb_sql.beam","ebin/actordb_console.beam"] ++ BinFiles1,
-  Apps = [thrift,lager,poolboy],
+  BinFiles = ["deps/bkdcore/ebin/butil.beam",
+    "deps/actordb_core/ebin/actordb_sql.beam",
+    "ebin/actordb_console.beam"] ++ BinFiles1,
+  Apps = [thrift,lager,poolboy, actordb_client],
 
   %% Add ebin paths to our path
   true = code:add_path("ebin"),

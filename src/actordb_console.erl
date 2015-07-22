@@ -1,5 +1,5 @@
 -module(actordb_console).
--export([main/1,cmd/1]).
+-export([main/1,cmd/1, map_print/1]).
 % -compile(export_all).
 -include_lib("actordb_core/include/actordb.hrl").
 
@@ -18,23 +18,47 @@
 % actordb - default can run queries directly
 % config - for adding groups and nodes
 % schema - for changing schema
--record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = []}).
+-record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = [],
+	addr = "127.0.0.1", port = 33306, username = "", password = ""}).
 
 main(["pipe", Req,Resp|Args]) ->
 	ReqPipe = open_port(Req, [in,eof,binary]),
 	RespPipe = open_port(Resp, [out,eof,binary]),
-	P = #dp{req = ReqPipe, resp = RespPipe, env = shell},
-	case Args of
-		[] ->
-			port_command(RespPipe, [?COMMANDS,<<"\r\n">>]);
-		_ ->
-			ok
+	P = parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args),
+	PoolInfo = [{size, 1}, {max_overflow, 5}],
+	WorkerParams = [{hostname, P#dp.addr},
+		{username, P#dp.username},
+		{password, P#dp.password},
+		{port,P#dp.port}
+	],
+	case actordb_client:start(PoolInfo,WorkerParams) of
+		ok ->
+			% print(P,"Connected to DB\n"),
+			ok;
+		Err ->
+			print(P,"Connect/login error: ~p~n",[Err]),
+			halt(1)
 	end,
-	dopipe(parse_args(P,Args));
+	port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
+	dopipe(P);
 main(_) ->
 	ok.
 
-parse_args(P,_) ->
+parse_args(P,["-h"|_]) ->
+	print(P,"Call with: actordb_console -u username -p password IP[:ThriftPort]\n"),
+	halt(1);
+parse_args(P,["-u",Username|T]) ->
+	parse_args(P#dp{username = Username},T);
+parse_args(P,["-p",Password|T]) ->
+	parse_args(P#dp{password = Password},T);
+parse_args(P,[Addr]) ->
+	case string:tokens(Addr,":") of
+		[Addr,Port] ->
+			P#dp{addr = Addr, port = list_to_integer(Port)};
+		[Addr] ->
+			P#dp{addr = Addr}
+	end;
+parse_args(P,[]) ->
 	P.
 
 cmd(C) ->
@@ -63,7 +87,7 @@ cmd(P,Bin,Tuple) ->
 		rollback ->
 			change_prompt(P#dp{buffer = []});
 		commit ->
-			change_prompt(send_query(P#dp{buffer = []},lists:reverse(P#dp.buffer)));
+			change_prompt(send_cfg_query(P#dp{buffer = []},lists:reverse(P#dp.buffer)));
 		create_table ->
 			change_prompt(cmd_create(P,Bin));
 		#select{} = R ->
@@ -99,11 +123,10 @@ cmd_update(#dp{curdb = actordb} = P,_,Bin) ->
 cmd_update(P,_,Bin) ->
 	P#dp{buffer = [Bin|P#dp.buffer]}.
 
-% cmd_select(#dp{curdb = actordb} = P,_,Bin) ->
-% 	send_query(P,Bin);
+cmd_select(#dp{curdb = actordb} = P,_,Bin) ->
+	send_query(P,Bin);
 cmd_select(P,_,Bin) ->
-	% P.
-	send_query(P,Bin).
+	send_cfg_query(P,Bin).
 
 cmd_create(#dp{curdb = actordb} = P,Bin) ->
 	send_query(P,Bin);
@@ -115,14 +138,21 @@ cmd_delete(#dp{curdb = actordb} = P,_R,Bin) ->
 cmd_delete(P,_,_) ->
 	print(P,"Can not run delete on current db.").
 
+send_cfg_query(P,Bin) ->
+	case actordb_client:exec_config(Bin) of
+		{ok,{false,Map}} ->
+			map_print(P,Map);
+		Err ->
+			print(P,"Error: ~p~n",[Err])
+	end.
 
-send_query(P,_Bin) ->
+send_query(P,Bin) ->
 	P.
 
 print(P,F) ->
 	print(P,F,[]).
 print(#dp{env = test} = P,F,A) ->
-	io:format(F,A),
+	io:format(F++"~n",A),
 	P;
 print(P,F,A) ->
 	port_command(P#dp.resp, [io_lib:format(F,A),<<"\r\n">>]),
@@ -186,4 +216,43 @@ dopipe(P) ->
 			port_command(P#dp.resp, [io_lib:fwrite("~p",[X]),<<"\n">>]),
 			io:format("Received ~p~n",[X])
 	end.
+
+
+map_print(M) when is_list(M) ->
+	map_print(#dp{env = test},M);
+map_print(M) ->
+	map_print([M]).
+map_print(P,M) ->
+	% Keys = [butil:tostring(K) || K <- map:keys(M)],
+	Keys = maps:keys(hd(M)),
+	map_print(P,Keys,M,[]).
+
+ map_print(P,[Key|T],Maps,L) ->
+ 	Lenk = length(butil:tolist(Key)),
+ 	Len = lists:max([Lenk|[length(butil:tolist(maps:get(Key,M))) || M <- Maps]]),
+ 	map_print(P,T,Maps,[{Key,Len}|L]);
+ map_print(P,[],Maps,L1) ->
+ 	L = lists:reverse(L1),
+ 	Width = lists:sum([Len || {_,Len} <- L]),
+ 	Chars = length(L)+1 + Width,
+ 	Delim = string:right("",Chars,$*),
+ 	Delim1 = string:right("",Chars,$-),
+ 	print(P,"~s",[Delim]),
+ 	StrKeys = [io_lib:format("~s",[string:left(butil:tolist(K),Len+1,$\s)]) || {K,Len} <- L],
+ 	print(P,"~s|",[StrKeys]),
+ 	print(P,"~s",[Delim1]),
+ 	StrVals = map_print1(Maps,L),
+ 	print(P,"~s",[StrVals]),
+ 	print(P,"~s",[Delim1]).
+
+map_print1([M|T],Keys) ->
+	case T of
+		[] ->
+			End = "";
+		_ ->
+			End = "\n"
+	end,
+	[[io_lib:format("~s",[string:left(butil:tolist(maps:get(K,M)),Len+1,$\s)]) || {K,Len} <- Keys],"|",End|map_print1(T,Keys)];
+map_print1([],_) ->
+	[].
 
