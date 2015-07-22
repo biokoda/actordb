@@ -9,17 +9,15 @@
 %   Provide a shortcut command to create single node init.
 % - if yes, print standard commands
 
--define(COMMANDS,"Commands:\n"++
-"use config - initialize and configure nodes\n"++
+-define(COMMANDS,"Databases:\n"++
+"use config - initialize/add nodes and user account management\n"++
 "use schema - set schema\n"++
-"use users - account management\n"++
 "use actordb - (default) run queries on database\n").
 
 % curdb changed with use statements 
 % actordb - default can run queries directly
 % config - for adding groups and nodes
 % schema - for changing schema
-% users  - for adding users
 -record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = []}).
 
 main(["pipe", Req,Resp|Args]) ->
@@ -55,8 +53,6 @@ cmd(P,Bin,Tuple) ->
 			case string:to_lower(binary_to_list(Name)) of
 				"actordb" ->
 					print_help(change_prompt(P#dp{curdb = actordb}));
-				"users" ->
-					print_help(change_prompt(P#dp{curdb = users}));
 				"config" ->
 					print_help(change_prompt(P#dp{curdb = config}));
 				"schema" ->
@@ -103,11 +99,11 @@ cmd_update(#dp{curdb = actordb} = P,_,Bin) ->
 cmd_update(P,_,Bin) ->
 	P#dp{buffer = [Bin|P#dp.buffer]}.
 
-cmd_select(#dp{curdb = actordb} = P,_,Bin) ->
-	send_query(P,Bin);
+% cmd_select(#dp{curdb = actordb} = P,_,Bin) ->
+% 	send_query(P,Bin);
 cmd_select(P,_,Bin) ->
 	% P.
-	P#dp{buffer = [Bin|P#dp.buffer]}.
+	send_query(P,Bin).
 
 cmd_create(#dp{curdb = actordb} = P,Bin) ->
 	send_query(P,Bin);
@@ -138,8 +134,6 @@ change_prompt(P) ->
 			print(P,"~~~~actordb"++uncommited(P)++">");
 		config ->
 			print(P,"~~~~actordb:config"++uncommited(P)++">");
-		users ->
-			print(P,"~~~~actordb:users"++uncommited(P)++">");
 		schema ->
 			print(P,"~~~~actordb:schema"++uncommited(P)++">")
 	end.
@@ -153,12 +147,16 @@ print_help(#dp{env = test} = P) ->
 	P;
 print_help(#dp{curdb = actordb} = P) ->
 	P;
-print_help(#dp{curdb = users} = P) ->
-	print(P,"MySQL commands https://dev.mysql.com/doc/refman/5.1/en/user-account-management.html");
+% print_help(#dp{curdb = users} = P) ->
+% 	print(P,"MySQL commands https://dev.mysql.com/doc/refman/5.1/en/user-account-management.html");
 print_help(#dp{curdb = config} = P) ->
+	Delim = "*******************************************************************\n",
+	Url = "https://dev.mysql.com/doc/refman/5.1/en/user-account-management.html\n",
+	U = "For user account management use mysql syntax.\n"++Url,
+	E = "To create/modify servers, run inserts to these tables: \n",
 	G = "CREATE TABLE groups (name TEXT, type TEXT DEFAULT 'cluster');\n",
 	N = "CREATE TABLE nodes (name TEXT, group_name TEXT);\n",
-	print(P,"Run inserts to these tables: \n"++G++N++c());
+	print(P,Delim++U++Delim++E++G++N++Delim++c()++Delim);
 print_help(#dp{curdb = schema} = P) ->
 	S = "actor type1; CREATE TABLE tab (id INTEGER PRIMARY KEY, val TEXT);\n",
 	print(P,"Create or modify schema for actor types. Example:\n"++S++c()).

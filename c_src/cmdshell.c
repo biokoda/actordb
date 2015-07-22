@@ -68,7 +68,7 @@ pid_t popen2(char* argv[], int argc, int *infp, int *outfp)
 
 void proc_exit()
 {
-	printf("EXIT\n");
+	// printf("EXIT\n");
 	running = 0;
 }
 
