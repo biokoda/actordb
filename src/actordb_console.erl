@@ -84,10 +84,12 @@ cmd(P,Bin,Tuple) ->
 			end;
 		#show{} = R ->
 			cmd_show(P,R);
+		print ->
+			print(P,io_lib:fwrite("~s",[butil:iolist_join(lists:reverse(P#dp.buffer),"\n")]));
 		rollback ->
 			change_prompt(P#dp{buffer = []});
 		commit ->
-			change_prompt(send_cfg_query(P#dp{buffer = []},lists:reverse(P#dp.buffer)));
+			send_cfg_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
 		create_table ->
 			change_prompt(cmd_create(P,Bin));
 		#select{} = R ->
@@ -98,6 +100,8 @@ cmd(P,Bin,Tuple) ->
 			change_prompt(cmd_update(P,R,Bin));
 		#delete{} = R ->
 			change_prompt(cmd_delete(P,R,Bin));
+		#management{} = R ->
+			change_prompt(cmd_usermng(P,R,Bin));
 		_ when is_tuple(Tuple), is_tuple(element(1,Tuple)), is_binary(element(2,Tuple)) ->
 			cmd(cmd(P,Bin,element(1,Tuple)), element(2,Tuple));
 		_ ->
@@ -117,6 +121,11 @@ cmd_insert(#dp{curdb = actordb} = P,_,Bin) ->
 % 	P#dp{buffer = [Bin|P#dp.buffer]};
 cmd_insert(P,_,Bin) ->
 	P#dp{buffer = [Bin|P#dp.buffer]}.
+
+cmd_usermng(#dp{curdb = config} = P,_,Bin) ->
+	P#dp{buffer = [Bin|P#dp.buffer]};
+cmd_usermng(P,_,_) ->
+	print(P,"Not in config database.").
 
 cmd_update(#dp{curdb = actordb} = P,_,Bin) ->
 	send_query(P,Bin);
@@ -139,9 +148,11 @@ cmd_delete(P,_,_) ->
 	print(P,"Can not run delete on current db.").
 
 send_cfg_query(P,Bin) ->
-	case actordb_client:exec_config(Bin) of
+	case actordb_client:exec_config(butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
+		{ok,{changes,Rowid,NChanged}} ->
+			print(P,"Rowid: ~p, Rows changed: ~p",[Rowid,NChanged]);
 		Err ->
 			print(P,"Error: ~p~n",[Err])
 	end.
@@ -192,7 +203,7 @@ print_help(#dp{curdb = schema} = P) ->
 	print(P,"Create or modify schema for actor types. Example:\n"++S++c()).
 
 c() ->
-	"To commit run: commit\nTo abort run: rollback\n".
+	"To commit run: commit\nTo abort run: rollback\nTo view transaction: print\n".
 
 dopipe(#dp{stop = true}) ->
 	ok;
@@ -223,27 +234,26 @@ map_print(M) when is_list(M) ->
 map_print(M) ->
 	map_print([M]).
 map_print(P,M) ->
-	% Keys = [butil:tostring(K) || K <- map:keys(M)],
 	Keys = maps:keys(hd(M)),
 	map_print(P,Keys,M,[]).
 
- map_print(P,[Key|T],Maps,L) ->
- 	Lenk = length(butil:tolist(Key)),
- 	Len = lists:max([Lenk|[length(butil:tolist(maps:get(Key,M))) || M <- Maps]]),
- 	map_print(P,T,Maps,[{Key,Len}|L]);
- map_print(P,[],Maps,L1) ->
- 	L = lists:reverse(L1),
- 	Width = lists:sum([Len || {_,Len} <- L]),
- 	Chars = length(L)+1 + Width,
- 	Delim = string:right("",Chars,$*),
- 	Delim1 = string:right("",Chars,$-),
- 	print(P,"~s",[Delim]),
- 	StrKeys = [io_lib:format("~s",[string:left(butil:tolist(K),Len+1,$\s)]) || {K,Len} <- L],
- 	print(P,"~s|",[StrKeys]),
- 	print(P,"~s",[Delim1]),
- 	StrVals = map_print1(Maps,L),
- 	print(P,"~s",[StrVals]),
- 	print(P,"~s",[Delim1]).
+map_print(P,[Key|T],Maps,L) ->
+	Lenk = length(butil:tolist(Key)),
+	Len = lists:max([Lenk|[length(butil:tolist(maps:get(Key,M))) || M <- Maps]]),
+	map_print(P,T,Maps,[{Key,Len}|L]);
+map_print(P,[],Maps,L1) ->
+	L = lists:reverse(L1),
+	Width = lists:sum([Len || {_,Len} <- L]),
+	Chars = length(L)+1 + Width,
+	Delim = string:right("",Chars,$*),
+	Delim1 = string:right("",Chars,$-),
+	print(P,"~s",[Delim]),
+	StrKeys = [io_lib:format("~s",[string:left(butil:tolist(K),Len+1,$\s)]) || {K,Len} <- L],
+	print(P,"~s|",[StrKeys]),
+	print(P,"~s",[Delim1]),
+	StrVals = map_print1(Maps,L),
+	print(P,"~s",[StrVals]),
+	print(P,"~s",[Delim1]).
 
 map_print1([M|T],Keys) ->
 	case T of

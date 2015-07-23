@@ -79,7 +79,8 @@ static void rl_handler(char* line)
 		running = 0;
 		return;
 	}
-	add_history(line);
+	if (strlen(line) > 1)
+		add_history(line);
 
 	if (write(req, line, strlen(line)) < 0)
 		running = 0;
