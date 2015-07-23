@@ -9,16 +9,27 @@
 %   Provide a shortcut command to create single node init.
 % - if yes, print standard commands
 
--define(COMMANDS,"Databases:\n"++
-"use config - initialize/add nodes and user account management\n"++
-"use schema - set schema\n"++
-"use actordb - (default) run queries on database\n").
+-define(COMMANDS,delim()++"Databases:\n"++
+"use config   initialize/add nodes and user account management\n"++
+"use schema   set schema\n"++
+"use actordb  (default) run queries on database\n"++
+delim()++
+"Commands:\n"++
+"q            exit\n"++
+"h            print this header\n"++
+"commit       execute transaction\n"++
+"rollback     to abort transaction\n"++
+"print        print transaction\n"++delim()).
+
+delim() ->
+	"*******************************************************************\n".
+
 
 % curdb changed with use statements 
 % actordb - default can run queries directly
 % config - for adding groups and nodes
 % schema - for changing schema
--record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = [],
+-record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = [], wait = false,
 	addr = "127.0.0.1", port = 33306, username = "", password = ""}).
 
 main(["pipe", Req,Resp|Args]) ->
@@ -45,12 +56,19 @@ main(_) ->
 	ok.
 
 parse_args(P,["-h"|_]) ->
-	print(P,"Call with: actordb_console -u username -p password IP[:ThriftPort]\n"),
+	L = "Flags:\n"++
+	"  -h   print this help and exit\n"++
+	"  -w   wait for commit to send query to actordb\n"++
+	"  -u   username\n"++
+	"  -p   password\n",
+	print(P,"Call with: actordb_console -u username -p password IP[:ThriftPort]\n"++L),
 	halt(1);
 parse_args(P,["-u",Username|T]) ->
 	parse_args(P#dp{username = Username},T);
 parse_args(P,["-p",Password|T]) ->
 	parse_args(P#dp{password = Password},T);
+parse_args(P,["-w"|T]) ->
+	parse_args(P#dp{wait = true},T);
 parse_args(P,[Addr]) ->
 	case string:tokens(Addr,":") of
 		[Addr,Port] ->
@@ -67,6 +85,8 @@ cmd(P,<<";",Rem/binary>>) ->
 	cmd(P,Rem);
 cmd(P,<<>>) ->
 	P;
+cmd(P,<<"h">>) ->
+	print(P,?COMMANDS);
 cmd(P,Bin) when is_binary(Bin) ->
 	cmd(P,Bin,actordb_sql:parse(Bin)).
 cmd(P,Bin,Tuple) ->
@@ -84,26 +104,33 @@ cmd(P,Bin,Tuple) ->
 			end;
 		#show{} = R ->
 			cmd_show(P,R);
+		{actor,Type,SubType} ->
+			cmd_actor(P,{actor,Type,SubType},Bin);
 		print ->
 			print(P,io_lib:fwrite("~s",[butil:iolist_join(lists:reverse(P#dp.buffer),"\n")]));
 		rollback ->
 			change_prompt(P#dp{buffer = []});
-		commit ->
+		commit when P#dp.curdb /= actordb ->
 			send_cfg_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
-		create_table ->
-			change_prompt(cmd_create(P,Bin));
+		commit ->
+			send_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
+		% create_table ->
+		% 	change_prompt(cmd_create(P,Bin));
 		#select{} = R ->
 			cmd_select(P,R,Bin);
 		#insert{} = R ->
-			change_prompt(cmd_insert(P,R,Bin));
+			cmd_insert(P,R,Bin);
 		#update{} = R ->
-			change_prompt(cmd_update(P,R,Bin));
+			cmd_update(P,R,Bin);
 		#delete{} = R ->
-			change_prompt(cmd_delete(P,R,Bin));
+			cmd_delete(P,R,Bin);
 		#management{} = R ->
-			change_prompt(cmd_usermng(P,R,Bin));
+			cmd_usermng(P,R,Bin);
 		_ when is_tuple(Tuple), is_tuple(element(1,Tuple)), is_binary(element(2,Tuple)) ->
 			cmd(cmd(P,Bin,element(1,Tuple)), element(2,Tuple));
+		% Let actordb deal with it, unless it is config db
+		_ when P#dp.curdb /= config andalso (P#dp.wait orelse P#dp.curdb == schema)  ->
+			append(P,Bin);
 		_ ->
 			print(P,"Unrecognized command.")
 	end.
@@ -113,52 +140,80 @@ cmd_show(#dp{curdb = actordb} = P,_R) ->
 cmd_show(P,_R) ->
 	P.
 
-cmd_insert(#dp{curdb = actordb} = P,_,Bin) ->
+append(P,Bin) ->
+	case binary:last(Bin) of
+		$; ->
+			change_prompt(P#dp{buffer = [Bin|P#dp.buffer]});
+		_ ->
+			change_prompt(P#dp{buffer = [[Bin,";"]|P#dp.buffer]})
+	end.
+
+cmd_actor(#dp{curdb = config} = P,_,_) ->
+	print(P,"actor statements do not belong in config db");
+cmd_actor(P,_,Bin) ->
+	append(P,Bin).
+% cmd_actor(#dp{curdb = actordb} = P,{actor,_Type},Bin) ->
+% 	P#dp{buffer = [Bin|P#dp.buffer]}.
+
+cmd_insert(#dp{curdb = actordb, wait = false} = P,_,Bin) ->
 	send_query(P,Bin);
-% cmd_insert(#dp{curdb = config} = P,_R,Bin) ->
-% 	% T = (R#insert.table)#table.name,
-% 	% V = []
-% 	P#dp{buffer = [Bin|P#dp.buffer]};
 cmd_insert(P,_,Bin) ->
-	P#dp{buffer = [Bin|P#dp.buffer]}.
+	append(P,Bin).
 
 cmd_usermng(#dp{curdb = config} = P,_,Bin) ->
-	P#dp{buffer = [Bin|P#dp.buffer]};
+	append(P,Bin);
 cmd_usermng(P,_,_) ->
 	print(P,"Not in config database.").
 
-cmd_update(#dp{curdb = actordb} = P,_,Bin) ->
+cmd_update(#dp{curdb = actordb, wait = false} = P,_,Bin) ->
 	send_query(P,Bin);
 cmd_update(P,_,Bin) ->
-	P#dp{buffer = [Bin|P#dp.buffer]}.
+	append(P,Bin).
 
-cmd_select(#dp{curdb = actordb} = P,_,Bin) ->
+cmd_select(#dp{curdb = actordb, wait = false} = P,_,Bin) ->
 	send_query(P,Bin);
+cmd_select(#dp{curdb = actordb} = P,_,Bin) ->
+	append(P,Bin);
+cmd_select(#dp{curdb = schema} = P,_,_) ->
+	print(P,"select statements do not belong in schema.");
 cmd_select(P,_,Bin) ->
 	send_cfg_query(P,Bin).
 
-cmd_create(#dp{curdb = actordb} = P,Bin) ->
-	send_query(P,Bin);
-cmd_create(P,_) ->
-	print(P,"Can not run create on current db.").
+% cmd_create(#dp{curdb = actordb, wait = false} = P,Bin) ->
+% 	send_query(P,Bin);
+% cmd_create(#dp{curdb = actordb} = P,Bin) ->
+% 	append(P,Bin);
+% cmd_create(P,_) ->
+% 	print(P,"Can not run create on current db.").
 
-cmd_delete(#dp{curdb = actordb} = P,_R,Bin) ->
+cmd_delete(#dp{curdb = actordb, wait = false} = P,_R,Bin) ->
 	send_query(P,Bin);
-cmd_delete(P,_,_) ->
-	print(P,"Can not run delete on current db.").
+cmd_delete(#dp{curdb = actordb} = P,_R,Bin) ->
+	append(P,Bin);
+cmd_delete(P,_,Bin) ->
+	append(P,Bin).
 
 send_cfg_query(P,Bin) ->
 	case actordb_client:exec_config(butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
+		{ok,{changes,_Rowid,_NChanged}} ->
+			print(P,"Config updated.",[]);
+		Err ->
+			print(P,"Error: ~p",[Err])
+	end.
+
+send_query(P,Bin) when P#dp.buffer /= [] ->
+	send_query(P#dp{buffer = []},lists:reverse(append(P,Bin)));
+send_query(P,Bin) ->
+	case actordb_client:exec(butil:tobin(Bin)) of
+		{ok,{false,Map}} ->
+			map_print(P,Map);
 		{ok,{changes,Rowid,NChanged}} ->
 			print(P,"Rowid: ~p, Rows changed: ~p",[Rowid,NChanged]);
 		Err ->
-			print(P,"Error: ~p~n",[Err])
+			print(P,"Error: ~p",[Err])
 	end.
-
-send_query(P,Bin) ->
-	P.
 
 print(P,F) ->
 	print(P,F,[]).
@@ -191,19 +246,18 @@ print_help(#dp{curdb = actordb} = P) ->
 % print_help(#dp{curdb = users} = P) ->
 % 	print(P,"MySQL commands https://dev.mysql.com/doc/refman/5.1/en/user-account-management.html");
 print_help(#dp{curdb = config} = P) ->
-	Delim = "*******************************************************************\n",
 	Url = "https://dev.mysql.com/doc/refman/5.1/en/user-account-management.html\n",
 	U = "For user account management use mysql syntax.\n"++Url,
 	E = "To create/modify servers, run inserts to these tables: \n",
 	G = "CREATE TABLE groups (name TEXT, type TEXT DEFAULT 'cluster');\n",
 	N = "CREATE TABLE nodes (name TEXT, group_name TEXT);\n",
-	print(P,Delim++U++Delim++E++G++N++Delim++c()++Delim);
+	print(P,delim()++U++delim()++E++G++N++delim());
 print_help(#dp{curdb = schema} = P) ->
 	S = "actor type1; CREATE TABLE tab (id INTEGER PRIMARY KEY, val TEXT);\n",
-	print(P,"Create or modify schema for actor types. Example:\n"++S++c()).
-
-c() ->
-	"To commit run: commit\nTo abort run: rollback\nTo view transaction: print\n".
+	R = "WARNING: Schema is not overwritten but appended.\n"++
+		"         Any pre-existing type will have old and new\n"++
+		"         statements as its schema.\n",
+	print(P,delim()++"Create or modify schema for actor types. Example:\n"++S++delim()++R++delim()).
 
 dopipe(#dp{stop = true}) ->
 	ok;

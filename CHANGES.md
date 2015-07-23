@@ -7,6 +7,7 @@
 - Feature: Expanded configuration options in app.config. 
 - Feature: Added fsync flag to queries. Writes with fsync will be synced to disk before response is sent to client. You can set fsync to safe in app.config, which will have the same result for all writes.
 - Bugfix: MySQL console bugfix for pragma statements. 
+- Bugfix: ActorDB was listening on all interfaces instead of just the one it actually is configured to use.
 
 
 **0.9 - 7 May 2015**
