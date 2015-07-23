@@ -127,7 +127,8 @@ cmd(P,Bin,Tuple) ->
 		#management{} = R ->
 			cmd_usermng(P,R,Bin);
 		_ when is_tuple(Tuple), is_tuple(element(1,Tuple)), is_binary(element(2,Tuple)) ->
-			cmd(cmd(P,Bin,element(1,Tuple)), element(2,Tuple));
+			[This,Next] = binary:split(Bin,element(2,Tuple)),
+			cmd(cmd(P,This,element(1,Tuple)), Next);
 		% Let actordb deal with it, unless it is config db
 		_ when P#dp.curdb /= config andalso (P#dp.wait orelse P#dp.curdb == schema)  ->
 			append(P,Bin);
