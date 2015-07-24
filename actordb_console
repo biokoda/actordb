@@ -1,0 +1,2 @@
+#!/bin/sh
+./priv/cmdshell escript ./priv/actordb_console "$@"
