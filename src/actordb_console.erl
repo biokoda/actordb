@@ -388,6 +388,7 @@ wxrun() ->
 	wxDialog:show(Dlg),
 	wxWindow:setFocus(TextInput),
 	wxTextCtrl:writeText(TextInput,?PROMPT),
+	wxEvtHandler:connect(Dlg,close_window),
 	wxEvtHandler:connect(TextInput,command_text_enter),
 	% wxEvtHandler:connect(TextInput,key_down,[{skip,true}]),
 	wxEvtHandler:connect(TextInput,key_down,[{callback,fun input/2},{userData,{TextInput,?PROMPT}}]),
@@ -416,7 +417,15 @@ wxloop(Disp,Input,Prompt) ->
 			Str = Cmd#wxCommand.cmdString,
 			Print = lists:sublist(Str,length(Prompt)+1,length(Str)),
 			home ! {exec, unicode:characters_to_binary(Print)},
-			wxloop(Disp,Input,Prompt)
+			wxloop(Disp,Input,Prompt);
+		Wx ->
+			Cmd = Wx#wx.event,
+			case Cmd of
+				#wxClose{} ->
+					halt(1);
+				_ ->
+					ok
+			end
 	end.
 
 input(Wx, Obj)  ->
