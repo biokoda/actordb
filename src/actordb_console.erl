@@ -1,7 +1,8 @@
 -module(actordb_console).
 -export([main/1,cmd/1, map_print/1]).
-% -compile(export_all).
 -include_lib("actordb_core/include/actordb.hrl").
+-include_lib("wx/include/wx.hrl").
+-define(PROMPT,"actordb>").
 
 % TODO:
 % on connect, check if initialized (select on config):
@@ -33,9 +34,19 @@ delim() ->
 	addr = "127.0.0.1", port = 33306, username = "", password = "", filebin}).
 
 main(Args) ->
-	ReqPipe = open_port("/tmp/actordb.req", [in,eof,binary]),
-	RespPipe = open_port("/tmp/actordb.resp", [out,eof,binary]),
-	P = parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args),
+	register(home,self()),
+	case os:type() of
+		{win32,_} ->
+			spawn(fun() -> (catch wxrun()),halt(1) end),
+			P = parse_args(#dp{env = wx}, Args);
+		% {unix,darwin} ->
+		% 	spawn(fun() -> (catch wxrun()),halt(1) end),
+		% 	P = parse_args(#dp{env = wx}, Args);
+		_ ->
+			ReqPipe = open_port("/tmp/actordb.req", [in,eof,binary]),
+			RespPipe = open_port("/tmp/actordb.resp", [out,eof,binary]),
+			P = parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args)
+	end,
 	PoolInfo = [{size, 1}, {max_overflow, 5}],
 	WorkerParams = [{hostname, P#dp.addr},
 		{username, P#dp.username},
@@ -52,7 +63,8 @@ main(Args) ->
 	end,
 	case P#dp.filebin of
 		undefined ->
-			port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
+			% port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
+			print(P,?COMMANDS),
 			dopipe(P);
 		_ ->
 			cmd_lines(P,binary:split(P#dp.filebin,<<"\n">>,[global])),
@@ -118,6 +130,8 @@ cmd(P,<<>>) ->
 	P;
 cmd(P,<<"h">>) ->
 	print(P,?COMMANDS);
+cmd(_P,<<"q">>) ->
+	halt(1);
 cmd(P,Bin) when is_binary(Bin) ->
 	cmd(P,Bin,actordb_sql:parse(Bin)).
 cmd(P,Bin,Tuple) ->
@@ -134,7 +148,9 @@ cmd(P,Bin,Tuple) ->
 				"config" ->
 					print_help(change_prompt(P#dp{curdb = config}));
 				"schema" ->
-					print_help(change_prompt(P#dp{curdb = schema}))
+					print_help(change_prompt(P#dp{curdb = schema}));
+				_ ->
+					print(P,"Invalid db")
 			end;
 		#show{} = R ->
 			cmd_show(P,R);
@@ -171,7 +187,7 @@ cmd(P,Bin,Tuple) ->
 			<<This:ThisSize/binary,Next:NextSize/binary>> = Bin,
 			cmd(cmd(P,This,element(1,Tuple)), Next);
 		_ ->
-			print(P,"Unrecognized command. ~p",[P#dp.curdb])
+			print(P,"Unrecognized command11. ~p",[P#dp.curdb])
 	end.
 
 cmd_show(#dp{curdb = actordb} = P,_R) ->
@@ -269,10 +285,23 @@ print(P,F) ->
 print(#dp{env = test} = P,F,A) ->
 	io:format(F++"~n",A),
 	P;
+print(#dp{env = wx} = P,F,A) ->
+	wxproc ! {print,io_lib:fwrite(F,A)},
+	P;
 print(P,F,A) ->
 	port_command(P#dp.resp, [io_lib:format(F,A),<<"\r\n">>]),
 	P.
 
+change_prompt(#dp{env = wx} = P) ->
+	case P#dp.curdb of
+		actordb ->
+			wxproc ! {prompt,"actordb"++uncommited(P)++">"};
+		config ->
+			wxproc ! {prompt,"actordb:config"++uncommited(P)++">"};
+		schema ->
+			wxproc ! {prompt,"actordb:schema"++uncommited(P)++">"}
+	end,
+	P;
 change_prompt(P) ->
 	case P#dp.curdb of
 		actordb ->
@@ -310,6 +339,18 @@ print_help(#dp{curdb = schema} = P) ->
 
 dopipe(#dp{stop = true}) ->
 	ok;
+dopipe(#dp{env = wx} = P) ->
+	receive
+		{exec,Str} ->
+			print(P,Str),
+			case catch cmd(P,Str) of
+				#dp{} = NP ->
+					dopipe(NP);
+				X ->
+					print(P,io_lib:fwrite("~p",[X])),
+					dopipe(P)
+			end
+	end;
 dopipe(P) ->
 	receive
 		{_, {data, Data}} ->
@@ -322,7 +363,8 @@ dopipe(P) ->
 						#dp{} = NP ->
 							dopipe(NP);
 						X ->
-							port_command(P#dp.resp, [io_lib:fwrite("~p",[X]),<<"\n">>]),
+							% port_command(P#dp.resp, [io_lib:fwrite("~p",[X]),<<"\n">>]),
+							print(P,io_lib:fwrite("~p",[X])),
 							dopipe(P)
 					end
 			end;
@@ -331,6 +373,71 @@ dopipe(P) ->
 			io:format("Received ~p~n",[X])
 	end.
 
+wxrun() ->
+	register(wxproc,self()),
+	Wx = wx:new(),
+	Dlg = wxDialog:new(Wx,-1,"ActorDB Shell",[{size,{640,480}},{style,?wxRESIZE_BORDER bor ?wxDEFAULT_DIALOG_STYLE}]),
+	Sizer = wxBoxSizer:new(?wxVERTICAL),
+	TextDisplay = wxTextCtrl:new(Dlg,4,[{style, ?wxTE_MULTILINE bor ?wxTE_READONLY}]),
+	TextInput = wxTextCtrl:new(Dlg,5,[{style, ?wxDEFAULT bor ?wxHSCROLL bor ?wxTE_PROCESS_ENTER}]),
+	SzFlags = [{proportion, 0}, {border, 4}, {flag, ?wxALL}],
+	wxSizer:add(Sizer,TextDisplay,[{flag, ?wxEXPAND},{proportion, 1}|SzFlags]),
+	wxSizer:add(Sizer,TextInput,[{proportion, 0},{border, 4}, {flag, ?wxEXPAND}]),
+	wxTextCtrl:setEditable(TextInput,true),
+	wxDialog:setSizer(Dlg,Sizer),
+	wxDialog:show(Dlg),
+	wxWindow:setFocus(TextInput),
+	wxTextCtrl:writeText(TextInput,?PROMPT),
+	wxEvtHandler:connect(TextInput,command_text_enter),
+	% wxEvtHandler:connect(TextInput,key_down,[{skip,true}]),
+	wxEvtHandler:connect(TextInput,key_down,[{callback,fun input/2},{userData,{TextInput,?PROMPT}}]),
+	wxloop(TextDisplay,TextInput,?PROMPT).
+
+wxloop(Disp,Input,Prompt) ->
+	receive
+		{prompt,Str} ->
+			wxTextCtrl:setValue(Input,Str),
+			wxTextCtrl:setInsertionPoint(Input,length(Str)),
+			wxEvtHandler:disconnect(Input,key_down),
+			wxEvtHandler:connect(Input,key_down,[{callback,fun input/2},{userData,{Input,Str}}]),
+			wxloop(Disp,Input,Str);
+		{print,Str} ->
+			wxTextCtrl:writeText(Disp,Str),
+			wxTextCtrl:writeText(Disp,"\n"),
+			wxloop(Disp,Input,Prompt);
+		down ->
+			wxloop(Disp,Input,Prompt);
+		up ->
+			wxloop(Disp,Input,Prompt);
+		Wx when Wx#wx.obj == Input ->
+			wxTextCtrl:setValue(Input,Prompt),
+			wxTextCtrl:setInsertionPoint(Input,length(Prompt)),
+			Cmd = Wx#wx.event,
+			Str = Cmd#wxCommand.cmdString,
+			Print = lists:sublist(Str,length(Prompt)+1,length(Str)),
+			home ! {exec, unicode:characters_to_binary(Print)},
+			wxloop(Disp,Input,Prompt)
+	end.
+
+input(Wx, Obj)  ->
+	Cmd = Wx#wx.event,
+	case Cmd of
+		#wxKey{keyCode = ?WXK_UP} ->
+			wxEvent:skip(Obj);
+		#wxKey{keyCode = ?WXK_DOWN} ->
+			wxEvent:skip(Obj);
+		#wxKey{keyCode = ?WXK_BACK} ->
+			{Input,Prompt} = Wx#wx.userData,
+			Len = length(wxTextCtrl:getValue(Input)),
+			case Len > length(Prompt) of
+				true ->
+					wxEvent:skip(Obj);
+				false ->
+					ok
+			end;
+		_ ->
+			wxEvent:skip(Obj)
+	end.
 
 map_print(M) when is_list(M) ->
 	map_print(#dp{env = test},M);

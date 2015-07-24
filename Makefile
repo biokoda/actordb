@@ -21,7 +21,6 @@ all: deps compile
 .PHONY: rel deps
 
 compile:
-	-mkdir priv
 	$(SHELLCMD)
 	./priv/mkconsole.escript
 	./rebar compile
