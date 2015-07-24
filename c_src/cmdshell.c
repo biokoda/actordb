@@ -36,15 +36,15 @@ pid_t popen2(char* argv[], int argc, int *infp, int *outfp)
 		return pid;
 	else if (pid == 0)
 	{
-		char *args[argc+2];
+		char *args[argc];
 		int i;
 		args[0] = argv[1];
-		args[1] = "pipe";
-		args[2] = pipe_req;
-		args[3] = pipe_resp;
+		// args[1] = "pipe";
+		// args[2] = pipe_req;
+		// args[3] = pipe_resp;
 		for (i = 2; i < argc; i++)
-			args[i-2+4] = argv[i];
-		args[i-2+4] = NULL;
+			args[i-2+1] = argv[i];
+		args[i-2+1] = NULL;
 
 		close(p_stdin[WRITE]);
 		dup2(p_stdin[READ], READ);
@@ -68,7 +68,6 @@ pid_t popen2(char* argv[], int argc, int *infp, int *outfp)
 
 void proc_exit()
 {
-	// printf("EXIT\n");
 	running = 0;
 }
 
@@ -94,6 +93,7 @@ int main(int argc, char *argv[])
 
 	if (argc < 2)
 	{
+		printf("Missing program to execute\n");
 		return 0;
 	}
 

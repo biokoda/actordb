@@ -5,6 +5,14 @@ BASE_DIR = $(shell pwd)
 ERLANG_BIN = $(shell dirname $(shell which erl))
 REBAR ?= $(BASE_DIR)/rebar
 OVERLAY_VARS    ?=
+uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+
+ifeq ($(uname_S),Darwin)
+	SHELLCMD = gcc c_src/cmdshell.c -I/usr/local/Cellar/readline/6.3.8/include/ /usr/local/Cellar/readline/6.3.8/lib/libreadline.a -lncurses  -o priv/cmdshell
+else
+	SHELLCMD = gcc c_src/cmdshell.c /usr/lib/x86_64-linux-gnu/libreadline.a -lncurses  -o priv/cmdshell
+endif
+
 
 $(if $(ERLANG_BIN),,$(warning "Warning: No Erlang found in your path, this will probably not work"))
 
@@ -13,6 +21,9 @@ all: deps compile
 .PHONY: rel deps
 
 compile:
+	-mkdir priv
+	$(SHELLCMD)
+	./priv/mkconsole.escript
 	./rebar compile
 
 recompile:

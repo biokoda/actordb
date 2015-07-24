@@ -30,11 +30,11 @@ delim() ->
 % config - for adding groups and nodes
 % schema - for changing schema
 -record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = [], wait = false,
-	addr = "127.0.0.1", port = 33306, username = "", password = ""}).
+	addr = "127.0.0.1", port = 33306, username = "", password = "", filebin}).
 
-main(["pipe", Req,Resp|Args]) ->
-	ReqPipe = open_port(Req, [in,eof,binary]),
-	RespPipe = open_port(Resp, [out,eof,binary]),
+main(Args) ->
+	ReqPipe = open_port("/tmp/actordb.req", [in,eof,binary]),
+	RespPipe = open_port("/tmp/actordb.resp", [out,eof,binary]),
 	P = parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args),
 	PoolInfo = [{size, 1}, {max_overflow, 5}],
 	WorkerParams = [{hostname, P#dp.addr},
@@ -50,19 +50,50 @@ main(["pipe", Req,Resp|Args]) ->
 			print(P,"Connect/login error: ~p~n",[Err]),
 			halt(1)
 	end,
-	port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
-	dopipe(P);
-main(_) ->
-	ok.
+	case P#dp.filebin of
+		undefined ->
+			port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
+			dopipe(P);
+		_ ->
+			cmd_lines(P,binary:split(P#dp.filebin,<<"\n">>,[global])),
+			halt(1)
+	end.
+
+cmd_lines(P,[H|T]) ->
+	case rem_spaces(H) of
+		<<"//",_/binary>> ->
+			cmd_lines(P,T);
+		<<"%",_/binary>> ->
+			cmd_lines(P,T);
+		<<"--",_/binary>> ->
+			cmd_lines(P,T);
+		_ ->
+			cmd_lines(cmd(P,H),T)
+	end;
+cmd_lines(P,[]) ->
+	P.
+
+rem_spaces(<<" ",X/binary>>) ->
+	rem_spaces(X);
+rem_spaces(<<"\n",X/binary>>) ->
+	rem_spaces(X);
+rem_spaces(<<"\r",X/binary>>) ->
+	rem_spaces(X);
+rem_spaces(X) ->
+	X.
 
 parse_args(P,["-h"|_]) ->
 	L = "Flags:\n"++
 	"  -h   print this help and exit\n"++
-	"  -w   wait for commit to send query to actordb\n"++
 	"  -u   username\n"++
-	"  -p   password\n",
+	"  -p   password\n"++
+	"  -f   <file> execute statements from file and exit\n"++
+	"  -w   wait for commit to send query to actordb\n",
 	print(P,"Call with: actordb_console -u username -p password IP[:ThriftPort]\n"++L),
 	halt(1);
+parse_args(P,["-f",File|T]) ->
+	{ok,F} = file:read_file(File),
+	parse_args(P#dp{filebin = F},T);
 parse_args(P,["-u",Username|T]) ->
 	parse_args(P#dp{username = Username},T);
 parse_args(P,["-p",Password|T]) ->
@@ -91,6 +122,9 @@ cmd(P,Bin) when is_binary(Bin) ->
 	cmd(P,Bin,actordb_sql:parse(Bin)).
 cmd(P,Bin,Tuple) ->
 	case Tuple of
+		% Let actordb deal with it, unless it is config db
+		{fail,_} when P#dp.curdb /= config andalso (P#dp.wait orelse P#dp.curdb == schema)  ->
+			append(P,Bin);
 		{fail,_} ->
 			print(P,"Unrecognized command.");
 		{use,Name} ->
@@ -110,10 +144,14 @@ cmd(P,Bin,Tuple) ->
 			print(P,io_lib:fwrite("~s",[butil:iolist_join(lists:reverse(P#dp.buffer),"\n")]));
 		rollback ->
 			change_prompt(P#dp{buffer = []});
+		commit when P#dp.curdb == schema ->
+			send_schema_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
 		commit when P#dp.curdb /= actordb ->
 			send_cfg_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
 		commit ->
 			send_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
+		{commit,B} ->
+			cmd(cmd(P,<<>>,commit),B);
 		% create_table ->
 		% 	change_prompt(cmd_create(P,Bin));
 		#select{} = R ->
@@ -126,14 +164,14 @@ cmd(P,Bin,Tuple) ->
 			cmd_delete(P,R,Bin);
 		#management{} = R ->
 			cmd_usermng(P,R,Bin);
-		_ when is_tuple(Tuple), is_tuple(element(1,Tuple)), is_binary(element(2,Tuple)) ->
-			[This,Next] = binary:split(Bin,element(2,Tuple)),
+		_ when is_tuple(Tuple), is_tuple(element(3,Tuple)), is_binary(element(2,Tuple)) ->
+			RemBin = element(2,Tuple),
+			ThisSize = byte_size(Bin) - byte_size(RemBin),
+			NextSize = byte_size(RemBin),
+			<<This:ThisSize/binary,Next:NextSize/binary>> = Bin,
 			cmd(cmd(P,This,element(1,Tuple)), Next);
-		% Let actordb deal with it, unless it is config db
-		_ when P#dp.curdb /= config andalso (P#dp.wait orelse P#dp.curdb == schema)  ->
-			append(P,Bin);
 		_ ->
-			print(P,"Unrecognized command.")
+			print(P,"Unrecognized command. ~p",[P#dp.curdb])
 	end.
 
 cmd_show(#dp{curdb = actordb} = P,_R) ->
@@ -200,6 +238,16 @@ send_cfg_query(P,Bin) ->
 			map_print(P,Map);
 		{ok,{changes,_Rowid,_NChanged}} ->
 			print(P,"Config updated.",[]);
+		Err ->
+			print(P,"Error: ~p",[Err])
+	end.
+
+send_schema_query(P,Bin) ->
+	case actordb_client:exec_schema(butil:tobin(Bin)) of
+		{ok,{false,Map}} ->
+			map_print(P,Map);
+		{ok,{changes,_Rowid,_NChanged}} ->
+			print(P,"Schema updated.",[]);
 		Err ->
 			print(P,"Error: ~p",[Err])
 	end.
