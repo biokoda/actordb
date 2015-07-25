@@ -390,7 +390,10 @@ wxrun() ->
 	wxTextCtrl:writeText(TextInput,?PROMPT),
 	wxEvtHandler:connect(Dlg,close_window),
 	wxEvtHandler:connect(TextInput,command_text_enter),
-	wxEvtHandler:connect(TextInput,left_down),
+	% wxEvtHandler:connect(TextInput,left_down),
+	% I guess its a broken erlang wx implementation. I don't see how I can read
+	% text from clipboard
+	% wxEvtHandler:connect(TextInput,command_text_paste,[{skip,false}]),
 	wxEvtHandler:connect(TextInput,key_down,[{callback,fun input/2},{userData,{TextInput,?PROMPT}}]),
 	wxloop(TextDisplay,TextInput,?PROMPT).
 
@@ -412,11 +415,15 @@ wxloop(Disp,Input,Prompt) ->
 			wxloop(Disp,Input,Prompt);
 		Wx when Wx#wx.obj == Input ->
 			Cmd = Wx#wx.event,
-			% case Cmd of
-			% 	#wxMouse{} ->
-			% 		self() ! {print,"MOUSE!"},
-			% 		wxloop(Disp,Input,Prompt);
-			% 	_ ->
+			case Cmd of
+				#wxMouse{} ->
+					% self() ! {print,"MOUSE!"},
+					wxloop(Disp,Input,Prompt);
+				% #wxClipboardText{} ->
+				% 	Clip = wxClipboard:get(),
+				% 	self() ! {print,io_lib:fwrite("~p~n",[get(clip)])},
+				% 	wxloop(Disp,Input,Prompt);
+				_ ->
 					wxTextCtrl:setValue(Input,Prompt),
 					wxTextCtrl:setInsertionPoint(Input,length(Prompt)),
 					Str = Cmd#wxCommand.cmdString,
@@ -424,8 +431,8 @@ wxloop(Disp,Input,Prompt) ->
 					wxTextCtrl:writeText(Disp,"\n"),
 					Print = lists:sublist(Str,length(Prompt)+1,length(Str)),
 					home ! {exec, unicode:characters_to_binary(Print)},
-					wxloop(Disp,Input,Prompt);
-			% end;
+					wxloop(Disp,Input,Prompt)
+			end;
 		Wx ->
 			Cmd = Wx#wx.event,
 			case Cmd of
