@@ -22,8 +22,9 @@ all: deps compile
 
 compile:
 	$(SHELLCMD)
-	./priv/mkconsole.escript
 	./rebar compile
+	./priv/mkconsole.escript
+
 
 recompile:
 	./rebar update-deps
