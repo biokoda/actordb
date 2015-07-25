@@ -16,6 +16,7 @@
 "use actordb  (default) run queries on database\n"++
 delim()++
 "Commands:\n"++
+"open         (windows only) open and execute .sql file\n"++
 "q            exit\n"++
 "h            print this header\n"++
 "commit       execute transaction\n"++
@@ -40,9 +41,9 @@ main(Args) ->
 			spawn(fun() -> (catch wxrun()),halt(1) end),
 			timer:sleep(50),
 			P = parse_args(#dp{env = wx}, Args);
-		{unix,darwin} ->
-			spawn(fun() -> (catch wxrun()),halt(1) end),
-			P = parse_args(#dp{env = wx}, Args);
+		% {unix,darwin} ->
+		% 	spawn(fun() -> (catch wxrun()),halt(1) end),
+		% 	P = parse_args(#dp{env = wx}, Args);
 		_ ->
 			ReqPipe = open_port("/tmp/actordb.req", [in,eof,binary]),
 			RespPipe = open_port("/tmp/actordb.resp", [out,eof,binary]),
@@ -132,7 +133,14 @@ cmd(P,<<>>) ->
 cmd(P,<<"h">>) ->
 	print(P,?COMMANDS);
 cmd(_P,<<"q">>) ->
-	halt(1);
+	case whereis(wxproc) of
+		undefined ->
+			halt(1);
+		_ ->
+			wxproc ! stop,
+			timer:sleep(200),
+			halt(1)
+	end;
 cmd(P,Bin) when is_binary(Bin) ->
 	cmd(P,Bin,actordb_sql:parse(Bin)).
 cmd(P,Bin,Tuple) ->
@@ -342,6 +350,9 @@ dopipe(#dp{stop = true}) ->
 	ok;
 dopipe(#dp{env = wx} = P) ->
 	receive
+		{dofile,Pth} ->
+			{ok,Bin} = file:read_file(Pth),
+			dopipe(cmd_lines(P,binary:split(Bin,<<"\n">>,[global])));
 		{exec,Str} ->
 			case catch cmd(P,Str) of
 				#dp{} = NP ->
@@ -373,6 +384,7 @@ dopipe(P) ->
 			io:format("Received ~p~n",[X])
 	end.
 
+-record(wc,{wx, dlg, input, disp, prompt = ?PROMPT,history_pos = 0,current = "",history = []}).
 wxrun() ->
 	register(wxproc,self()),
 	Wx = wx:new(),
@@ -395,43 +407,89 @@ wxrun() ->
 	% text from clipboard
 	% wxEvtHandler:connect(TextInput,command_text_paste,[{skip,false}]),
 	wxEvtHandler:connect(TextInput,key_down,[{callback,fun input/2},{userData,{TextInput,?PROMPT}}]),
-	wxloop(TextDisplay,TextInput,?PROMPT).
+	wxloop(#wc{wx = Wx, dlg = Dlg, input = TextInput, disp = TextDisplay}),
+	wx:destroy(Wx).
 
-wxloop(Disp,Input,Prompt) ->
+wxloop(P) ->
 	receive
 		{prompt,Str} ->
-			wxTextCtrl:setValue(Input,Str),
-			wxTextCtrl:setInsertionPoint(Input,length(Str)),
-			wxEvtHandler:disconnect(Input,key_down),
-			wxEvtHandler:connect(Input,key_down,[{callback,fun input/2},{userData,{Input,Str}}]),
-			wxloop(Disp,Input,Str);
+			wxTextCtrl:setValue(P#wc.input,Str),
+			wxTextCtrl:setInsertionPoint(P#wc.input,length(Str)),
+			wxEvtHandler:disconnect(P#wc.input,key_down),
+			wxEvtHandler:connect(P#wc.input,key_down,[{callback,fun input/2},{userData,{P#wc.input,Str}}]),
+			self() ! {print,""},
+			wxloop(P#wc{prompt = Str});
 		{print,Str} ->
-			wxTextCtrl:writeText(Disp,Str),
-			wxTextCtrl:writeText(Disp,"\n"),
-			wxloop(Disp,Input,Prompt);
-		down ->
-			wxloop(Disp,Input,Prompt);
+			wxTextCtrl:writeText(P#wc.disp,Str),
+			wxTextCtrl:writeText(P#wc.disp,"\n"),
+			wxloop(P);
 		up ->
-			wxloop(Disp,Input,Prompt);
-		Wx when Wx#wx.obj == Input ->
+			case P#wc.history_pos of
+				0 ->
+					Str = wxTextCtrl:getValue(P#wc.input),
+					Cur = lists:sublist(Str,length(P#wc.prompt)+1,length(Str));
+				_ ->
+					Cur = P#wc.current
+			end,
+			case catch lists:nth(P#wc.history_pos+1,P#wc.history) of
+				{'EXIT',_} ->
+					wxloop(P);
+				NewStr ->
+					wxTextCtrl:setValue(P#wc.input,P#wc.prompt++NewStr),
+					wxTextCtrl:setInsertionPoint(P#wc.input,length(NewStr)+length(P#wc.prompt)),
+					wxloop(P#wc{current = Cur, history_pos = P#wc.history_pos+1})
+			end;
+		down ->
+			case P#wc.history_pos > 0 of
+				true ->
+					case P#wc.history_pos > 1 of
+						true ->
+							Str = lists:nth(P#wc.history_pos-1,P#wc.history);
+						false ->
+							Str = P#wc.current
+					end,
+					wxTextCtrl:setValue(P#wc.input,P#wc.prompt++Str),
+					wxTextCtrl:setInsertionPoint(P#wc.input,length(Str)+length(P#wc.prompt)),
+					wxloop(P#wc{history_pos = P#wc.history_pos-1});
+				false ->
+					wxloop(P)
+			end;
+		stop ->
+			ok;
+		Wx when Wx#wx.obj == P#wc.input ->
 			Cmd = Wx#wx.event,
 			case Cmd of
 				#wxMouse{} ->
 					% self() ! {print,"MOUSE!"},
-					wxloop(Disp,Input,Prompt);
+					wxloop(P);
 				% #wxClipboardText{} ->
 				% 	Clip = wxClipboard:get(),
 				% 	self() ! {print,io_lib:fwrite("~p~n",[get(clip)])},
 				% 	wxloop(Disp,Input,Prompt);
 				_ ->
-					wxTextCtrl:setValue(Input,Prompt),
-					wxTextCtrl:setInsertionPoint(Input,length(Prompt)),
+					wxTextCtrl:setValue(P#wc.input,P#wc.prompt),
+					wxTextCtrl:setInsertionPoint(P#wc.input,length(P#wc.prompt)),
 					Str = Cmd#wxCommand.cmdString,
-					wxTextCtrl:writeText(Disp,Str),
-					wxTextCtrl:writeText(Disp,"\n"),
-					Print = lists:sublist(Str,length(Prompt)+1,length(Str)),
-					home ! {exec, unicode:characters_to_binary(Print)},
-					wxloop(Disp,Input,Prompt)
+					Print = lists:sublist(Str,length(P#wc.prompt)+1,length(Str)),
+					case Print of
+						"open" ->
+							% spawn(fun() ->
+							% {wildCard,"*.sql"}
+							File = wxFileDialog:new(P#wc.dlg,[{defaultDir,"."}]),
+							case wxDialog:showModal(File) == ?wxID_OK of
+								true ->
+									home ! {dofile,wxFileDialog:getPath(File)};
+								_ ->
+									ok
+							end,
+							wxFileDialog:destroy(File),
+							wxWindow:setFocus(P#wc.input);
+							% end);
+						_ ->
+							self() ! {print,Str},
+							home ! {exec, unicode:characters_to_binary(Print)}
+					end,
+					wxloop(P#wc{history = [Print|P#wc.history]})
 			end;
 		Wx ->
 			Cmd = Wx#wx.event,
@@ -439,7 +497,7 @@ wxloop(Disp,Input,Prompt) ->
 				#wxClose{} ->
 					halt(1);
 				_ ->
-					ok
+					wxloop(P)
 			end
 	end.
 
@@ -447,9 +505,13 @@ input(Wx, Obj)  ->
 	Cmd = Wx#wx.event,
 	case Cmd of
 		#wxKey{keyCode = ?WXK_UP} ->
-			wxEvent:skip(Obj);
+			% wxEvent:skip(Obj);
+			wxproc ! up,
+			ok;
 		#wxKey{keyCode = ?WXK_DOWN} ->
-			wxEvent:skip(Obj);
+			% wxEvent:skip(Obj);
+			wxproc ! down,
+			ok;
 		#wxKey{keyCode = K} when K == ?WXK_BACK; K == ?WXK_LEFT ->
 			{Input,Prompt} = Wx#wx.userData,
 			Len = length(wxTextCtrl:getValue(Input)),
