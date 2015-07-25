@@ -20,7 +20,7 @@ delim()++
 "q            exit\n"++
 "h            print this header\n"++
 "commit       execute transaction\n"++
-"rollback     to abort transaction\n"++
+"rollback     abort transaction\n"++
 "print        print transaction\n"++delim()).
 
 delim() ->
@@ -402,7 +402,7 @@ wxrun() ->
 	wxTextCtrl:writeText(TextInput,?PROMPT),
 	wxEvtHandler:connect(Dlg,close_window),
 	wxEvtHandler:connect(TextInput,command_text_enter),
-	% wxEvtHandler:connect(TextInput,left_down),
+	wxEvtHandler:connect(TextDisplay,key_down),
 	% I guess its a broken erlang wx implementation. I don't see how I can read
 	% text from clipboard
 	% wxEvtHandler:connect(TextInput,command_text_paste,[{skip,false}]),
@@ -456,6 +456,9 @@ wxloop(P) ->
 			end;
 		stop ->
 			ok;
+		Wx when Wx#wx.obj == P#wc.disp ->
+			wxWindow:setFocus(P#wc.input),
+			wxloop(P);
 		Wx when Wx#wx.obj == P#wc.input ->
 			Cmd = Wx#wx.event,
 			case Cmd of
