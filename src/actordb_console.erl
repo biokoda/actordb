@@ -38,10 +38,11 @@ main(Args) ->
 	case os:type() of
 		{win32,_} ->
 			spawn(fun() -> (catch wxrun()),halt(1) end),
+			timer:sleep(50),
 			P = parse_args(#dp{env = wx}, Args);
-		% {unix,darwin} ->
-		% 	spawn(fun() -> (catch wxrun()),halt(1) end),
-		% 	P = parse_args(#dp{env = wx}, Args);
+		{unix,darwin} ->
+			spawn(fun() -> (catch wxrun()),halt(1) end),
+			P = parse_args(#dp{env = wx}, Args);
 		_ ->
 			ReqPipe = open_port("/tmp/actordb.req", [in,eof,binary]),
 			RespPipe = open_port("/tmp/actordb.resp", [out,eof,binary]),
@@ -187,7 +188,7 @@ cmd(P,Bin,Tuple) ->
 			<<This:ThisSize/binary,Next:NextSize/binary>> = Bin,
 			cmd(cmd(P,This,element(1,Tuple)), Next);
 		_ ->
-			print(P,"Unrecognized command11. ~p",[P#dp.curdb])
+			print(P,"Unrecognized command. ~p",[P#dp.curdb])
 	end.
 
 cmd_show(#dp{curdb = actordb} = P,_R) ->
@@ -342,7 +343,6 @@ dopipe(#dp{stop = true}) ->
 dopipe(#dp{env = wx} = P) ->
 	receive
 		{exec,Str} ->
-			print(P,Str),
 			case catch cmd(P,Str) of
 				#dp{} = NP ->
 					dopipe(NP);
@@ -390,7 +390,7 @@ wxrun() ->
 	wxTextCtrl:writeText(TextInput,?PROMPT),
 	wxEvtHandler:connect(Dlg,close_window),
 	wxEvtHandler:connect(TextInput,command_text_enter),
-	% wxEvtHandler:connect(TextInput,key_down,[{skip,true}]),
+	wxEvtHandler:connect(TextInput,left_down),
 	wxEvtHandler:connect(TextInput,key_down,[{callback,fun input/2},{userData,{TextInput,?PROMPT}}]),
 	wxloop(TextDisplay,TextInput,?PROMPT).
 
@@ -411,13 +411,21 @@ wxloop(Disp,Input,Prompt) ->
 		up ->
 			wxloop(Disp,Input,Prompt);
 		Wx when Wx#wx.obj == Input ->
-			wxTextCtrl:setValue(Input,Prompt),
-			wxTextCtrl:setInsertionPoint(Input,length(Prompt)),
 			Cmd = Wx#wx.event,
-			Str = Cmd#wxCommand.cmdString,
-			Print = lists:sublist(Str,length(Prompt)+1,length(Str)),
-			home ! {exec, unicode:characters_to_binary(Print)},
-			wxloop(Disp,Input,Prompt);
+			% case Cmd of
+			% 	#wxMouse{} ->
+			% 		self() ! {print,"MOUSE!"},
+			% 		wxloop(Disp,Input,Prompt);
+			% 	_ ->
+					wxTextCtrl:setValue(Input,Prompt),
+					wxTextCtrl:setInsertionPoint(Input,length(Prompt)),
+					Str = Cmd#wxCommand.cmdString,
+					wxTextCtrl:writeText(Disp,Str),
+					wxTextCtrl:writeText(Disp,"\n"),
+					Print = lists:sublist(Str,length(Prompt)+1,length(Str)),
+					home ! {exec, unicode:characters_to_binary(Print)},
+					wxloop(Disp,Input,Prompt);
+			% end;
 		Wx ->
 			Cmd = Wx#wx.event,
 			case Cmd of
@@ -435,7 +443,7 @@ input(Wx, Obj)  ->
 			wxEvent:skip(Obj);
 		#wxKey{keyCode = ?WXK_DOWN} ->
 			wxEvent:skip(Obj);
-		#wxKey{keyCode = ?WXK_BACK} ->
+		#wxKey{keyCode = K} when K == ?WXK_BACK; K == ?WXK_LEFT ->
 			{Input,Prompt} = Wx#wx.userData,
 			Len = length(wxTextCtrl:getValue(Input)),
 			case Len > length(Prompt) of
