@@ -7,6 +7,12 @@ main(BinFiles1) ->
     "ebin/actordb_console.beam"] ++ BinFiles1,
   Apps = [thrift,lager,poolboy, actordb_client,adbt],
 
+  file:make_dir("ebin"),
+
+  {ok, _Mod,Bin} = compile:file("src/actordb_console.erl", [binary]),
+  filelib:ensure_dir("ebin/"),
+  file:write_file("ebin/actordb_console.beam",Bin),
+
   %% Add ebin paths to our path
   % true = code:add_path("ebin"),
   ok = code:add_paths(filelib:wildcard("deps/*/ebin")),
