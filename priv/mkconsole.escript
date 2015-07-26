@@ -8,7 +8,7 @@ main(BinFiles1) ->
   Apps = [thrift,lager,poolboy, actordb_client],
 
   %% Add ebin paths to our path
-  true = code:add_path("ebin"),
+  % true = code:add_path("ebin"),
   ok = code:add_paths(filelib:wildcard("deps/*/ebin")),
 
   %% Read the contents of the files in ebin(s)

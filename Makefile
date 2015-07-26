@@ -20,6 +20,7 @@ all: deps compile
 
 .PHONY: rel deps
 
+# thrift -gen erl -out deps/adbt/src/  adbt.thrift
 compile:
 	$(SHELLCMD)
 	./rebar compile

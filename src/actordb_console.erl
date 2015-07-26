@@ -1,6 +1,6 @@
 -module(actordb_console).
 -export([main/1,cmd/1, map_print/1]).
--include_lib("actordb_core/include/actordb.hrl").
+% -include_lib("actordb_core/include/actordb.hrl").
 -include_lib("wx/include/wx.hrl").
 -define(PROMPT,"actordb>").
 
@@ -161,7 +161,7 @@ cmd(P,Bin,Tuple) ->
 				_ ->
 					print(P,"Invalid db")
 			end;
-		#show{} = R ->
+		R when element(1,R) == show ->
 			cmd_show(P,R);
 		{actor,Type,SubType} ->
 			cmd_actor(P,{actor,Type,SubType},Bin);
@@ -179,15 +179,15 @@ cmd(P,Bin,Tuple) ->
 			cmd(cmd(P,<<>>,commit),B);
 		% create_table ->
 		% 	change_prompt(cmd_create(P,Bin));
-		#select{} = R ->
+		R when element(1,R) == select ->
 			cmd_select(P,R,Bin);
-		#insert{} = R ->
+		R when element(1,R) == insert ->
 			cmd_insert(P,R,Bin);
-		#update{} = R ->
+		R when element(1,R) == update ->
 			cmd_update(P,R,Bin);
-		#delete{} = R ->
+		R when element(1,R) == delete ->
 			cmd_delete(P,R,Bin);
-		#management{} = R ->
+		R when element(1,R) == management ->
 			cmd_usermng(P,R,Bin);
 		_ when is_tuple(Tuple), is_tuple(element(3,Tuple)), is_binary(element(2,Tuple)) ->
 			RemBin = element(2,Tuple),
