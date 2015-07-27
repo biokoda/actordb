@@ -55,8 +55,9 @@ epmd() ->
 
 ctrl() ->
   check("escript.exe") ++
-  "%CD%/erl7.0/bin/escript.exe priv/actordb_console %*\n"++
-  "pause".  
+  %"%CD%/erl7.0/bin/escript.exe priv/actordb_console %*\n"++
+  "start /min \"\" \"%CD%/erl7.0/bin/escript.exe\" priv/actordb_console %*\n".
+  %"pause".  
 
 check(_Name) ->
   "@echo off\n"++
