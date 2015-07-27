@@ -295,6 +295,8 @@ print(#dp{env = test} = P,F,A) ->
 	io:format(F++"~n",A),
 	P;
 print(#dp{env = wx} = P,F,A) ->
+	io:format(F,A),
+	io:format("\n"),
 	wxproc ! {print,io_lib:fwrite(F,A)},
 	P;
 print(P,F,A) ->
@@ -391,7 +393,7 @@ wxrun() ->
 	Dlg = wxDialog:new(Wx,-1,"ActorDB Shell",[{size,{640,480}},{style,?wxRESIZE_BORDER bor ?wxDEFAULT_DIALOG_STYLE}]),
 	Sizer = wxBoxSizer:new(?wxVERTICAL),
 	TextDisplay = wxTextCtrl:new(Dlg,4,[{style, ?wxTE_MULTILINE bor ?wxTE_READONLY}]),
-	TextInput = wxTextCtrl:new(Dlg,5,[{style, ?wxDEFAULT bor ?wxHSCROLL bor ?wxTE_PROCESS_ENTER}]),
+	TextInput = wxTextCtrl:new(Dlg,5,[{style, ?wxDEFAULT bor ?wxTE_PROCESS_ENTER}]),
 	SzFlags = [{proportion, 0}, {border, 4}, {flag, ?wxALL}],
 	wxSizer:add(Sizer,TextDisplay,[{flag, ?wxEXPAND},{proportion, 1}|SzFlags]),
 	wxSizer:add(Sizer,TextInput,[{proportion, 0},{border, 4}, {flag, ?wxEXPAND}]),
@@ -515,6 +517,10 @@ input(Wx, Obj)  ->
 			% wxEvent:skip(Obj);
 			wxproc ! down,
 			ok;
+		#wxKey{keyCode = ?WXK_HOME} ->
+			{Input,Prompt} = Wx#wx.userData,
+			wxTextCtrl:setInsertionPoint(Input,length(Prompt));
+			%wxEvent:skip(Obj);
 		#wxKey{keyCode = K} when K == ?WXK_BACK; K == ?WXK_LEFT ->
 			{Input,Prompt} = Wx#wx.userData,
 			Len = length(wxTextCtrl:getValue(Input)),

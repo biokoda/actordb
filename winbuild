@@ -18,21 +18,23 @@ main(_Args) ->
   filelib:ensure_dir("win/data/"),
   filelib:ensure_dir("win/etc/"),
   filelib:ensure_dir("win/log/"),
+  filelib:ensure_dir("win/licenses/"),
   
   [file:copy(F,"win/ebin/"++filename:basename(F)) || F <- filelib:wildcard("deps/*/ebin/*")],
   [file:copy(F,"win/priv/"++filename:basename(F)) || F <- filelib:wildcard("deps/*/priv/*.dll")],
   
-  file:copy("LICENSE","win/LICENSE"),
-  [file:copy(F,"win/LICENSE-"++hd(tl(filename:split(filename:dirname(F))))) || F <- filelib:wildcard("deps/*/LICENSE")],
+  file:copy("LICENSE","win/licenses/LICENSE"),
+  [file:copy(F,"win/licenses/LICENSE-"++hd(tl(filename:split(filename:dirname(F))))) || F <- filelib:wildcard("deps/*/LICENSE")],
   
   file:write_file("win/actordb.bat",run()),
-  file:write_file("win/actordbctrl.bat",ctrl()),
+  file:write_file("win/actordb_console.bat",ctrl()),
   file:write_file("win/stop-background-processes.bat",epmd()),
-  file:copy("actordbctrl","win/actordbctrl"),
+
+  os:cmd("escript.exe priv/mkconsole.escript"),
+  file:copy("priv/actordb_console","win/priv/actordb_console"),
 
   file:copy("rel/files/vm.args","win/etc/vm.args"),
-  file:copy("rel/files/nodes.yaml","win/etc/nodes.yaml"),
-  file:copy("rel/files/schema.yaml","win/etc/schema.yaml"),
+  file:copy("etc/init.sql","win/etc/init.sql"),
   {ok,AppFile} = file:read_file("rel/files/app.config"),
   AppFile1 = re:replace(AppFile,"{{platform_data_dir}}","data",[global]),
   AppFile2 = re:replace(AppFile1,"{{platform_log_dir}}","log",[global]),
@@ -43,36 +45,28 @@ main(_Args) ->
 run() ->
   check("erl.exe") ++
   % "%CD%/erl6.3/bin/werl -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n".
-  "start \"\" \"%CD%/erl6.3/bin/werl\" -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n"++
+  "start \"\" \"%CD%/erl7.0/bin/werl\" -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n"++
   "exit\n".
 
 epmd() ->
   check("")++
-  "\"%CD%/erl6.3/erts-6.3/bin/epmd\" -kill\n"++
+  "\"%CD%/erl7.0/erts-7.0/bin/epmd\" -kill\n"++
   "exit\n".
 
 ctrl() ->
   check("escript.exe") ++
-  "%CD%/erl6.3/bin/escript.exe actordbctrl %*\n"++
+  "%CD%/erl7.0/bin/escript.exe priv/actordb_console %*\n"++
   "pause".  
 
 check(_Name) ->
   "@echo off\n"++
   "setlocal\n".
-  % "%CD%/erl6.2/bin/werl -pa ebin -config etc/app.config -args_file etc/vm.args -s actordb_core".
-% "if exist 'where "++Name++"' (\n"++
-% "set ERL="++Name++"\n"++
-% ") ELSE (\n"++
-% "for /f \"delims=\" %%x in ('dir \"C:\\Program Files\\erl6.*\" /on /ad /b') do set erlfolder=%%x\n"++
-% "if not defined erlfolder (\n"++
-% "echo.\n"++
-% "echo ****************************************************************************************\n"++
-% "echo.\n"++
-% "echo Erlang not found. Please install 64bit erlang from http://www.erlang.org/download.html\n"++
-% "echo.\n"++
-% "echo ****************************************************************************************\n"++
-% "pause\n"++
-% "exit /B\n"++
-% ")\n"++
-% "set ERL=\"C:\\Program Files\\%erlfolder%\\bin\\"++Name++"\"\n"++
-% ")\n".
+
+% Used to clean up erlang folder.
+%[file:delete(Nm) || Nm <- filelib:wildcard("**"), filename:extension(Nm) == ".erl"].
+%[file:delete(Nm) || Nm <- filelib:wildcard("**"), filename:extension(Nm) == ".lib"].
+%[file:delete(Nm) || Nm <- filelib:wildcard("**"), filename:extension(Nm) == ".pdb"].
+%[file:delete(Nm) || Nm <- filelib:wildcard("**"), filename:extension(Nm) == ".hrl"].      
+%[file:delete(Nm) || Nm <- filelib:wildcard("**"), filename:extension(Nm) == ".html"].
+%[file:delete(Nm) || Nm <- filelib:wildcard("**"), filename:extension(Nm) == ".gif"]. 
+%[file:delete(Nm) || Nm <- filelib:wildcard("**"), filename:extension(Nm) == ".pdf"].
