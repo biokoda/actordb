@@ -11,17 +11,17 @@
 % - if yes, print standard commands
 
 -define(COMMANDS,delim()++"Databases:\n"++
-"use config   initialize/add nodes and user account management\n"++
-"use schema   set schema\n"++
-"use actordb  (default) run queries on database\n"++
+"use config (use c)  initialize/add nodes and user account management\n"++
+"use schema (use s)  set schema\n"++
+"use actordb (use a) (default) run queries on database\n"++
 delim()++
 "Commands:\n"++
 "open         (windows only) open and execute .sql file\n"++
 "q            exit\n"++
 "h            print this header\n"++
-"commit       execute transaction\n"++
-"rollback     abort transaction\n"++
-"print        print transaction\n"++delim()).
+"commit (c)   execute transaction\n"++
+"rollback (r) abort transaction\n"++
+"print (p)    print transaction\n"++delim()).
 
 delim() ->
 	"*******************************************************************\n".
@@ -109,8 +109,8 @@ parse_args(P,["-h"|_]) ->
 	"  -h   print this help and exit\n"++
 	"  -u   username\n"++
 	"  -p   password\n"++
-	"  -f   <file> execute statements from file and exit\n"++
-	"  -w   wait for commit to send query to actordb\n",
+	"  -f   <file> execute statements from file and exit\n",
+	% "  -w   wait for commit to send query to actordb\n",
 	print(P,"Call with: actordb_console -u username -p password IP[:ThriftPort]\n"++L),
 	halt(1);
 parse_args(P,["-f",File|T]) ->
@@ -140,6 +140,18 @@ cmd(P,<<>>) ->
 	P;
 cmd(P,<<"h">>) ->
 	print(P,?COMMANDS);
+cmd(P,<<"c">>) ->
+	cmd(P,<<>>,commit);
+cmd(P,<<"C">>) ->
+	cmd(P,<<>>,commit);
+cmd(P,<<"p">>) ->
+	cmd(P,<<>>,print);
+cmd(P,<<"P">>) ->
+	cmd(P,<<>>,print);
+cmd(P,<<"r">>) ->
+	cmd(P,<<>>,rollback);
+cmd(P,<<"R">>) ->
+	cmd(P,<<>>,rollback);
 cmd(_P,<<"q">>) ->
 	case whereis(wxproc) of
 		undefined ->
@@ -153,11 +165,18 @@ cmd(P,Bin) when is_binary(Bin) ->
 	cmd(P,Bin,actordb_sql:parse(Bin)).
 cmd(P,Bin,Tuple) ->
 	case Tuple of
-		% Let actordb deal with it, unless it is config db
-		{fail,_} when P#dp.curdb /= config andalso (P#dp.wait orelse P#dp.curdb == schema)  ->
-			append(P,Bin);
-		{fail,_} ->
-			print(P,"Unrecognized command.");
+		{use,<<"c">>} ->
+			cmd(P,<<>>,{use,<<"config">>});
+		{use,<<"s">>} ->
+			cmd(P,<<>>,{use,<<"schema">>});
+		{use,<<"a">>} ->
+			cmd(P,<<>>,{use,<<"actordb">>});
+		{use,<<"C">>} ->
+			cmd(P,<<>>,{use,<<"config">>});
+		{use,<<"S">>} ->
+			cmd(P,<<>>,{use,<<"schema">>});
+		{use,<<"A">>} ->
+			cmd(P,<<>>,{use,<<"actordb">>});
 		{use,Name} ->
 			case string:to_lower(binary_to_list(Name)) of
 				"actordb" ->
@@ -169,14 +188,12 @@ cmd(P,Bin,Tuple) ->
 				_ ->
 					print(P,"Invalid db")
 			end;
-		R when element(1,R) == show ->
-			cmd_show(P,R);
-		{actor,Type,SubType} ->
-			cmd_actor(P,{actor,Type,SubType},Bin);
 		print ->
 			print(P,io_lib:fwrite("~s",[butil:iolist_join(lists:reverse(P#dp.buffer),"\n")]));
 		rollback ->
 			change_prompt(P#dp{buffer = []});
+		commit when P#dp.buffer == [] ->
+			print(P,"Nothing to commit.");
 		commit when P#dp.curdb == schema ->
 			send_schema_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
 		commit when P#dp.curdb /= actordb ->
@@ -185,6 +202,17 @@ cmd(P,Bin,Tuple) ->
 			send_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
 		{commit,B} ->
 			cmd(cmd(P,<<>>,commit),B);
+		_ when P#dp.curdb == actordb ->
+			append(P,Bin);
+		% Let actordb deal with it, unless it is config db
+		{fail,_} when P#dp.curdb /= config andalso (P#dp.wait orelse P#dp.curdb == schema)  ->
+			append(P,Bin);
+		{fail,_} ->
+			print(P,"Unrecognized command.");
+		R when element(1,R) == show ->
+			cmd_show(P,R);
+		{actor,Type,SubType} ->
+			cmd_actor(P,{actor,Type,SubType},Bin);
 		% create_table ->
 		% 	change_prompt(cmd_create(P,Bin));
 		R when element(1,R) == select ->
