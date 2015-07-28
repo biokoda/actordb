@@ -200,8 +200,8 @@ cmd(P,Bin,Tuple) ->
 			send_cfg_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
 		commit ->
 			send_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
-		{commit,B} ->
-			cmd(cmd(P,<<>>,commit),B);
+		{commit,_,_} ->
+			cmd(P,<<>>,commit);
 		_ when P#dp.curdb == actordb ->
 			append(P,Bin);
 		% Let actordb deal with it, unless it is config db
