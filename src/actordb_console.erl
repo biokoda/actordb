@@ -49,6 +49,18 @@ main(Args) ->
 			RespPipe = open_port("/tmp/actordb.resp", [out,eof,binary]),
 			P = parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args)
 	end,
+	dologin(P),
+	case P#dp.filebin of
+		undefined ->
+			% port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
+			print(P,?COMMANDS),
+			dopipe(P);
+		_ ->
+			cmd_lines(P,binary:split(P#dp.filebin,<<"\n">>,[global])),
+			halt(1)
+	end.
+
+dologin(P) ->
 	PoolInfo = [{size, 1}, {max_overflow, 5}],
 	WorkerParams = [{hostname, P#dp.addr},
 		{username, P#dp.username},
@@ -59,19 +71,15 @@ main(Args) ->
 		ok ->
 			% print(P,"Connected to DB\n"),
 			ok;
+		{error,{login_failed,Msg}} when P#dp.env == wx ->
+			print(P,Msg),
+			wxproc ! dologin;
 		Err ->
 			print(P,"Connect/login error: ~p~n",[Err]),
-			halt(1)
-	end,
-	case P#dp.filebin of
-		undefined ->
-			% port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
-			print(P,?COMMANDS),
-			dopipe(P);
-		_ ->
-			cmd_lines(P,binary:split(P#dp.filebin,<<"\n">>,[global])),
-			halt(1)
+			cmd(P,<<"q">>)
 	end.
+
+
 
 cmd_lines(P,[H|T]) ->
 	case rem_spaces(H) of
@@ -258,21 +266,33 @@ cmd_delete(P,_,Bin) ->
 	append(P,Bin).
 
 send_cfg_query(P,Bin) ->
-	case actordb_client:exec_config(butil:tobin(Bin)) of
+	case catch actordb_client:exec_config(butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
 		{ok,{changes,_Rowid,_NChanged}} ->
 			print(P,"Config updated.",[]);
+		{'EXIT',{noproc,_}} when P#dp.env == wx ->
+			wxproc ! dologin,
+			P;
+		{'EXIT',{noproc,_}} ->
+			print(P,"No session."),
+			halt(1);
 		Err ->
 			print(P,"Error: ~p",[Err])
 	end.
 
 send_schema_query(P,Bin) ->
-	case actordb_client:exec_schema(butil:tobin(Bin)) of
+	case catch actordb_client:exec_schema(butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
 		{ok,{changes,_Rowid,_NChanged}} ->
 			print(P,"Schema updated.",[]);
+		{'EXIT',{noproc,_}} when P#dp.env == wx ->
+			wxproc ! dologin,
+			P;
+		{'EXIT',{noproc,_}} ->
+			print(P,"No session."),
+			halt(1);
 		Err ->
 			print(P,"Error: ~p",[Err])
 	end.
@@ -280,11 +300,17 @@ send_schema_query(P,Bin) ->
 send_query(P,Bin) when P#dp.buffer /= [] ->
 	send_query(P#dp{buffer = []},lists:reverse(append(P,Bin)));
 send_query(P,Bin) ->
-	case actordb_client:exec(butil:tobin(Bin)) of
+	case catch actordb_client:exec(butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
 		{ok,{changes,Rowid,NChanged}} ->
 			print(P,"Rowid: ~p, Rows changed: ~p",[Rowid,NChanged]);
+		{'EXIT',{noproc,_}} when P#dp.env == wx ->
+			wxproc ! dologin,
+			P;
+		{'EXIT',{noproc,_}} ->
+			print(P,"No session."),
+			halt(1);
 		Err ->
 			print(P,"Error: ~p",[Err])
 	end.
@@ -352,6 +378,10 @@ dopipe(#dp{stop = true}) ->
 	ok;
 dopipe(#dp{env = wx} = P) ->
 	receive
+		{login,U,Pw} ->
+			NP = P#dp{username = U, password = Pw},
+			dologin(NP),
+			dopipe(NP);
 		{dofile,Pth} ->
 			{ok,Bin} = file:read_file(Pth),
 			dopipe(cmd_lines(P,binary:split(Bin,<<"\n">>,[global])));
@@ -411,6 +441,8 @@ wxrun() ->
 	wxEvtHandler:connect(TextInput,key_down,[{callback,fun input/2},{userData,{TextInput,?PROMPT}}]),
 	wxloop(#wc{wx = Wx, dlg = Dlg, input = TextInput, disp = TextDisplay}),
 	wx:destroy(Wx).
+
+-record(lg,{dlg, uinp, pinp, btn}).
 
 wxloop(P) ->
 	receive
@@ -489,22 +521,86 @@ wxloop(P) ->
 							end,
 							wxFileDialog:destroy(File),
 							wxWindow:setFocus(P#wc.input);
-							% end);
+						"login" ->
+							self() ! dologin,
+							wxloop(P);
 						_ ->
 							self() ! {print,Str},
 							home ! {exec, unicode:characters_to_binary(Print)}
 					end,
 					wxloop(P#wc{history = [Print|P#wc.history]})
 			end;
-		Wx ->
+		Wx when element(1,Wx) == wx ->
 			Cmd = Wx#wx.event,
 			case Cmd of
 				#wxClose{} ->
 					halt(1);
 				_ ->
 					wxloop(P)
-			end
+			end;
+		dologin ->
+			Dlg = wxDialog:new(P#wc.dlg,7,"Login",[{style,?wxRESIZE_BORDER bor ?wxDEFAULT_DIALOG_STYLE}]),
+			VSizer = wxBoxSizer:new(?wxVERTICAL),
+			HSizer1 = wxBoxSizer:new(?wxHORIZONTAL),
+			HSizer2 = wxBoxSizer:new(?wxHORIZONTAL),
+			ULabel = wxTextCtrl:new(Dlg,-1,[{value,"Username:"},{style, ?wxDEFAULT bor ?wxTE_READONLY}]),
+			PLabel = wxTextCtrl:new(Dlg,-1,[{value,"Password:"},{style, ?wxDEFAULT bor ?wxTE_READONLY}]),
+			UInp = wxTextCtrl:new(Dlg,-1,[{style, ?wxDEFAULT bor ?wxTE_PROCESS_ENTER}]),
+			PInp = wxTextCtrl:new(Dlg,-1,[{style, ?wxDEFAULT bor ?wxTE_PASSWORD bor ?wxTE_PROCESS_ENTER}]),
+			Btn = wxButton:new(Dlg,-1,[{label,"Login"}]),
+			SzFlags = [{proportion, 0}, {border, 4}, {flag, ?wxALL}],
+			wxSizer:add(HSizer1,ULabel,[{flag, ?wxEXPAND},{proportion, 1}|SzFlags]),
+			wxSizer:add(HSizer1,UInp,[{proportion, 0},{border, 4}, {flag, ?wxEXPAND}]),
+			wxSizer:add(HSizer2,PLabel,[{flag, ?wxEXPAND},{proportion, 1}|SzFlags]),
+			wxSizer:add(HSizer2,PInp,[{proportion, 0},{border, 4}, {flag, ?wxEXPAND}]),
+			wxSizer:add(VSizer,HSizer1),
+			wxSizer:add(VSizer,HSizer2),
+			wxSizer:add(VSizer,Btn,[{proportion,0},{flag,?wxEXPAND}]),
+			wxDialog:setSizerAndFit(Dlg,VSizer),
+			UP = #lg{dlg = Dlg, uinp = UInp, pinp = PInp, btn = Btn},
+			wxEvtHandler:connect(Btn,command_button_clicked,[{callback,fun btn/2},{userData,UP}]),
+			wxEvtHandler:connect(UInp,command_text_enter,[{callback,fun uinp/2},{userData,UP}]),
+			wxEvtHandler:connect(PInp,command_text_enter,[{callback,fun pinp/2},{userData,UP}]),
+			wxEvtHandler:connect(UInp,key_down,[{callback,fun ukey/2},{userData,UP}]),
+			wxEvtHandler:connect(PInp,key_down,[{callback,fun pkey/2},{userData,UP}]),
+			wxWindow:setFocus(UInp),
+			wxDialog:showModal(Dlg),
+			wxDialog:destroy(Dlg),
+			wxWindow:setFocus(P#wc.input),
+			wxloop(P)
 	end.
+
+uinp(Wx,_Obj) ->
+	P = Wx#wx.userData,
+	wxWindow:setFocus(P#lg.pinp).
+pinp(Wx,_Obj) ->
+	P = Wx#wx.userData,
+	U = wxTextCtrl:getValue(P#lg.uinp),
+	Pw = wxTextCtrl:getValue(P#lg.pinp),
+	home ! {login,U,Pw},
+	wxWindow:close(P#lg.dlg).
+
+ukey(Wx,Obj) ->
+	Cmd = Wx#wx.event,
+	P = Wx#wx.userData,
+	case Cmd of
+		#wxKey{keyCode = ?WXK_TAB} ->
+			wxWindow:setFocus(P#lg.pinp);
+		_ ->
+			wxEvent:skip(Obj)
+	end.
+pkey(Wx,Obj) ->
+	Cmd = Wx#wx.event,
+	P = Wx#wx.userData,
+	case Cmd of
+		#wxKey{keyCode = ?WXK_TAB} ->
+			wxWindow:setFocus(P#lg.btn);
+		_ ->
+			wxEvent:skip(Obj)
+	end.
+btn(Wx,Obj) ->
+	pinp(Wx,Obj).
+
 
 input(Wx, Obj)  ->
 	Cmd = Wx#wx.event,
