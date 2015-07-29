@@ -240,10 +240,16 @@ cmd_show(#dp{curdb = actordb} = P,_R) ->
 cmd_show(P,_R) ->
 	P.
 
+append(P,<<>>) ->
+	P;
 append(P,Bin) ->
 	case binary:last(Bin) of
 		$; ->
 			change_prompt(P#dp{buffer = [Bin|P#dp.buffer]});
+		C when C == $\s; C == $\t; C == $\r; C == $\n ->
+			S = byte_size(Bin)-1,
+			<<Bin1:S/binary,_>> = Bin,
+			append(P,Bin1);
 		_ ->
 			change_prompt(P#dp{buffer = [[Bin,";"]|P#dp.buffer]})
 	end.

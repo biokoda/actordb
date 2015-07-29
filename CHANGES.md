@@ -3,7 +3,7 @@
 - Feature: Seperate Read/Write threads for improved concurrency.
 - Feature: Added LIMIT and OFFSET to pragma list: "actor type1(*);PRAGMA list LIMIT 1000 OFFSET 10;"
 - Feature: ActorDB shell to manage the database. 
-- Feature: Expanded thrift interface. 
+- Feature: Expanded thrift interface. ActorDB can now be completely controled through thrift.
 - Feature: Expanded configuration options in app.config. 
 - Feature: Added fsync flag to queries. Writes with fsync will be synced to disk before response is sent to client. You can set fsync to safe in app.config, which will have the same result for all writes.
 - Bugfix: MySQL console bugfix for pragma statements. 
