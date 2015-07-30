@@ -668,6 +668,8 @@ map_print(M) when is_list(M) ->
 	map_print(#dp{env = test},M);
 map_print(M) ->
 	map_print([M]).
+map_print(P,[]) ->
+	print(P,"No results.");
 map_print(P,M) ->
 	Keys = maps:keys(hd(M)),
 	map_print(P,Keys,M,[]).
