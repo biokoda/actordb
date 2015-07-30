@@ -4,12 +4,6 @@
 -include_lib("wx/include/wx.hrl").
 -define(PROMPT,"actordb>").
 
-% TODO:
-% on connect, check if initialized (select on config):
-% - if not, print help for init user needs to create group,nodes and root user
-%   Provide a shortcut command to create single node init.
-% - if yes, print standard commands
-
 -define(COMMANDS,delim()++"Databases:\n"++
 "use config (use c)  initialize/add nodes and user account management\n"++
 "use schema (use s)  set schema\n"++
@@ -21,7 +15,8 @@ delim()++
 "h            print this header\n"++
 "commit (c)   execute transaction\n"++
 "rollback (r) abort transaction\n"++
-"print (p)    print transaction\n"++delim()).
+"print (p)    print transaction\n"
+"show (s)     show schema\n"++delim()).
 
 delim() ->
 	"*******************************************************************\n".
@@ -140,6 +135,10 @@ cmd(P,<<>>) ->
 	P;
 cmd(P,<<"h">>) ->
 	print(P,?COMMANDS);
+cmd(P,<<"s">>) ->
+	cmd(P,<<>>,show);
+cmd(P,<<"S">>) ->
+	cmd(P,<<>>,show);
 cmd(P,<<"c">>) ->
 	cmd(P,<<>>,commit);
 cmd(P,<<"C">>) ->
@@ -188,6 +187,10 @@ cmd(P,Bin,Tuple) ->
 				_ ->
 					print(P,"Invalid db")
 			end;
+		show when P#dp.curdb == config ->
+			send_cfg_query(change_prompt(P#dp{buffer = []}),<<"show schema;">>);
+		show ->
+			send_schema_query(change_prompt(P#dp{buffer = []}),<<"show schema;">>);
 		print ->
 			print(P,io_lib:fwrite("~s",[butil:iolist_join(lists:reverse(P#dp.buffer),"\n")]));
 		rollback ->
@@ -209,8 +212,8 @@ cmd(P,Bin,Tuple) ->
 			append(P,Bin);
 		{fail,_} ->
 			print(P,"Unrecognized command.");
-		R when element(1,R) == show ->
-			cmd_show(P,R);
+		% R when element(1,R) == show ->
+		% 	cmd_show(P,R);
 		{actor,Type,SubType} ->
 			cmd_actor(P,{actor,Type,SubType},Bin);
 		% create_table ->
@@ -235,10 +238,10 @@ cmd(P,Bin,Tuple) ->
 			print(P,"Unrecognized command. ~p",[P#dp.curdb])
 	end.
 
-cmd_show(#dp{curdb = actordb} = P,_R) ->
-	P;
-cmd_show(P,_R) ->
-	P.
+% cmd_show(#dp{curdb = actordb} = P,_R) ->
+% 	P;
+% cmd_show(P,_R) ->
+% 	P.
 
 append(P,<<>>) ->
 	P;
