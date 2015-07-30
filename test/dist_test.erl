@@ -174,6 +174,7 @@ run(Param,"missingnode") ->
 	multiupdate_read(Ndl),
 	copyactor(Ndl),
 	detest:stop_node(Nd3),
+	basic_write(Ndl),
 	basic_write(Ndl);
 run(Param,"addthentake") ->
 	Path = butil:ds_val(path,Param),
