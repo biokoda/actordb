@@ -242,12 +242,16 @@ addclusters(Path,Nd1,Nodes) ->
 		ok
 	end,
 	timer:sleep(1000),
-	Port = 50000 + length(Nodes),
-	NI = [{name,butil:toatom("node"++butil:tolist(Port))},{rpcport,Port}],
+	Len = length(Nodes)+1,
+	Port = 50000 + Len,
+	NI = [{name,butil:toatom("node"++butil:tolist(Len))},{rpcport,Port}],
 	Nodes1 = [NI|Nodes],
-	Grps = [[{name,butil:ds_val(name,Ndi)},{nodes,[butil:ds_val(name,Ndi)]}] || Ndi <- Nodes1],
-	DistName = detest:add_node(NI,cfg({Nodes1,Grps})),
-	rpc:call(Nd1,actordb_cmd,cmd,[updatenodes,commit,Path++"/node1/etc"],3000),
+	
+	% Grps = [[{name,butil:ds_val(name,Ndi)},{nodes,[butil:ds_val(name,Ndi)]}] || Ndi <- Nodes1],
+	% cfg({Nodes1,Grps})
+	DistName = detest:add_node(NI),
+	% rpc:call(Nd1,actordb_cmd,cmd,[updatenodes,commit,Path++"/node1/etc"],3000),
+	{ok,_} = rpc:call(Nd1,actordb_config,exec,[[grp(Len),nds([DistName],Len)]],3000),
 	ok = wait_modified_tree(DistName,nodes(connected),30000),
 	addclusters(Path,Nd1,Nodes1).
 
