@@ -22,7 +22,7 @@ delim() ->
 	"*******************************************************************\n".
 
 
-% curdb changed with use statements 
+% curdb changed with use statements
 % actordb - default can run queries directly
 % config - for adding groups and nodes
 % schema - for changing schema
@@ -119,10 +119,10 @@ parse_args(P,["-w"|T]) ->
 	parse_args(P#dp{wait = true},T);
 parse_args(P,[Addr]) ->
 	case string:tokens(Addr,":") of
-		[Addr,Port] ->
-			P#dp{addr = Addr, port = list_to_integer(Port)};
-		[Addr] ->
-			P#dp{addr = Addr}
+		[Address,Port] ->
+			P#dp{addr = Address, port = list_to_integer(Port)};
+		[Address] ->
+			P#dp{addr = Address}
 	end;
 parse_args(P,[]) ->
 	P.
@@ -707,4 +707,3 @@ map_print1([M|T],Keys) ->
 	[[io_lib:format("~s",[string:left(butil:tolist(maps:get(K,M)),Len+1,$\s)]) || {K,Len} <- Keys],"|",End|map_print1(T,Keys)];
 map_print1([],_) ->
 	[].
-
