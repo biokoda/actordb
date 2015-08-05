@@ -398,8 +398,10 @@ print_help(#dp{curdb = actordb} = P) ->
 % print_help(#dp{curdb = users} = P) ->
 % 	print(P,"MySQL commands https://dev.mysql.com/doc/refman/5.1/en/user-account-management.html");
 print_help(#dp{curdb = config} = P) ->
-	Url = "https://dev.mysql.com/doc/refman/5.1/en/user-account-management.html\n",
-	U = "For user account management use mysql syntax.\n"++Url,
+	% Url = "https://dev.mysql.com/doc/refman/5.1/en/user-account-management.html\n",
+	Usr = "CREATE USER 'myuser' IDENTIFIED BY 'mypass'\n",
+	Usrg = "GRANT read,write ON * to 'myuser'\n",
+	U = "For user account management:\n"++Usr++Usrg,
 	E = "To create/modify servers, run inserts to these tables: \n",
 	G = "CREATE TABLE groups (name TEXT, type TEXT DEFAULT 'cluster');\n",
 	N = "CREATE TABLE nodes (name TEXT, group_name TEXT);\n",
