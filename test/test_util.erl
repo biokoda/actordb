@@ -181,19 +181,6 @@ kv_readwrite(Ndl) ->
 
 	ok.
 
-make_actors(N) when N > 10000 ->
-	ok;
-make_actors(N) ->
-	case exec(nodes(connected),<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
-			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:rand_bytes(128)))/binary,"',1);">>) of
-		{ok,_} ->
-			ok;
-		Err ->
-			exit(Err)
-	end,
-	timer:sleep(100),
-	make_actors(N+1).
-
 writer(Home,Nd,N,SleepMax,RC) ->
 	checkhome(Home),
 	% Sleep a random amount from 0 to ..
@@ -233,6 +220,21 @@ writer(Home,Nd,N,SleepMax,RC) ->
 	%lager:info("Write complete for ~p, runcount=~p, slept_for=~p, exec_time=~ps  ~pms",[N,RC,SleepFor,Diff div 1000, Diff rem 1000]),
 	writer(Home,Nd,N,SleepMax,RC+1).
 
+make_actors(N) when N > 100 ->
+	timer:sleep(60000),
+	ok;
+make_actors(N) ->
+	case exec(nodes(connected),<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
+			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:rand_bytes(128)))/binary,"',1);">>) of
+		{ok,_} ->
+			ok;
+		Err ->
+			?INF("Creating actor failed ~p",[Err])
+			% exit(Err)
+	end,
+	timer:sleep(100),
+	make_actors(N+1).
+
 % We will keep adding single node clusters to the network. Cluster name is same as node name
 addclusters(Path,Nd1,Nodes) ->
 	receive
@@ -252,8 +254,20 @@ addclusters(Path,Nd1,Nodes) ->
 	DistName = detest:add_node(NI),
 	% rpc:call(Nd1,actordb_cmd,cmd,[updatenodes,commit,Path++"/node1/etc"],3000),
 	{ok,_} = rpc:call(Nd1,actordb_config,exec,[[grp(Len),nds([DistName],Len)]],3000),
+	spawn(fun() -> periodic_isolation(DistName,0) end),
 	ok = wait_modified_tree(DistName,nodes(connected),30000),
 	addclusters(Path,Nd1,Nodes1).
+
+periodic_isolation(Nd,N) when N > 2 ->
+	ok;
+periodic_isolation(Nd,N) ->
+	timer:sleep(5000),
+	?INF("Isolating ~p",[Nd]),
+	detest:isolate(Nd,Nd),
+	timer:sleep(2000),
+	detest:isolate_end(Nd),
+	?INF("Isolate end ~p",[Nd]),
+	periodic_isolation(Nd,N+1).
 
 wait_crash(L) ->
 	wait_crash(L,element(2,os:timestamp()),0).
