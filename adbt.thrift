@@ -51,7 +51,7 @@ enum ErrorCode {
   NotLoggedIn = 1,
   EmptyActorName = 2,
   InvalidActorName = 3, // invalid characters
-  InvalidType = 4,      // invalid characters
+  InvalidType = 4,      // invalid actor type
   NotPermitted = 5,     // accessing actor that user does not have permission for
   SqlError = 6,
   ConsensusTimeout = 7, // cluster is unable to reach consensus, query was not executed
