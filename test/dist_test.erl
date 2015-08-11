@@ -127,6 +127,22 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 			ok
 	end,
 	basic_write(Ndl);
+run(Param,"remnode" = TType) ->
+	Nd1 = butil:ds_val(node1,Param),
+	Nd2 = butil:ds_val(node2,Param),
+	Nd3 = butil:ds_val(node3,Param),
+	Ndl = [Nd1,Nd2,Nd3],
+	{ok,_} = rpc:call(Nd1,actordb_config,exec,[init(Ndl,TType)],3000),
+	timer:sleep(100),
+	{ok,_} = rpc:call(Nd1,actordb_config,exec_schema,[schema1()],3000),
+	ok = wait_tree(Nd1,10000),
+	basic_write(Ndl),
+	detest:stop_node(Nd3),
+	{ok,_} = rpc:call(Nd1,actordb_config,exec,["delete from nodes where name like 'node3%'"],3000),
+	timer:sleep(300),
+	lager:info("Nodelist now: ~p",[rpc:call(Nd1,bkdcore,nodelist,[])]),
+	basic_write(Ndl),
+	ok;
 run(Param,"mysql" = TType) ->
 	true = code:add_path("test/mysql.ez"),
 	Nd1 = butil:ds_val(node1,Param),
@@ -135,11 +151,12 @@ run(Param,"mysql" = TType) ->
 	{ok,_} = rpc:call(Nd1,actordb_config,exec,[init(Ndl,TType)],3000),
 	timer:sleep(100),
 	{ok,_} = rpc:call(Nd1,actordb_config,exec_schema,[schema1()],3000),
+	{ok,_} = rpc:call(Nd1,actordb_config,exec,["CREATE USER 'myuser' IDENTIFIED BY 'mypass';GRANT read,write ON * to 'myuser';"],3000),
 
 	ok = wait_tree(Nd1,10000),
 
 	[_,Host] = string:tokens(butil:tolist(Nd1),"@"),
-	MyOpt = [{host,Host},{port,butil:ds_val(rpcport,?ND1)-10000},{user,"user"},{password,"password"},{database,"actordb"}],
+	MyOpt = [{host,Host},{port,butil:ds_val(rpcport,?ND1)-10000},{user,"myuser"},{password,"mypass"},{database,"actordb"}],
 	{ok,Pid} = mysql:start_link(MyOpt),
 	ok = mysql:query(Pid, <<"actor type1(ac1) create;INSERT INTO tab VALUES (111,'aaaa',1);">>),
 	ok = mysql:query(Pid, <<"PREPARE stmt1 () FOR type1 AS select * from tab;">>),
@@ -309,7 +326,7 @@ usr() ->
 	"CREATE USER 'root' IDENTIFIED BY 'rootpass'".
 
 init(Ndl,TT) when TT == "single"; TT == "cluster"; TT == "addthentake"; TT == "addcluster"; TT == "endless2";
-		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql" ->
+		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; TT == "remnode" ->
 	[grp(1),nds(Ndl,1),usr()];
 init([N1,N2,N3,N4],"multicluster") ->
 	[grp(1),grp(2),nds([N1,N2],1),nds([N3,N4],2),usr()].
