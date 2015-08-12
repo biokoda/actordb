@@ -19,7 +19,7 @@
 char running=1;
 int infp, outfp;
 int req = 0, resp = 0;
-const char *prompt = "actordb>";
+const char *prompt = "actordb> ";
 char *pipe_req = "/tmp/actordb.req";
 char *pipe_resp = "/tmp/actordb.resp";
 

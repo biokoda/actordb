@@ -369,21 +369,21 @@ print(P,F,A) ->
 change_prompt(#dp{env = wx} = P) ->
 	case P#dp.curdb of
 		actordb ->
-			wxproc ! {prompt,"actordb"++uncommited(P)++">"};
+			wxproc ! {prompt,"actordb"++uncommited(P)++"> "};
 		config ->
-			wxproc ! {prompt,"actordb:config"++uncommited(P)++">"};
+			wxproc ! {prompt,"actordb:config"++uncommited(P)++"> "};
 		schema ->
-			wxproc ! {prompt,"actordb:schema"++uncommited(P)++">"}
+			wxproc ! {prompt,"actordb:schema"++uncommited(P)++"> "}
 	end,
 	P;
 change_prompt(P) ->
 	case P#dp.curdb of
 		actordb ->
-			print(P,"~~~~actordb"++uncommited(P)++">");
+			print(P,"~~~~actordb"++uncommited(P)++"> ");
 		config ->
-			print(P,"~~~~actordb:config"++uncommited(P)++">");
+			print(P,"~~~~actordb:config"++uncommited(P)++"> ");
 		schema ->
-			print(P,"~~~~actordb:schema"++uncommited(P)++">")
+			print(P,"~~~~actordb:schema"++uncommited(P)++"> ")
 	end.
 
 uncommited(#dp{buffer = []}) ->
