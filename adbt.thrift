@@ -76,6 +76,11 @@ service Actordb {
 
   LoginResult login(1: required string username, 2: required string password) throws (1:InvalidRequestException ire), 
 
+  // For safer login, get 20 bytes of cryptographically random data, use it to hash password for login call.
+  // It uses the same hashing algorithm as mysql:
+  // SHA1( password ) XOR SHA1( "20-bytes random data from server" <concat> SHA1( SHA1( password ) ) )
+  binary salt(), 
+
   // Initialize instance/cluster(s), create users
   Result exec_config(1: required string sql) throws (1:InvalidRequestException ire),
 

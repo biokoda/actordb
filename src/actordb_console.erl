@@ -45,6 +45,7 @@ main(Args) ->
 			P = parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args)
 	end,
 	dologin(P),
+	% print(P,"SALT=~p",[actordb_client:salt()]),
 	case P#dp.filebin of
 		undefined ->
 			% port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
