@@ -87,28 +87,23 @@ service Actordb {
   // Change schema
   Result exec_schema(1: required string sql) throws (1:InvalidRequestException ire),
 
-  // query for 1 actor of type
+  // query for a single actor of type
   Result exec_single(1: required string actorname, 2: required string actortype, 3: required string sql, 4: list<string> flags = []) throws (1:InvalidRequestException ire),
 
-  // query for 1 actor of type with prepare argument
-  Result exec_single_prepare(1: required string actorname, 2: required string actortype, 3: required string sql, 4: list<string> flags = [], 5: list<list<Val>> bindingvals = []) throws (1:InvalidRequestException ire),
+  // query for a single actor of type with parameterized query (ex.: "insert into tab values (?1,?2,?3)")
+  // This is faster and safer.
+  Result exec_single_param(1: required string actorname, 2: required string actortype, 3: required string sql, 4: list<string> flags = [], 5: list<list<Val>> bindingvals = []) throws (1:InvalidRequestException ire),
 
-  // query over some actors of type
+  // query over multiple actors of type
   Result exec_multi(1: required list<string> actors, 2: required string actortype, 3: required string sql, 4: list<string> flags = []) throws (1:InvalidRequestException ire),
-
-  // query over some actors of type prepare argument
-  Result exec_multi_prepare(1: required list<string> actors, 2: required string actortype, 3: required string sql, 4: list<string> flags = [], 5: list<list<Val>> bindingvals = []) throws (1:InvalidRequestException ire),
 
   // query over all actors for type
   Result exec_all(1: required string actortype, 2: required string sql, 3: list<string> flags = []) throws (1:InvalidRequestException ire),
 
-  // query over all actors for type with prepare argument
-  Result exec_all_prepare(1: required string actortype, 2: required string sql, 3: list<string> flags = [], 4: list<list<Val>> bindingvals = []) throws (1:InvalidRequestException ire),
-
   // all in sql: actor sometype(actorname) create; select * from mytab;
   Result exec_sql(1: required string sql) throws (1:InvalidRequestException ire),
 
-  // all in sql: actor sometype(actorname) create; select * from mytab; with prepare argument
-  Result exec_sql_prepare(1: required string sql, 2: list<list<Val>> bindingvals = []) throws (1:InvalidRequestException ire)
+  // all in sql but with parameterized query
+  Result exec_sql_param(1: required string sql, 2: list<list<Val>> bindingvals = []) throws (1:InvalidRequestException ire)
 
 }

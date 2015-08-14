@@ -141,6 +141,8 @@ run(Param,"remnode" = TType) ->
 	{ok,_} = rpc:call(Nd1,actordb_config,exec,["delete from nodes where name like 'node3%'"],3000),
 	timer:sleep(300),
 	lager:info("Nodelist now: ~p",[rpc:call(Nd1,bkdcore,nodelist,[])]),
+	lager:info("Nodelist now: ~p",[rpc:call(Nd1,ets,tab2list,[globalets])]),
+	ok = wait_tree(Nd1,10000),
 	basic_write(Ndl),
 	ok;
 run(Param,"mysql" = TType) ->
