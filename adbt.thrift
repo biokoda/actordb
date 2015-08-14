@@ -6,6 +6,7 @@ namespace php actordb
 namespace perl Actordb
 namespace rb ActordbThrift
 namespace erl adbt
+namespace go actordb
 
 const string VERSION = "1.1.0"
 
