@@ -135,9 +135,20 @@ cmd(P,<<";",Rem/binary>>) ->
 cmd(P,<<>>) ->
 	P;
 cmd(P,<<"dim=",Dim/binary>>) ->
-	[_Rows,_Cols] = binary:split(Dim,<<",">>),
-	% print(P,"Rows=~p,Cols=~p",[_Rows,_Cols]),
-	P;
+	case binary:split(Dim,<<"\n">>) of
+		[DimBin,Rem] ->
+			ok;
+		[DimBin] ->
+			Rem = <<>>
+	end,
+	case binary:split(DimBin,<<",">>) of
+		[_Rows,_Cols] ->
+			% print(P,"Rows=~p,Cols=~p",[_Rows,_Cols]);
+			ok;
+		_ ->
+			ok
+	end,
+	cmd(P,Rem);
 cmd(P,<<"h">>) ->
 	print(P,?COMMANDS);
 cmd(P,<<"s">>) ->
