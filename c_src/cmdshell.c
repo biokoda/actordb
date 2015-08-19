@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #ifndef _WIN32
 #include <unistd.h>
+#include <sys/ioctl.h>
 #endif
 #include <fcntl.h>
 #include <errno.h>
@@ -83,6 +84,18 @@ static void rl_handler(char* line)
 	}
 	if (strlen(line) > 1)
 		add_history(line);
+
+	// #ifdef TIOCGWINSZ
+	// {
+	// 	struct winsize ws;
+	// 	if (ioctl(0, TIOCGWINSZ, &ws) >= 0)
+	// 	{
+	// 		char dim[30];
+	// 		sprintf(dim,"dim=%d,%d\n",(int)ws.ws_row, (int)ws.ws_col),
+	// 		write(req, dim, strlen(dim));
+	// 	}
+	// }
+	// #endif
 
 	if (write(req, line, strlen(line)) < 0)
 		running = 0;
