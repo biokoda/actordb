@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #ifndef _WIN32
 #include <unistd.h>
+#include <sys/ioctl.h>
 #endif
 #include <fcntl.h>
 #include <errno.h>
@@ -115,6 +116,18 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	rl_callback_handler_install(prompt, &rl_handler);
+
+	#ifdef TIOCGWINSZ
+	{
+		struct winsize ws;
+		if (ioctl(0, TIOCGWINSZ, &ws) >= 0)
+		{
+			char dim[30];
+			sprintf(dim,"dim=%d,%d",(int)ws.ws_row, (int)ws.ws_col),
+			write(req, dim, strlen(dim));
+		}
+	}
+	#endif
 
 	while (running)
 	{

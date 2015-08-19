@@ -134,6 +134,10 @@ cmd(P,<<";",Rem/binary>>) ->
 	cmd(P,Rem);
 cmd(P,<<>>) ->
 	P;
+cmd(P,<<"dim=",Dim/binary>>) ->
+	[_Rows,_Cols] = binary:split(Dim,<<",">>),
+	% print(P,"Rows=~p,Cols=~p",[_Rows,_Cols]),
+	P;
 cmd(P,<<"h">>) ->
 	print(P,?COMMANDS);
 cmd(P,<<"s">>) ->

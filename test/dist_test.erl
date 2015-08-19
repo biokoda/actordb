@@ -166,7 +166,14 @@ run(Param,"mysql" = TType) ->
 	lager:info("Cols=~p, rows=~p", [_Cols, _Rows]),
 
 	{ok,Id} = mysql:prepare(Pid, <<"actor type1(ac1);INSERT INTO tab VALUES ($1,$2,$3);">>),
-	ok = mysql:execute(Pid,Id,[1,"prep!",3]),
+	ok = mysql:execute(Pid,Id,[1,<<"insert with prepared statement!">>,3]),
+
+	{ok,_Cols,_Rows1} = mysql:query(Pid, <<"actor type1(ac1); select * from tab;">>),
+	lager:info("Cols=~p, rows=~p", [_Cols, _Rows1]),
+
+	{ok,Id1} = mysql:prepare(Pid, <<"actor type1(ac1);select * from tab where id=$1;">>),
+	{ok,_Cols,_Rows2} = mysql:execute(Pid, Id1, [1]),
+	lager:info("Using select with prepared statement: Cols=~p, rows=~p", [_Cols, _Rows2]),
 
 	% ok = mysql:query(Pid, <<"PREPARE stmt1 () FOR type1 AS select * from tab;">>),
 	% {ok,_Cols,_Rows} = PrepRes = mysql:query(Pid,<<"actor type1(ac1);EXECUTE stmt1 ();">>),
