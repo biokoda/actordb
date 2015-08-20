@@ -163,6 +163,7 @@ run(Param,"mysql" = TType) ->
 
 	FirstInsert = [111,<<"aaaa">>,1.2],
 	SecondInsert = [1,<<"insert with prepared statement!">>,3.0],
+	ThirdInsert = [2,<<"second insert with prepared statement!">>,5.0],
 	
 	ok = mysql:query(Pid, <<"actor type1(ac1) create;INSERT INTO tab VALUES (111,'aaaa',1.2);">>),
 	{ok,_Cols,[FirstInsert] = _Rows} = mysql:query(Pid, <<"actor type1(ac1); select * from tab;">>),
@@ -179,9 +180,16 @@ run(Param,"mysql" = TType) ->
 	{ok,_Cols,[SecondInsert] = _Rows2} = mysql:execute(Pid, Id1, [1]),
 	lager:info("Using select with prepared statement: Cols=~p, rows=~p", [_Cols, _Rows2]),
 
-	% ok = mysql:query(Pid, <<"PREPARE stmt1 () FOR type1 AS select * from tab;">>),
-	% {ok,_Cols,_Rows} = PrepRes = mysql:query(Pid,<<"actor type1(ac1);EXECUTE stmt1 ();">>),
-	% io:format("PrepRes ~p~n",[PrepRes]),
+	{ok,[<<"token">>],[[<<"#r0000;">>]]} = mysql:query(Pid, <<"PREPARE stmt1 () FOR type1 AS select * from tab;">>),
+	{ok,[<<"token">>],[[InsertToken]]} = mysql:query(Pid, <<"PREPARE stmt2 () FOR type1 AS insert into tab values ($1,$2,$3);">>),
+	timer:sleep(300),
+	{ok,_Cols,[SecondInsert,FirstInsert]} = mysql:query(Pid,<<"actor type1(ac1);EXECUTE stmt1 ();">>),
+
+	{ok,Id2} = mysql:prepare(Pid, <<"actor type1(ac1);",InsertToken/binary>>),
+	ok = mysql:execute(Pid,Id2,ThirdInsert),
+
+	{ok,_Cols,[SecondInsert,ThirdInsert,FirstInsert]} = PrepRes = mysql:query(Pid,<<"actor type1(ac1);EXECUTE stmt1 ();">>),
+	io:format("PrepRes ~p~n",[PrepRes]),
 	ok;
 run(Param,"addsecond" = TType) ->
 	[Nd1,Path] = butil:ds_vals([node1,path],Param),
