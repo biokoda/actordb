@@ -147,6 +147,7 @@ run(Param,"remnode" = TType) ->
 	ok;
 run(Param,"mysql" = TType) ->
 	true = code:add_path("test/mysql.ez"),
+	% true = code:add_path("test/emysql.ez"),
 	Nd1 = butil:ds_val(node1,Param),
 	Ndl = [Nd1],
 	% rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
@@ -157,7 +158,10 @@ run(Param,"mysql" = TType) ->
 
 	ok = wait_tree(Nd1,10000),
 
+	% application:ensure_all_started(emysql),
+
 	[_,Host] = string:tokens(butil:tolist(Nd1),"@"),
+	% ok = emysql:add_pool(pool, [{size,1},{host,Host},{port,33307},{encoding,utf8},{user,"myuser"},{password,"mypass"}]),
 	MyOpt = [{host,Host},{port,butil:ds_val(rpcport,?ND1)-10000},{user,"myuser"},{password,"mypass"},{database,"actordb"}],
 	{ok,Pid} = mysql:start_link(MyOpt),
 
@@ -179,8 +183,13 @@ run(Param,"mysql" = TType) ->
 	lager:info("Using select with prepared statement: Cols=~p, rows=~p", [_Cols, _Rows2]),
 
 	% ok = mysql:query(Pid, <<"PREPARE stmt1 () FOR type1 AS select * from tab;">>),
+	% timer:sleep(100),
 	% {ok,_Cols,_Rows} = PrepRes = mysql:query(Pid,<<"actor type1(ac1);EXECUTE stmt1 ();">>),
 	% io:format("PrepRes ~p~n",[PrepRes]),
+
+	% ERES = (catch emysql:execute(pool,<<"actor type1(ac1) create;select * from tab where id>100;">>)),
+	% lager:info("EMYSQL: ~p",[ERES]),
+
 	ok;
 run(Param,"addsecond" = TType) ->
 	[Nd1,Path] = butil:ds_vals([node1,path],Param),
