@@ -173,6 +173,7 @@ run(Param,"mysql" = TType) ->
 	lager:info("Cols=~p, rows=~p", [_Cols, _Rows]),
 
 	{ok,Id} = mysql:prepare(Pid, <<"actor type1(ac1);INSERT INTO tab VALUES ($1,$2,$3);">>),
+
 	ok = mysql:execute(Pid,Id,[1,"insert with prepared statement!",3.0]),
 
 	{ok,_Cols,[SecondInsert,FirstInsert] = _Rows1} = mysql:query(Pid, <<"actor type1(ac1); select * from tab;">>),
