@@ -45,7 +45,7 @@ main(Args) ->
 		_ ->
 			ReqPipe = open_port("/tmp/actordb.req", [in,eof,binary]),
 			RespPipe = open_port("/tmp/actordb.resp", [out,eof,binary]),
-			P = parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args)
+			P = setpw(parse_args(#dp{password = prompt,req = ReqPipe, resp = RespPipe, env = shell},Args))
 	end,
 	dologin(P),
 	% print(P,"SALT=~p",[actordb_client:salt()]),
@@ -58,6 +58,13 @@ main(Args) ->
 			cmd_lines(P,binary:split(P#dp.filebin,<<"\n">>,[global])),
 			halt(1)
 	end.
+
+setpw(#dp{password = prompt} = P) ->
+	print(P,"~~~~getpass"),
+	Pw = dopipe(P),
+	P#dp{password = Pw};
+setpw(P) ->
+	P.
 
 dologin(P) ->
 	PoolInfo = [{size, 1}, {max_overflow, 5}],
@@ -106,8 +113,7 @@ rem_spaces(X) ->
 parse_args(P,["-h"|_]) ->
 	L = "Flags:\n"++
 	"  -h   print this help and exit\n"++
-	"  -u   username\n"++
-	"  -p   password\n"++
+	"  -u   username (you will be prompted for password)\n"++
 	"  -f   <file> execute statements from file and exit\n",
 	% "  -w   wait for commit to send query to actordb\n",
 	print(P,"Call with: actordb_console -u username -p password IP[:ThriftPort]\n"++L),
@@ -116,9 +122,11 @@ parse_args(P,["-f",File|T]) ->
 	{ok,F} = file:read_file(File),
 	parse_args(P#dp{filebin = F},T);
 parse_args(P,["-u",Username|T]) ->
-	parse_args(P#dp{username = Username},T);
-parse_args(P,["-p",Password|T]) ->
-	parse_args(P#dp{password = Password},T);
+	parse_args(P#dp{username = Username, password = prompt},T);
+% parse_args(P,["-p",Password|T]) ->
+% 	parse_args(P#dp{password = Password},T);
+% parse_args(P,["-p"|T]) ->
+% 	parse_args(P#dp{password = prompt},T);
 parse_args(P,["-w"|T]) ->
 	parse_args(P#dp{wait = true},T);
 parse_args(P,[Addr]) ->
@@ -186,6 +194,7 @@ cmd(P,Bin,Tuple) ->
 		{use,<<"c">>} ->
 			cmd(P,<<>>,{use,<<"config">>});
 		{use,<<"s">>} ->
+			print(P,"SCHEMA"),
 			cmd(P,<<>>,{use,<<"schema">>});
 		{use,<<"a">>} ->
 			cmd(P,<<>>,{use,<<"actordb">>});
@@ -457,8 +466,11 @@ dopipe(P) ->
 		{_, {data, Data}} ->
 			Line = string:tokens(binary_to_list(Data),"\n"),
 			case Line of
-				["q"] ->
+				[Q] when (Q == "Q" orelse Q == "q") andalso P#dp.password /= prompt ->
+					print(P,"Bye!"),
 					ok;
+				_ when P#dp.password == prompt ->
+					Data;
 				_ ->
 					case catch cmd(P,Data) of
 						#dp{} = NP ->

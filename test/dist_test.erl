@@ -147,7 +147,8 @@ run(Param,"remnode" = TType) ->
 	ok;
 run(Param,"mysql" = TType) ->
 	true = code:add_path("test/mysql.ez"),
-	% true = code:add_path("test/emysql.ez"),
+	true = code:add_path("test/emysql.ez"),
+	application:ensure_all_started(emysql),
 	Nd1 = butil:ds_val(node1,Param),
 	Ndl = [Nd1],
 	% rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
@@ -158,10 +159,10 @@ run(Param,"mysql" = TType) ->
 
 	ok = wait_tree(Nd1,10000),
 
-	% application:ensure_all_started(emysql),
-
 	[_,Host] = string:tokens(butil:tolist(Nd1),"@"),
-	% ok = emysql:add_pool(pool, [{size,1},{host,Host},{port,33307},{encoding,utf8},{user,"myuser"},{password,"mypass"}]),
+	lager:info("OK?"),
+	POOL = (catch emysql:add_pool(pool, [{size,1},{host,Host},{port,butil:ds_val(rpcport,?ND1)-10000},{encoding,utf8},{user,"myuser"},{password,"mypass"}])),
+	lager:info("OK ~p",[POOL]),
 	MyOpt = [{host,Host},{port,butil:ds_val(rpcport,?ND1)-10000},{user,"myuser"},{password,"mypass"},{database,"actordb"}],
 	{ok,Pid} = mysql:start_link(MyOpt),
 
@@ -195,6 +196,14 @@ run(Param,"mysql" = TType) ->
 	{ok,_Cols,[SecondInsert,ThirdInsert,FirstInsert]} = PrepRes = mysql:query(Pid,<<"actor type1(ac1);EXECUTE stmt1 ();">>),
 	io:format("PrepRes ~p~n",[PrepRes]),
 
+	[emysql:execute(pool,<<"actor type1(emysql) create;INSERT INTO tabau (txt) values ('",(butil:tobin(N))/binary,"-TEXT');">>) || N <- lists:seq(1,500)],
+	emysql:execute(pool,<<"actor type1(emysql) create;INSERT INTO tabau (txt) values ('aa');">>),
+	emysql:execute(pool,<<"actor type1(emysql) create;INSERT INTO tabau (txt) values ('bb');">>),
+	emysql:execute(pool,<<"actor type1(emysql) create;INSERT INTO tabau (txt) values ('cc');">>),
+
+	io:format("Res:~p~n",[emysql:execute(pool,"actor type1(emysql);select * from tabau;")]),
+	io:format("Res:~p~n",[emysql:execute(pool,"actor type1(emysql);select * from sqlite_sequence;")]),
+	io:format("mysql: ~p~n",[mysql:query(Pid,"actor type1(emysql);select * from tabau;")]),
 	ok;
 run(Param,"addsecond" = TType) ->
 	[Nd1,Path] = butil:ds_vals([node1,path],Param),
@@ -381,4 +390,5 @@ schema1() ->
 
 schema2() ->
 	["actor type1;",
-	"CREATE TABLE tab (id INTEGER PRIMARY KEY, txt TEXT, i FLOAT);"].
+	"CREATE TABLE tab (id INTEGER PRIMARY KEY, txt TEXT, i FLOAT);",
+	"CREATE TABLE tabau (id INTEGER PRIMARY KEY AUTOINCREMENT, txt TEXT);"].

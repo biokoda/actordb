@@ -15,6 +15,7 @@
 #endif
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <curses.h>
 #define READ 0
 #define WRITE 1
 
@@ -96,9 +97,10 @@ static void rl_handler(char* line)
 	// 	}
 	// }
 	// #endif
-
 	if (write(req, line, strlen(line)) < 0)
+	{
 		running = 0;
+	}
 }
 
 int main(int argc, char *argv[])
@@ -149,14 +151,13 @@ int main(int argc, char *argv[])
 		else if (FD_ISSET(resp, &fdread))
 		{
 			int offset = 0;
-			sread = read(resp, buf, sizeof(buf));
+			sread = read(resp, buf, sizeof(buf)-1);
 			if (sread <= 0 && errno == EWOULDBLOCK)
 				continue;
 			else if (sread <= 0)
 			{
-				rl_replace_line("",0);
+				rl_set_prompt("");
 				rl_redisplay();
-				printf("\n");
 				break;
 			}
 			buf[sread] = 0;
@@ -171,8 +172,25 @@ int main(int argc, char *argv[])
 						break;
 					}
 				}
-				rl_set_prompt(buf+2);
-				rl_redisplay();
+				if (strcmp(buf+2,"getpass") == 0)
+				{
+					char *line = NULL;
+
+					rl_save_prompt();
+					rl_replace_line("",0);
+					rl_redisplay();
+					line = getpass("Password:");
+					write(req, line, strlen(line));
+					rl_clear_message();
+					rl_restore_prompt();
+					rl_redisplay();
+					continue;
+				}
+				else
+				{
+					rl_set_prompt(buf+2);
+					rl_redisplay();
+				}
 
 				for (; i < sread; i++)
 				{
