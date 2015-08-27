@@ -112,11 +112,11 @@ rem_spaces(X) ->
 
 parse_args(P,["-h"|_]) ->
 	L = "Flags:\n"++
-	"  -h   print this help and exit\n"++
-	"  -u   username (you will be prompted for password)\n"++
-	"  -f   <file> execute statements from file and exit\n",
+	"  -h            Print this help and exit.\n"++
+	"  -u <username> Set username. You will be prompted for password. Not required if ActorDB is uninitalized.\n"++
+	"  -f <file>     Execute statements from file and exit.\n",
 	% "  -w   wait for commit to send query to actordb\n",
-	print(P,"Call with: actordb_console -u username -p password IP[:ThriftPort]\n"++L),
+	print(P,"Call with: actordb_console -u username IP[:ThriftPort]\n"++L),
 	halt(1);
 parse_args(P,["-f",File|T]) ->
 	{ok,F} = file:read_file(File),
