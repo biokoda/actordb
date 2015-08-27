@@ -45,7 +45,7 @@ main(Args) ->
 		_ ->
 			ReqPipe = open_port("/tmp/actordb.req", [in,eof,binary]),
 			RespPipe = open_port("/tmp/actordb.resp", [out,eof,binary]),
-			P = setpw(parse_args(#dp{password = prompt,req = ReqPipe, resp = RespPipe, env = shell},Args))
+			P = setpw(parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args))
 	end,
 	dologin(P),
 	% print(P,"SALT=~p",[actordb_client:salt()]),
