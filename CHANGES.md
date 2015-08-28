@@ -1,8 +1,9 @@
 **0.10 - ?????**
 - Feature: ActorDB now uses LMDB as a storage engine. SQLite is still the SQL engine. Performace is vastly improved. Old versions are automatically imported. Old files will be left intact. A new file named lmdb will appear in every storage folder and it will contain all data.
 - Feature: Seperate Read/Write threads for improved concurrency.
+- Feature: Write batching. If an actor receives many writes at once, they will be a part of a single replication event. 
 - Feature: Added LIMIT and OFFSET to pragma list: "actor type1(*);PRAGMA list LIMIT 1000 OFFSET 10;"
-- Feature: ActorDB shell to manage the database. 
+- Feature: ActorDB shell to manage the database. It replaces actordbctrl.
 - Feature: Expanded thrift interface. ActorDB can now be completely controled through thrift.
 - Feature: Finally added user management. Thrift interface supports safer mysql style login that does not send the actual password over the wire.
 - Feature: Expanded configuration options in app.config. 

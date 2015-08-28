@@ -24,7 +24,6 @@ delim()++
 delim() ->
 	"*******************************************************************\n".
 
-
 % curdb changed with use statements
 % actordb - default can run queries directly
 % config - for adding groups and nodes
@@ -227,7 +226,7 @@ cmd(P,Bin,Tuple) ->
 			print(P,"Nothing to commit.");
 		commit when P#dp.curdb == schema ->
 			send_schema_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
-		commit when P#dp.curdb /= actordb ->
+		commit when P#dp.curdb == config ->
 			send_cfg_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
 		commit ->
 			send_query(change_prompt(P#dp{buffer = []}),lists:reverse(P#dp.buffer));
