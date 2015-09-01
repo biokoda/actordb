@@ -390,7 +390,7 @@ print(#dp{env = wx} = P,F,A) ->
 	wxproc ! {print,io_lib:fwrite(F,A)},
 	P;
 print(P,F,A) ->
-	port_command(P#dp.resp, [io_lib:format(F,A),<<"\r\n">>]),
+	port_command(P#dp.resp, [unicode:characters_to_binary(io_lib:format(F,A)),<<"\r\n">>]),
 	P.
 
 change_prompt(#dp{env = wx} = P) ->
@@ -709,9 +709,16 @@ map_print(P,M) ->
 	Keys = maps:keys(hd(M)),
 	map_print(P,Keys,M,[]).
 
+to_unicode(B) when is_binary(B) ->
+	unicode:characters_to_list(B);
+to_unicode(B) when is_list(B) ->
+	to_unicode(iolist_to_binary(B));
+to_unicode(B) ->
+	to_unicode(butil:tobin(B)).
+
 map_print(P,[Key|T],Maps,L) ->
 	Lenk = length(butil:tolist(Key)),
-	Len = lists:max([Lenk|[length(butil:tolist(maps:get(Key,M))) || M <- Maps]]),
+	Len = lists:max([Lenk|[length(to_unicode(maps:get(Key,M))) || M <- Maps]]),
 	map_print(P,T,Maps,[{Key,Len}|L]);
 map_print(P,[],Maps,L1) ->
 	L = lists:reverse(L1),
@@ -720,11 +727,11 @@ map_print(P,[],Maps,L1) ->
 	Delim = string:right("",Chars,$*),
 	Delim1 = string:right("",Chars,$-),
 	print(P,"~s",[Delim]),
-	StrKeys = [io_lib:format("~s",[string:left(butil:tolist(K),Len+1,$\s)]) || {K,Len} <- L],
-	print(P,"~s|",[StrKeys]),
+	StrKeys = [io_lib:format("~ts",[string:left(to_unicode(K),Len+1,$\s)]) || {K,Len} <- L],
+	print(P,"~ts|",[StrKeys]),
 	print(P,"~s",[Delim1]),
 	StrVals = map_print1(Maps,L),
-	print(P,"~s",[StrVals]),
+	print(P,"~ts",[StrVals]),
 	print(P,"~s",[Delim1]).
 
 map_print1([M|T],Keys) ->
@@ -734,6 +741,6 @@ map_print1([M|T],Keys) ->
 		_ ->
 			End = "\n"
 	end,
-	[[io_lib:format("~s",[string:left(butil:tolist(maps:get(K,M)),Len+1,$\s)]) || {K,Len} <- Keys],"|",End|map_print1(T,Keys)];
+	[[io_lib:format("~ts",[string:left(to_unicode(maps:get(K,M)),Len+1,$\s)]) || {K,Len} <- Keys],"|",End|map_print1(T,Keys)];
 map_print1([],_) ->
 	[].

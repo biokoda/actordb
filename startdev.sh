@@ -6,7 +6,7 @@ case $1 in
         ;;
     debug)
         exec ../otp/bin/cerl -debug -pa ebin deps/*/ebin -config etc/app.config -s actordb_core -args_file etc/vm.args
-	;;
+        ;;
     *)
         exec erl -pa ebin deps/*/ebin -config etc/app.config -s actordb_core -args_file etc/vm.args
 esac
