@@ -51,19 +51,22 @@ union Result
 enum ErrorCode {
   NotLoggedIn = 1,
   EmptyActorName = 2,
-  InvalidActorName = 3, // invalid characters
-  InvalidType = 4,      // invalid actor type
-  NotPermitted = 5,     // accessing actor that user does not have permission for
+  InvalidActorName = 3,       // Invalid characters
+  InvalidType = 4,            // Invalid actor type
+  NotPermitted = 5,           // Accessing actor that user does not have permission for
   SqlError = 6,
-  ConsensusTimeout = 7, // cluster is unable to reach consensus, query was not executed
-  LocalNodeMissing = 8, // when creating a cluster, node where init was attempted was missing
-                        // from the node list.
-  MissingGroupInsert = 9,  // when creating a cluster, if no groups are specified
-  MissingNodesInsert = 10, // when creating a cluster, if no nodes are specified
-  MissingRootUser = 11, // when creating a cluster, if no root user was specified
-  LoginFailed     = 12, // username and/or password was incorrect
-  NotInitialized  = 13, // query before actordb initialized
-  Error = 100           // unknown error
+  ConsensusTimeout = 7,       // After writing not enough nodes responded to confirm. 
+                              // Write may later be successfuly replicated, or it may be
+                              // abandoned. 
+  ConsensusImpossibleAtm = 8, // Query was not executed because not enough nodes are online.
+  LocalNodeMissing = 9,       // When creating a cluster, node where init was attempted was missing
+                              // from the node list.
+  MissingGroupInsert = 10,    // When creating a cluster, if no groups are specified
+  MissingNodesInsert = 11,    // When creating a cluster, if no nodes are specified
+  MissingRootUser = 12,       // When creating a cluster, if no root user was specified
+  LoginFailed     = 13,       // Username and/or password was incorrect
+  NotInitialized  = 14,       // Query before actordb initialized
+  Error = 100                 // Unknown error
 }
 
 exception InvalidRequestException {
