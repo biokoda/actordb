@@ -33,6 +33,12 @@ delim() ->
 
 main(Args) ->
 	register(home,self()),
+	file:write_file("err.txt",io_lib:fwrite("HAVE ???~n",[])),
+	
+	{ok,Comfile} = file:read_file("/tmp/comfile"),
+	[Req,Resp] = binary:split(Comfile,<<"\n">>),
+	file:delete("/tmp/comfile"),
+
 	case os:type() of
 		{win32,_} ->
 			spawn(fun() -> (catch wxrun()),halt(1) end),
@@ -42,8 +48,8 @@ main(Args) ->
 		% 	spawn(fun() -> (catch wxrun()),halt(1) end),
 		% 	P = parse_args(#dp{env = wx}, Args);
 		_ ->
-			ReqPipe = open_port("/tmp/actordb.req", [in,eof,binary]),
-			RespPipe = open_port("/tmp/actordb.resp", [out,eof,binary]),
+			ReqPipe = open_port(binary_to_list(Req), [in,eof,binary]),
+			RespPipe = open_port(binary_to_list(Resp), [out,eof,binary]),
 			P = setpw(parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args))
 	end,
 	dologin(P),

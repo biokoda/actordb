@@ -16,6 +16,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <curses.h>
+#include <sys/time.h>
 #define READ 0
 #define WRITE 1
 
@@ -25,8 +26,9 @@ char running=1;
 int infp, outfp;
 int req = 0, resp = 0;
 const char *prompt = "actordb> ";
-char *pipe_req = "/tmp/actordb.req";
-char *pipe_resp = "/tmp/actordb.resp";
+char pipe_req[128];
+char pipe_resp[128];
+unsigned long long int mytime = 0;
 
 pid_t popen2(char* argv[], int argc, int *infp, int *outfp)
 {
@@ -39,6 +41,7 @@ pid_t popen2(char* argv[], int argc, int *infp, int *outfp)
 	pid = fork();
 	if (pid < 0)
 		return pid;
+
 	else if (pid == 0)
 	{
 		char *args[argc];
@@ -103,11 +106,23 @@ static void rl_handler(char* line)
 	}
 }
 
+void stop()
+{
+	running = 0;
+	close(STDIN_FILENO);
+	close(resp);
+}
+
 int main(int argc, char *argv[])
 {
 	signal(SIGCHLD, proc_exit);
+	signal(SIGQUIT, stop);
+	signal(SIGINT, stop);
 	int nread = 0, sread = 0;
 	char buf[1024*64];
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	FILE *comfile = NULL;
 
 	if (argc < 2)
 	{
@@ -115,22 +130,36 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	mytime = tv.tv_sec*1000 + (tv.tv_usec / 1000);
+	snprintf(pipe_req,125,"/tmp/actordb.%llu.req",mytime);
+	snprintf(pipe_resp,125,"/tmp/actordb.%llu.resp",mytime);
+
+	comfile = fopen("/tmp/comfile","wb");
+	sprintf(buf,"%s\n%s",pipe_req,pipe_resp);
+	fwrite(buf,strlen(buf),1,comfile);
+	fclose(comfile);
+
 	mknod(pipe_req, S_IFIFO|0666, 0);
 	mknod(pipe_resp, S_IFIFO|0666, 0);
 
 	resp = open(pipe_resp,O_RDONLY | O_NONBLOCK);
 	if (resp == -1)
-		return 0;
+	{
+		printf("Unable to open resp pipe\n");
+		goto finished;
+	}
 	if (popen2(argv, argc, &infp, &outfp) <= 0)
 	{
 		printf("Unable to exec your-program-B\n");
-		return 0;
+		goto finished;
 	}
+	
+
 	req = open(pipe_req,O_WRONLY);
 	if (req == -1)
 	{
-		running = 0;
-		return 0;
+		printf("Unable to open req pipe\n");
+		goto finished;
 	}
 	rl_callback_handler_install(prompt, &rl_handler);
 
@@ -215,8 +244,10 @@ int main(int argc, char *argv[])
 		}
 	}
 	rl_callback_handler_remove();
-	unlink("/tmp/actordb.req");
-	unlink("/tmp/actordb.resp");
+
+finished:
+	unlink(pipe_req);
+	unlink(pipe_resp);
 
 	return 0;
 }
