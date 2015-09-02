@@ -33,12 +33,9 @@ delim() ->
 
 main(Args) ->
 	register(home,self()),
-	file:write_file("err.txt",io_lib:fwrite("HAVE ???~n",[])),
-	
 	{ok,Comfile} = file:read_file("/tmp/comfile"),
 	[Req,Resp] = binary:split(Comfile,<<"\n">>),
 	file:delete("/tmp/comfile"),
-
 	case os:type() of
 		{win32,_} ->
 			spawn(fun() -> (catch wxrun()),halt(1) end),
