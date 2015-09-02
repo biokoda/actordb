@@ -109,7 +109,7 @@ static void rl_handler(char* line)
 void stop()
 {
 	running = 0;
-	close(STDIN_FILENO);
+	// close(STDIN_FILENO);
 	close(resp);
 }
 
@@ -172,6 +172,8 @@ int main(int argc, char *argv[])
 		FD_SET(resp, &fdread);
 
 		rc = select(resp+1, &fdread, NULL, NULL, NULL);
+		if (!running)
+			break;
 
 		if (FD_ISSET(STDIN_FILENO, &fdread))
 		{
@@ -244,7 +246,6 @@ int main(int argc, char *argv[])
 		}
 	}
 	rl_callback_handler_remove();
-
 finished:
 	unlink(pipe_req);
 	unlink(pipe_resp);
