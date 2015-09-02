@@ -733,17 +733,11 @@ map_print(P,[],Maps,L1) ->
 	StrKeys = [io_lib:format("~ts",[string:left(to_unicode(K),Len+1,$\s)]) || {K,Len} <- L],
 	print(P,"~ts|",[StrKeys]),
 	print(P,"~s",[Delim1]),
-	StrVals = map_print1(Maps,L),
-	print(P,"~ts",[StrVals]),
+	map_print1(P,Maps,L),
 	print(P,"~s",[Delim1]).
 
-map_print1([M|T],Keys) ->
-	case T of
-		[] ->
-			End = "";
-		_ ->
-			End = "\n"
-	end,
-	[[io_lib:format("~ts",[string:left(to_unicode(maps:get(K,M)),Len+1,$\s)]) || {K,Len} <- Keys],"|",End|map_print1(T,Keys)];
-map_print1([],_) ->
+map_print1(P,[M|T],Keys) ->
+	print(P,[[io_lib:format("~ts",[string:left(to_unicode(maps:get(K,M)),Len+1,$\s)]) || {K,Len} <- Keys],"|"]),
+	map_print1(P,T,Keys);
+map_print1(_,[],_) ->
 	[].
