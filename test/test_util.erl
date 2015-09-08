@@ -314,6 +314,8 @@ ltime() ->
 	element(2,lager_util:localtime_ms()).
 exec(Nodes,Bin) ->
 	rpc:call(findnd(Nodes),actordb,exec,[iolist_to_binary(Bin)]).
+exec(Nodes,Bin,Timeout) ->
+	rpc:call(findnd(Nodes),actordb,exec,[iolist_to_binary(Bin)],Timeout).
 
 findnd([H|T]) ->
 	case lists:member(H,nodes(connected)) of

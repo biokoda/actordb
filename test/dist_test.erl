@@ -44,6 +44,8 @@ cfg(Args) ->
 			"single, cluster, multicluster, mysql, addsecond, missingnode, addthentake, addcluster, failednodes,"++
 			"endless1, endless2, addclusters~n~n"),
 			throw(noparam);
+		["partitions"] ->
+			Nodes = [?ND1,?ND2,?ND3,?ND4,?ND5];
 		_ ->
 			Nodes = [?ND1,?ND2,?ND3]
 			% Groups = ?ONEGRP(Nodes)
@@ -127,6 +129,40 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 			ok
 	end,
 	basic_write(Ndl);
+run(Param,"partitions") ->
+	Nd1 = butil:ds_val(node1,Param),
+	Nd2 = butil:ds_val(node2,Param),
+	Nd3 = butil:ds_val(node3,Param),
+	Nd4 = butil:ds_val(node4,Param),
+	Nd5 = butil:ds_val(node5,Param),
+	Ndl = [N || N <- [Nd1,Nd2,Nd3,Nd4,Nd5], N /= undefined],
+	{ok,_} = rpc:call(Nd1,actordb_config,exec,[init(Ndl,"partitions")],3000),
+	timer:sleep(100),
+	{ok,_} = rpc:call(Nd1,actordb_config,exec_schema,[schema2()],3000),
+	ok = wait_tree(Nd1,10000),
+	timer:sleep(2000),
+	% Create actor
+	{ok,_} = exec(Ndl,<<"actor type1(ac1) create; insert into tab values (1,'sometext',2);">>),
+	timer:sleep(2000),
+	lager:info("Isolating nd1, nd2"),
+	detest:isolate([Nd1,Nd2],minority),
+	timer:sleep(1000),
+	lager:info("Calling write on ac1 to minority partition"),
+	{error,consensus_timeout} = exec([Nd1],<<"actor type1(ac1) create; insert into tab values (2,'minority',2);">>,infinity),
+	
+	lager:info("Calling write on ac1 to majority partition"),
+	Res1 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},{rows,[{1,<<"sometext">>,2.0}]}]},
+	Res2 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},{rows,[{2,<<"majority">>,2.0},{1,<<"sometext">>,2.0}]}]},
+	
+	Res1 = exec([Nd3],<<"actor type1(ac1); select * from tab;">>),
+	{ok,_} = exec([Nd3],<<"actor type1(ac1) create; insert into tab values (2,'majority',2);">>),
+	Res2 = exec([Nd3],<<"actor type1(ac1); select * from tab;">>),
+	detest:isolate_end([Nd1,Nd2]),
+	timer:sleep(100),
+	{ok,_} = exec([Nd3],<<"actor type1(ac1) create; insert into tab values (3,'majority_2',2);">>),
+	Res2 = exec([Nd1],<<"actor type1(ac1); select * from tab;">>),
+	timer:sleep(1000),
+	ok;
 run(Param,"remnode" = TType) ->
 	Nd1 = butil:ds_val(node1,Param),
 	Nd2 = butil:ds_val(node2,Param),
@@ -368,7 +404,7 @@ usr() ->
 	"CREATE USER 'root' IDENTIFIED BY 'rootpass'".
 
 init(Ndl,TT) when TT == "single"; TT == "cluster"; TT == "addthentake"; TT == "addcluster"; TT == "endless2";
-		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; TT == "remnode" ->
+		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; TT == "remnode"; TT == "partitions" ->
 	[grp(1),nds(Ndl,1),usr()];
 init([N1,N2,N3,N4],"multicluster") ->
 	[grp(1),grp(2),nds([N1,N2],1),nds([N3,N4],2),usr()].
