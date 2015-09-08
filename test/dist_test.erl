@@ -153,6 +153,8 @@ run(Param,"partitions") ->
 	lager:info("Calling write on ac1 to majority partition"),
 	Res1 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},{rows,[{1,<<"sometext">>,2.0}]}]},
 	Res2 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},{rows,[{2,<<"majority">>,2.0},{1,<<"sometext">>,2.0}]}]},
+	Res3 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},
+		{rows,[{3,<<"majority_2">>,2.0},{2,<<"majority">>,2.0},{1,<<"sometext">>,2.0}]}]},
 	
 	Res1 = exec([Nd3],<<"actor type1(ac1); select * from tab;">>),
 	{ok,_} = exec([Nd3],<<"actor type1(ac1) create; insert into tab values (2,'majority',2);">>),
@@ -160,7 +162,8 @@ run(Param,"partitions") ->
 	detest:isolate_end([Nd1,Nd2]),
 	timer:sleep(100),
 	{ok,_} = exec([Nd3],<<"actor type1(ac1) create; insert into tab values (3,'majority_2',2);">>),
-	Res2 = exec([Nd1],<<"actor type1(ac1); select * from tab;">>),
+	Res3 = exec([Nd1],<<"actor type1(ac1); select * from tab;">>),
+	lager:info("Majority wins!"),
 	timer:sleep(1000),
 	ok;
 run(Param,"remnode" = TType) ->
