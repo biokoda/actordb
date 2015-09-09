@@ -3,7 +3,8 @@
 - Feature: Seperate Read/Write threads for improved concurrency.
 - Feature: Write batching. If an actor receives many writes at once, they will be a part of a single replication event. 
 - Feature: Added LIMIT and OFFSET to pragma list: "actor type1(*);PRAGMA list LIMIT 1000 OFFSET 10;"
-- Feature: ActorDB shell to manage the database. It replaces actordbctrl.
+- Feature: actordb_console to manage the database. It replaces actordbctrl.
+- Feature: actordb_tool for backups and diagnostics.
 - Feature: Expanded thrift interface. ActorDB can now be completely controled through thrift.
 - Feature: Finally added user management. Thrift interface supports safer mysql style login that does not send the actual password over the wire.
 - Feature: Expanded configuration options in app.config. 
