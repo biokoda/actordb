@@ -10,7 +10,7 @@ uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 ifeq ($(uname_S),Darwin)
 	SHELLCMD = gcc c_src/cmdshell.c -I/usr/local/Cellar/readline/6.3.8/include/ /usr/local/Cellar/readline/6.3.8/lib/libreadline.a -lncurses  -o priv/cmdshell
 else
-	SHELLCMD = gcc c_src/cmdshell.c /usr/lib/x86_64-linux-gnu/libreadline.a -lncurses  -o priv/cmdshell
+	SHELLCMD = gcc c_src/cmdshell.c -lreadline -lncurses  -o priv/cmdshell
 endif
 
 ifeq ($(uname_S),Darwin)
