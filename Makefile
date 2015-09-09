@@ -13,6 +13,11 @@ else
 	SHELLCMD = gcc c_src/cmdshell.c /usr/lib/x86_64-linux-gnu/libreadline.a -lncurses  -o priv/cmdshell
 endif
 
+ifeq ($(uname_S),Darwin)
+	TOOLCMD = gcc deps/actordb_driver/c_src/tool.c deps/actordb_driver/c_src/mdb.c deps/actordb_driver/c_src/midl.c deps/actordb_driver/c_src/lz4.c   -DMDB_MAXKEYSIZE=0 -DSQLITE_DEFAULT_PAGE_SIZE=4096 -DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=0  -o actordb_tool
+else
+	TOOLCMD = gcc deps/actordb_driver/c_src/tool.c deps/actordb_driver/c_src/mdb.c deps/actordb_driver/c_src/midl.c deps/actordb_driver/c_src/lz4.c   -DMDB_MAXKEYSIZE=0 -DSQLITE_DEFAULT_PAGE_SIZE=4096 -DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=0 -lpthread -ldl -o actordb_tool
+endif
 
 $(if $(ERLANG_BIN),,$(warning "Warning: No Erlang found in your path, this will probably not work"))
 
@@ -23,8 +28,10 @@ all: deps compile
 # thrift -gen erl -out deps/adbt/src/  adbt.thrift
 compile:
 	$(SHELLCMD)
+	$(TOOLCMD)
 	./rebar compile
 	./priv/mkconsole.escript
+
 
 
 recompile:
