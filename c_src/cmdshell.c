@@ -206,15 +206,12 @@ int main(int argc, char *argv[])
 				if (strcmp(buf+2,"getpass") == 0)
 				{
 					char *line = NULL;
-
 					rl_save_prompt();
-					rl_replace_line("",0);
-					rl_redisplay();
+					rl_message("");
+					rl_callback_handler_remove();
 					line = getpass("Password:");
 					write(req, line, strlen(line));
-					rl_clear_message();
-					rl_restore_prompt();
-					rl_redisplay();
+					rl_callback_handler_install(prompt, &rl_handler);
 					continue;
 				}
 				else
