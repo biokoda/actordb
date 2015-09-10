@@ -84,6 +84,8 @@ a.redlink { color: #dc1414; font-weight: bold; }
 
 .hr14colorsmalmargin { border: none; height: 1px; width: 100%; background: #141414; margin: 10px 0 !Important; }
 
+.latomono           {font-family: monospace !Important;}
+
 /* search bliznjice */
 /* landing page */
 /* -header */

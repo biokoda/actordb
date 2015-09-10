@@ -231,7 +231,7 @@ $(document).ready(function(){
 If you are on OSX then open terminal and move into the directory where you downloaded the package above (*.tar.gz package) and run:</p>
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 tar -zxvf actordb*.tar.gz</pre>
             </div>
 
@@ -240,7 +240,7 @@ tar -zxvf actordb*.tar.gz</pre>
 If you are on Ubuntu/Debian open terminal and move into the directory where you downloaded the package above (*.deb package) and run:</p>
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 dpkg -i actordb*.deb</pre>
             </div>
 
@@ -257,21 +257,21 @@ Let's run ActorDB for the first time!</p>
 
 
             <div class="structure">
-                <pre>cd actordb-*
+                <pre class="latomono">cd actordb-*
             </div>
 
 
 
 <p class="pagetext">and now run:</p>
             <div class="structure">
-                <pre> ./bin/actordb start
+                <pre class="latomono"> ./bin/actordb start
  ./bin/actordb_console -f etc/init.example.sql</pre>
             </div>
 
 <p class="pagetext">If on Linux:</p>
 
             <div class="structure">
-                <pre> actordb start
+                <pre class="latomono"> actordb start
  actordb_console -f etc/init.example.sql</pre>
             </div>
 
@@ -282,14 +282,14 @@ Let's run ActorDB for the first time!</p>
 <p class="pagetext">Queries to ActorDB can be executed using actordb_console. You can run actordb_console -h to print call options. If connecting to local node that is using default thrift interface port, IP can be omitted.</p>
 
             <div class="structure">
-<pre>actordb_console -u myuser 127.0.0.1 </pre>
+<pre class="latomono">actordb_console -u myuser 127.0.0.1 </pre>
             </div>
 
 <p class="pagetext"> You should now be connected to ActorDB. Next, run this command:
 </p>
 
             <div class="structure">
-<pre>actordb> ACTOR type1(music) CREATE; 
+<pre class="latomono">actordb> ACTOR type1(music) CREATE; 
 actordb (1)> INSERT INTO tab (i,txt) VALUES (42,"this is our first run");
 actordb (2)> c
 Rowid: 1, Rows changed: 1</pre>
@@ -301,7 +301,7 @@ Rowid: 1, Rows changed: 1</pre>
 Our actor instance is called 'music' and it has schema of type1 (set in init.sql). If this instance doesn't exist it will be created after first query because it has the CREATE flag. Run:</p>
 
             <div class="structure">
-<pre>actordb> ACTOR type1(music); SELECT * FROM tab;
+<pre class="latomono">actordb> ACTOR type1(music); SELECT * FROM tab;
 actordb (1) c
 *****************************
 i  id txt                   |
@@ -318,7 +318,7 @@ i  id txt                   |
 <p class="pagetext">Let's start with creating some instances of actors type1 and inserting data.</p>
 
             <div class="structure">
-<pre>
+<pre class="latomono">
 actordb> ACTOR type1(sport) CREATE;
 actordb (1)> INSERT INTO tab (i,txt) VALUES (1,"Insert into sport.");
 actordb (2)> ACTOR type1(reading) CREATE;
@@ -333,14 +333,14 @@ Rowid: 0, Rows changed: 3
 <p class="pagetext">The above was actually a 3 actor transaction. Here is another one:</p>
 
             <div class="structure">
-<pre>
+<pre class="latomono">
 actordb> ACTOR type1(sport,reading,paint);
 actordb (1)> INSERT INTO tab (i,txt) VALUES (2,"Insert into three type1 actors.");
 actordb (2)> c
 Rowid: 0, Rows changed: 3
 </pre>
 <p class="pagetext">Lets read tab from all actors of type1:</p>
-<pre>
+<pre class="latomono">
 actordb> actor type1(*); {{RESULT}}select * from tab;
 actordb (1)> c
 ***********************************************
@@ -364,7 +364,7 @@ music   42 1  this is our first run           |
 <p class="pagetext">If you followed this tutorial from step 1 to 4, you should have four actors of type1. Let's check this assumption with next query:</p>
 
             <div class="structure">
-<pre>
+<pre class="latomono">
 actordb> ACTOR type1(*);PRAGMA list;
 actordb (1)> c
 *********
@@ -385,7 +385,7 @@ music   |
 <p class="pagetext">We can update actor by actor or all actors at once. Let's start with only one actor:</p>
 
             <div class="structure">
-<pre>actordb> ACTOR type1(music); SELECT * FROM tab;
+<pre class="latomono">actordb> ACTOR type1(music); SELECT * FROM tab;
 actordb (1)> c
 *****************************
 i  id txt                   |
@@ -397,7 +397,7 @@ i  id txt                   |
 
 
             <div class="structure">
-<pre>actordb> ACTOR type1(music);
+<pre class="latomono">actordb> ACTOR type1(music);
 actordb (1)> UPDATE tab SET i=i+1 WHERE id=1;
 actordb (2)> c
 Rowid: 9, Rows changed: 1
@@ -415,7 +415,7 @@ i  id txt                   |
 <p class="pagetext">Let's update all four actors at once. Begin with selecting all actors of type type1. Note this is just an example, you really should not have queries like this in production. Transactions over many actors are not cheap:</p>
 
             <div class="structure">
-<pre>
+<pre class="latomono">
 actordb> ACTOR type1(*);
 actordb (1)> UPDATE tab SET i=44 WHERE id = 1;
 actordb (2)> c
@@ -444,7 +444,7 @@ music   44 1  this is our first run           |
 <p class="pagetext">Deleting a row in actor music and table tab:</p>
 
             <div class="structure">
-<pre>
+<pre class="latomono">
 actordb> ACTOR type1(music);
 actordb (1)> DELETE FROM tab WHERE id=1;
 actordb (2)> c
@@ -459,7 +459,7 @@ No results.
 Deleting a specific row in table tab in all actors of type type1.</p>
 
             <div class="structure">
-<pre>
+<pre class="latomono">
 actordb> ACTOR type1(*);
 actordb (1)> DELETE FROM tab WHERE id=2;
 actordb (2)> c
@@ -482,7 +482,7 @@ reading 44 1  Insert into reading. |
 We can also delete all our actors. Proceed with caution!</p>
 
             <div class="structure">
-<pre>
+<pre class="latomono">
 actordb> ACTOR type1(*);
 actordb (1)> PRAGMA delete; 
 actordb (2)> c

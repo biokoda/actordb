@@ -227,7 +227,7 @@ $(document).ready(function(){
 
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 
 Landing page    -> subsection1 -> article1
                                                           article2
@@ -250,7 +250,7 @@ Landing page    -> subsection1 -> article1
 
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 user:
 - CREATE TABLE user (id INTEGER PRIMARY KEY, email TEXT, username TEXT, registered_at DATETIME);
 - CREATE TABLE mymessages (id INTEGER PRIMARY KEY, threadid INTEGER);
@@ -270,7 +270,7 @@ subforum:
 
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 ACTOR thread({{uniqid.threadid}}) create;
 INSERT INTO messages VALUES ({{uniqid.msgid}}, 'txt', _userid_, datetime('now'));
 ACTOR user(_userid_);
@@ -298,7 +298,7 @@ INSERT INTO threads VALUES ({{uniqid.threadid}},'Thread title',datetime('now'))<
 
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 ACTOR thread(_threadid_);
 SELECT * FROM messages LIMIT 30;</pre>
             </div>
@@ -310,7 +310,7 @@ SELECT * FROM messages LIMIT 30;</pre>
             
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 ACTOR thread(_threadid_);
 INSERT INTO messages VALUES ({{uniqid.msgid}},'I disagree because of reasons.',_userid_,datetime('now'));
 ACTOR user(_userid_)

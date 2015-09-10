@@ -228,7 +228,7 @@ $(document).ready(function(){
 
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 -- create a KV namespace named counters.
 actor counters kv
 -- Every KV type must have a table named actors. id and hash are mandatory. 
@@ -246,7 +246,7 @@ CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)</pre>
 
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 actordb> ACTOR counters(mykey);
 actordb (1)> INSERT INTO actors VALUES ('mykey', {{hash(mykey)}}, 42);
 actordb (2)> c
@@ -266,7 +266,7 @@ Rowid: 1, Rows changed: 1</pre>
             <p class="pagetext">Let's return a row we inserted earlier:</p>
             
                         <div class="structure">
-<pre>actordb> actor counters(mykey);
+<pre class="latomono">actordb> actor counters(mykey);
 actordb (1)> select * from actors where id='mykey';
 actordb (2)> c
 **********************
@@ -279,7 +279,7 @@ hash       id    val |
 
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 actordb> actor counters(*);
 actordb (1)> {{RESULT}}SELECT * FROM actors;
 actordb (2)> c
@@ -306,7 +306,7 @@ actor      hash       id     val |
 
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 ACTOR counters(N);
 UPDATE actors SET val = val+1 WHERE id='N';</pre>
             </div>
@@ -316,7 +316,7 @@ UPDATE actors SET val = val+1 WHERE id='N';</pre>
 
 
             <div class="structure">
-                <pre>
+                <pre class="latomono">
 ACTOR counters(1,2,3,4,5,6,7,8,9,10,11,12);
 {{RESULT}}SELECT * FROM actors where id='{{curactor}}';</pre>
             </div>
