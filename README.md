@@ -56,4 +56,4 @@ Centos 7: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10-1.el7.centos.x
 
 **windows package (64bit):**
 
-https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.9-win-x86_64.zip
+https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10-win-x86_64.zip
