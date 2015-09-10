@@ -30,6 +30,7 @@ Advantages
 *   No special drivers needed. Use the mysql driver of your language of choice.
 *   Easy to configure and administer.
 *   No global locks. Only the actors (one or many) involved in a transaction are locked during a write. All other actors are unaffected.
+*   Uses stable reliable SQL and storage engines: SQLite on top of LMDB.
 
 Documentation: http://www.actordb.com/docs-about.html
 
