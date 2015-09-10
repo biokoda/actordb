@@ -19,7 +19,7 @@ ActorDB is:
 *   Massively concurrent.
 *   No single point of failure.
 *   ACID.
-*   Connectable over MySQL protocol and Thrift.
+*   Connectable over MySQL protocol and [Thrift](https://github.com/biokoda/actordb/blob/master/adbt.thrift).
 *   Replicated safely using the Raft distributed consensus algorithm.
 
 Advantages
