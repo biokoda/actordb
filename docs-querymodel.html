@@ -120,7 +120,7 @@ $(document).ready(function(){
                         <a href="docs-howitworks.html#h_323" class="text last">3.2.3 Multi-actor transactions</a>
                     </div>
                     <a href="docs-howitworks.html#dbengine" class="title">
-                        <span class="text">3.3 Database engine</span>
+                        <span class="text">3.3 SQL engine</span>
                     </a>
                 </div>
             </div>
@@ -198,25 +198,22 @@ $(document).ready(function(){
                     <span>7.1 ActorDB configuration files</span>
                 </a>
                 <a href="docs-configuration.html#conf_nodes" class="last">
-                    <span>7.2 nodes.yaml</span>
-                </a>
-                <a href="docs-configuration.html#conf_schema" class="last">
-                    <span>7.3 schema.yaml</span>
+                    <span>7.2 init.sql</span>
                 </a>
                 <a href="docs-configuration.html#setup_guide" class="last">
-                    <span>7.4 Setup guide</span>
+                    <span>7.3 Setup guide</span>
                 </a>
                 <a href="docs-configuration.html#changing_schema" class="last">
-                    <span>7.5 Changing schema</span>
+                    <span>7.4 Changing schema</span>
                 </a>
                 <a href="docs-configuration.html#adding_cluster" class="last">
-                    <span>7.6 Adding a cluster</span>
+                    <span>7.5 Adding a cluster</span>
                 </a>
                 <a href="docs-configuration.html#building_actordb" class="last">
-                    <span>7.7 Building ActorDB</span>
+                    <span>7.6 Building ActorDB</span>
                 </a>
                 <a href="docs-configuration.html#running_dev_mode" class="last">
-                    <span>7.8 Running ActorDB development mode</span>
+                    <span>7.7 Running ActorDB development mode</span>
                 </a>
             </div>
 
@@ -414,7 +411,7 @@ ACTOR user(for X.userid in RESULT);
 
             <h3 class="pagesubtitle">PRAGMA list</h3>                        
 
-            <p class="pagetext">Will list all actors of a certain type</p>
+            <p class="pagetext">Will list all actors of a certain type. </p>
 
 
 
@@ -422,6 +419,14 @@ ACTOR user(for X.userid in RESULT);
                 <pre>
 ACTOR thread(*);
 PRAGMA list;    </pre>
+            </div>
+
+<p class="pagetext">You can also add limit and offset.</p>
+
+            <div class="structure">
+                <pre>
+ACTOR thread(*);
+PRAGMA list LIMIT 100 OFFSET 100;    </pre>
             </div>
 
 

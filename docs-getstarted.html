@@ -120,7 +120,7 @@ $(document).ready(function(){
                         <a href="docs-howitworks.html#h_323" class="text last">3.2.3 Multi-actor transactions</a>
                     </div>
                     <a href="docs-howitworks.html#dbengine" class="title">
-                        <span class="text">3.3 Database engine</span>
+                        <span class="text">3.3 SQL engine</span>
                     </a>
                 </div>
             </div>
@@ -198,25 +198,22 @@ $(document).ready(function(){
                     <span>7.1 ActorDB configuration files</span>
                 </a>
                 <a href="docs-configuration.html#conf_nodes" class="last">
-                    <span>7.2 nodes.yaml</span>
-                </a>
-                <a href="docs-configuration.html#conf_schema" class="last">
-                    <span>7.3 schema.yaml</span>
+                    <span>7.2 init.sql</span>
                 </a>
                 <a href="docs-configuration.html#setup_guide" class="last">
-                    <span>7.4 Setup guide</span>
+                    <span>7.3 Setup guide</span>
                 </a>
                 <a href="docs-configuration.html#changing_schema" class="last">
-                    <span>7.5 Changing schema</span>
+                    <span>7.4 Changing schema</span>
                 </a>
                 <a href="docs-configuration.html#adding_cluster" class="last">
-                    <span>7.6 Adding a cluster</span>
+                    <span>7.5 Adding a cluster</span>
                 </a>
                 <a href="docs-configuration.html#building_actordb" class="last">
-                    <span>7.7 Building ActorDB</span>
+                    <span>7.6 Building ActorDB</span>
                 </a>
                 <a href="docs-configuration.html#running_dev_mode" class="last">
-                    <span>7.8 Running ActorDB development mode</span>
+                    <span>7.7 Running ActorDB development mode</span>
                 </a>
             </div>
 
@@ -253,7 +250,7 @@ dpkg -i actordb*.deb</pre>
 
 
 <p class="pagetext">
-Let's assume we just wan't to test ActorDB and we won't do any configurational changes. Our ActorDB server is one node only and runs on host 127.0.0.1 and port 33307.
+Let's assume we just wan't to test ActorDB and we won't do any configurational changes. Our ActorDB server is one node only and runs on host 127.0.0.1 and port 33306.
 
 Let's run ActorDB for the first time!</p>
 <p class="pagetext">If on OSX move into directory:</p>
@@ -261,66 +258,59 @@ Let's run ActorDB for the first time!</p>
 
             <div class="structure">
                 <pre>cd actordb-*
-cd bin/</pre>
             </div>
 
 
 
 <p class="pagetext">and now run:</p>
             <div class="structure">
-                <pre> sudo ./actordb start
- ./actordbctrl init</pre>
+                <pre> ./bin/actordb start
+ ./bin/actordb_console -f etc/init.example.sql</pre>
             </div>
 
 <p class="pagetext">If on Linux:</p>
 
             <div class="structure">
                 <pre> actordb start
- actordbctrl init</pre>
+ actordb_console -f etc/init.example.sql</pre>
             </div>
 
-<p class="pagetext">You should see:</p>
-
-            <div class="structure">
-                <pre>Start new cluster?
-Confirm change? (Y/N):</pre>
-            </div>
+<p class="pagetext">Once actordb_console is finished running (should be quick), you have an initialized ActorDB setup.</p>
 
 <h2 id="insertandquery" class="pagesubtitle">2.3 Simple insert and query data</h2>
 
-<p class="pagetext">At the moment we will use mysql client program.</p>
+<p class="pagetext">Queries to ActorDB can be executed using actordb_console. You can run actordb_console -h to print call options. If connecting to local node that is using default thrift interface port, IP can be omitted.</p>
 
             <div class="structure">
-<pre>mysql --host 127.0.0.1 --port 33307 </pre>
+<pre>actordb_console -u myuser 127.0.0.1 </pre>
             </div>
 
-<p class="pagetext">You should now be connected to mysql client. Next, run this command:
+<p class="pagetext"> You should now be connected to ActorDB. Next, run this command:
 </p>
 
             <div class="structure">
-<pre>mysql> ACTOR type1(music) CREATE;</pre>
+<pre>actordb> ACTOR type1(music) CREATE; 
+actordb (1)> INSERT INTO tab (i,txt) VALUES (42,"this is our first run");
+actordb (2)> c
+Rowid: 1, Rows changed: 1</pre>
             </div>
-
-<p class="pagetext">Let's just check our actor table structure:</p> 
-
-<div class="structure">
-<pre>
-mysql> SHOW TABLES;
-</pre>
-<img src="imgs/get_started/1.png" alt=""/>
-</div>
 
 
 
 <p class="pagetext">
-Note that we specified type of actor and entity–relationship model in schema.yaml but NOT an actor instance. Our actor instance is called 'music' and if this instance doesn't exist it will be created after first query. Run:</p>
+Our actor instance is called 'music' and it has schema of type1 (set in init.sql). If this instance doesn't exist it will be created after first query because it has the CREATE flag. Run:</p>
 
             <div class="structure">
-<pre>mysql>INSERT INTO tab (i,txt) VALUES (42,"this is our first run");
-mysql> SELECT * FROM tab;</pre>
+<pre>actordb> ACTOR type1(music); SELECT * FROM tab;
+actordb (1) c
+*****************************
+i  id txt                   |
+-----------------------------
+42 1  this is our first run |
+-----------------------------
+</pre>
             </div>
 
-<img src="imgs/get_started/2.png" alt=""/>
 
 
 <h2 id="crud" class="pagesubtitle">2.4 CRUD in ActorDB</h2>
@@ -329,21 +319,41 @@ mysql> SELECT * FROM tab;</pre>
 
             <div class="structure">
 <pre>
-mysql> ACTOR type1(sport) CREATE;
-mysql> INSERT INTO tab (i,txt) VALUES (1,"Insert into sport.");
-mysql> ACTOR type1(reading) CREATE;
-mysql> INSERT INTO tab (i,txt) VALUES (2,"Insert into reading.");
-mysql> ACTOR type1(paint) CREATE;
-mysql> INSERT INTO tab (i,txt) VALUES (3,"Insert into paint.");
+actordb> ACTOR type1(sport) CREATE;
+actordb (1)> INSERT INTO tab (i,txt) VALUES (1,"Insert into sport.");
+actordb (2)> ACTOR type1(reading) CREATE;
+actordb (3)> INSERT INTO tab (i,txt) VALUES (2,"Insert into reading.");
+actordb (4)> ACTOR type1(paint) CREATE;
+actordb (5)> INSERT INTO tab (i,txt) VALUES (3,"Insert into paint.");
+actordb (6)> c
+Rowid: 0, Rows changed: 3
 </pre>
             </div>
 
-<p class="pagetext">We can also insert data in all type1 actors:</p>
+<p class="pagetext">The above was actually a 3 actor transaction. Here is another one:</p>
 
             <div class="structure">
 <pre>
-mysql> ACTOR type1(*);
-mysql> INSERT INTO tab (i,txt) VALUES (2,"Insert into all type1 actors.");
+actordb> ACTOR type1(sport,reading,paint);
+actordb (1)> INSERT INTO tab (i,txt) VALUES (2,"Insert into three type1 actors.");
+actordb (2)> c
+Rowid: 0, Rows changed: 3
+</pre>
+<p class="pagetext">Lets read tab from all actors of type1:</p>
+<pre>
+actordb> actor type1(*); {{RESULT}}select * from tab;
+actordb (1)> c
+***********************************************
+actor   i  id txt                             |
+-----------------------------------------------
+sport   1  1  Insert into sport.              |
+sport   2  2  Insert into three type1 actors. |
+paint   3  1  Insert into paint.              |
+paint   2  2  Insert into three type1 actors. |
+reading 2  1  Insert into reading.            |
+reading 2  2  Insert into three type1 actors. |
+music   42 1  this is our first run           |
+-----------------------------------------------
 </pre>
             </div>
 
@@ -355,15 +365,18 @@ mysql> INSERT INTO tab (i,txt) VALUES (2,"Insert into all type1 actors.");
 
             <div class="structure">
 <pre>
-mysql> ACTOR type1(*);
-Query OK, 0 rows affected (0.00 sec)
-mysql> PRAGMA list;
+actordb> ACTOR type1(*);PRAGMA list;
+actordb (1)> c
+*********
+actor   |
+---------
+sport   |
+paint   |
+reading |
+music   |
+---------
 </pre>
             </div>
-
-<img src="imgs/get_started/3.png" alt=""/>
-
-
 
 
 
@@ -372,36 +385,58 @@ mysql> PRAGMA list;
 <p class="pagetext">We can update actor by actor or all actors at once. Let's start with only one actor:</p>
 
             <div class="structure">
-<pre>mysql> ACTOR type1(music);
-mysql> SELECT * FROM tab;
+<pre>actordb> ACTOR type1(music); SELECT * FROM tab;
+actordb (1)> c
+*****************************
+i  id txt                   |
+-----------------------------
+42 1  this is our first run |
+----------------------------- 
 </pre>
             </div>
 
-<img src="imgs/get_started/4.png" alt=""/>
 
             <div class="structure">
-<pre>mysql> ACTOR type1(music);
-mysql> UPDATE tab SET i=i+1 WHERE id=1;
+<pre>actordb> ACTOR type1(music);
+actordb (1)> UPDATE tab SET i=i+1 WHERE id=1;
+actordb (2)> c
+Rowid: 9, Rows changed: 1
+actordb> ACTOR type1(music); SELECT * FROM tab;
+actordb (1)> c
+*****************************
+i  id txt                   |
+-----------------------------
+43 1  this is our first run |
+-----------------------------
 </pre>
             </div>
 
 
-<p class="pagetext">
-Row with id 1 should now have i of value 43.
-Note that we selected our actor before the SELECT statement.
-Result:</p>
-<img src="imgs/get_started/5.png" alt=""/>
-
-<p class="pagetext">Let's update all four actors at once. Begin with selecting all actors of type type1:</p>
+<p class="pagetext">Let's update all four actors at once. Begin with selecting all actors of type type1. Note this is just an example, you really should not have queries like this in production. Transactions over many actors are not cheap:</p>
 
             <div class="structure">
 <pre>
-mysql> ACTOR type1(*);
-mysql> UPDATE tab SET i=44 WHERE id = 1;
+actordb> ACTOR type1(*);
+actordb (1)> UPDATE tab SET i=44 WHERE id = 1;
+actordb (2)> c
+Rowid: 0, Rows changed: 4
+actordb> actor type1(*); {{RESULT}}select * from tab;
+actordb (1)> c
+***********************************************
+actor   i  id txt                             |
+-----------------------------------------------
+sport   44 1  Insert into sport.              |
+sport   2  2  Insert into three type1 actors. |
+paint   44 1  Insert into paint.              |
+paint   2  2  Insert into three type1 actors. |
+reading 44 1  Insert into reading.            |
+reading 2  2  Insert into three type1 actors. |
+music   44 1  this is our first run           |
+---------------------------------------------
 </pre>
             </div>
 
-<p class="pagetext">All tables tab in all actors should now have column i of value 44.</p>
+<p class="pagetext">All tables tab in all actors now have column i of value 44.</p>
 
 
 
@@ -410,8 +445,13 @@ mysql> UPDATE tab SET i=44 WHERE id = 1;
 
             <div class="structure">
 <pre>
-mysql> ACTOR type1(music);
-mysql> DELETE FROM tab WHERE id=1;
+actordb> ACTOR type1(music);
+actordb (1)> DELETE FROM tab WHERE id=1;
+actordb (2)> c
+actordb> ACTOR type1(music);
+actordb (1)> select * from tab;
+actordb (2)> c
+No results.
 </pre>
             </div>
 
@@ -420,20 +460,37 @@ Deleting a specific row in table tab in all actors of type type1.</p>
 
             <div class="structure">
 <pre>
-mysql> ACTOR type1(*);
-mysql> DELETE FROM tab WHERE id=2;
+actordb> ACTOR type1(*);
+actordb (1)> DELETE FROM tab WHERE id=2;
+actordb (2)> c
+Rowid: 0, Rows changed: 4
+actordb> ACTOR type1(*);
+actordb (1)> {{RESULT}}select * from tab;
+actordb (2)> c
+************************************
+actor   i  id txt                  |
+------------------------------------
+sport   44 1  Insert into sport.   |
+paint   44 1  Insert into paint.   |
+reading 44 1  Insert into reading. |
+------------------------------------
 </pre>
             </div>
 
 
 <p class="pagetext">
-All our actors and their tables tab should now be totaly empty. We can also delete all our actors. 
-Proceed with caution!</p>
+We can also delete all our actors. Proceed with caution!</p>
 
             <div class="structure">
 <pre>
-mysql> ACTOR type1(*);
-mysql> PRAGMA delete; 
+actordb> ACTOR type1(*);
+actordb (1)> PRAGMA delete; 
+actordb (2)> c
+Rowid: 0, Rows changed: 4
+actordb> ACTOR type1(*);
+actordb (1)> pragma list;
+actordb (2)> c
+No results.
 </pre>
             </div>
 

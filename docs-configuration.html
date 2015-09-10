@@ -120,7 +120,7 @@ $(document).ready(function(){
                         <a href="docs-howitworks.html#h_323" class="text last">3.2.3 Multi-actor transactions</a>
                     </div>
                     <a href="docs-howitworks.html#dbengine" class="title">
-                        <span class="text">3.3 Database engine</span>
+                        <span class="text">3.3 SQL engine</span>
                     </a>
                 </div>
             </div>
@@ -198,25 +198,22 @@ $(document).ready(function(){
                     <span>7.1 ActorDB configuration files</span>
                 </a>
                 <a href="docs-configuration.html#conf_nodes" class="last">
-                    <span>7.2 nodes.yaml</span>
-                </a>
-                <a href="docs-configuration.html#conf_schema" class="last">
-                    <span>7.3 schema.yaml</span>
+                    <span>7.2 init.sql</span>
                 </a>
                 <a href="docs-configuration.html#setup_guide" class="last">
-                    <span>7.4 Setup guide</span>
+                    <span>7.3 Setup guide</span>
                 </a>
                 <a href="docs-configuration.html#changing_schema" class="last">
-                    <span>7.5 Changing schema</span>
+                    <span>7.4 Changing schema</span>
                 </a>
                 <a href="docs-configuration.html#adding_cluster" class="last">
-                    <span>7.6 Adding a cluster</span>
+                    <span>7.5 Adding a cluster</span>
                 </a>
                 <a href="docs-configuration.html#building_actordb" class="last">
-                    <span>7.7 Building ActorDB</span>
+                    <span>7.6 Building ActorDB</span>
                 </a>
                 <a href="docs-configuration.html#running_dev_mode" class="last">
-                    <span>7.8 Running ActorDB development mode</span>
+                    <span>7.7 Running ActorDB development mode</span>
                 </a>
             </div>
 
@@ -231,10 +228,10 @@ $(document).ready(function(){
 
     <p class="pagetext">
         <ol>
-            <li>app.config: where to store data, mysql protocol port.</li>
-            <li>vm.args: set name of node (also erlang vm tweak parameters, which you should probably leave default).</li>
-            <li>nodes.yaml: list of all nodes</li>
-            <li>schema.yaml: SQL database schema for every actor type.</li>            
+            <li>app.config - where to store data, mysql protocol port.</li>
+            <li>vm.args - set name of node (also erlang vm tweak parameters, which you should probably leave default).</li>
+            <li>init.example.sql - initialize cluster, add users and set schema using an sql script</li>
+            
         </ol>
     </p>
 
@@ -242,70 +239,68 @@ $(document).ready(function(){
 
     <p class="pagetext">app.config and vm.args need to be set on every node.</p>
 	
-	<p class="pagetext">nodes.yaml and schema.yaml only need to be set on one node, then sent to ActorDB with actordbctrl command. ActorDB will then store that data and send it to all nodes internally.</p>
-
+	<p class="pagetext">init.sql needs to be created by the user to set nodes, users and initial schema. Settings can later be changed using actordb_console or by creating a second file and applying sql statements from it.</p>
 
 	<p class="pagetext">On install, default configuration files are placed in /etc/actordb or whichever is equivalent for your platform.</p>	
 
-	<h2 id="conf_nodes" class="pagesubtitle">7.2 nodes.yaml</h2>
+	<h2 id="conf_nodes" class="pagesubtitle">7.2 init.sql</h2>
 
-	<p class="pagetext">Nodes file is split into two sections. First section lists all servers, second section organizes those servers into groups. This way you can manually organize nodes across different availability zones per cluster.</p>
-
-
-            <div class="structure">
-                <pre>
-# List all servers.
-nodes:
-- node1@192.168.1.2 
-- node2@192.168.1.3
-- node3@192.168.1.4
-
-# Organize servers.
-# Groups of type cluster are actordb data nodes.
-# Groups of other types will be able to communicate with cluster nodes, 
-#  but will not hold actordb data. They can be used as incremental backup nodes (coming soon), 
-#  client connection gateways and transaction managers. 
-groups:
-- name: grp2
-  nodes: [node1,node2,node3]
-  type: cluster</pre>
-            </div>
-
-
-
-	<h2 id="conf_schema" class="pagesubtitle">7.3 schema.yaml</h2>
-
-	<p class="pagetext">Schema file contains the SQL create or alter table commands. The schema can be changed at any time, but only by adding SQL statements <b>to the end of the list</b>. Every time a new actor is created, the entire list of SQL commands will be executed to create the schema. If schema changes while ActorDB is running, actors will be updated by applying the new statements in the list. If you add new statements in the middle of the list, you will have inconsistent schemas.
-</p>
+	<p class="pagetext">Default example initialize script is divided into three sections. First section which initializes cluster is mandatory. Setting schema can be done later, users can be added at any time.</p>
 
 
             <div class="structure">
                 <pre>
-# type1, type2 are types of actors. Every line is an update to the schema.
-# Lines SHOULD NEVER BE REMOVED. If lines are removed new actors will 
-#  have an incomplete schema and existing actors will not detect the schema change either.
-# To update the schema add lines for type or add new types.
+--WARNING: Every sql statement must be in its own line.
 
-type1: 
-- CREATE TABLE tab (id INTEGER PRIMARY KEY, txt TEXT)   
-- CREATE TABLE tab1 (id INTEGER PRIMARY KEY, txt TEXT)  
-- ALTER TABLE tab ADD i INTEGER                      
-- CREATE TABLE tabx (id INTEGER PRIMARY KEY, txt TEXT) 
+-- First initialize node. Create group, create node and create root user. Only this created
+-- user is able to change schema or change configuration. Once initialization is done
+-- console will be connected as this user. Every user created in this stage will have all privileges.
+-- Which means you should not create more than one. Add additional users later.
+use config
+insert into groups values ('grp1','cluster')
+-- localnode() is whatever is in vm.args (-name ....) for node we are connected to.
+insert into nodes values (localnode(),'grp1')
+CREATE USER 'root' IDENTIFIED BY 'rootpass'
+commit
 
-type2:
-- CREATE TABLE asdf (id INTEGER PRIMARY KEY AUTOINCREMENT, txt BLOB)
+-- Still in config db, now add second user to run queries with
+CREATE USER 'myuser' IDENTIFIED BY 'mypass'
+-- * means user has access to all actor types
+GRANT read,write ON * to 'myuser'
+-- We could also set a user that only has access to type1 actors with
+-- CREATE USER 'type1user' IDENTIFIED BY 'type1pass'
+-- GRANT read,write ON type1 to 'type1user';
+commit
 
-# typekv is a key-value type. It will not be an actor but a fragmented table across all nodes
-typekv: 
- type: kv
- schema: 
-  - CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)                </pre>
+-- Set schema
+use schema
+actor type1
+CREATE TABLE tab (id INTEGER PRIMARY KEY, txt TEXT)
+CREATE TABLE tab1 (id INTEGER PRIMARY KEY, txt TEXT)
+ALTER TABLE tab ADD i INTEGER
+CREATE TABLE tabx (id INTEGER PRIMARY KEY CHECK (typeof(id) == 'integer'), txt TEXT CHECK (typeof(id) == 'text'))
+actor type2
+CREATE TABLE asdf (id INTEGER PRIMARY KEY AUTOINCREMENT, txt BLOB)
+-- KV type of actor. This means counters is a sharded table across all nodes.
+actor counters kv
+CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)
+-- Another KV type. This one with a nother sub table. 
+-- Any sub table must use foreign key on actors.id and have "on delete cascade"
+actor filesystem kv
+CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, size INTEGER)
+CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, fileid TEXT, uid INTEGER, FOREIGN KEY (fileid) REFERENCES actors(id) ON DELETE CASCADE)
+commit
+</pre>
             </div>
 
+
+<p class="pagetext">The above example sets a schema with 4 different types of actors. These actor types are completely independent.</p> 
+
+<p class="pagetext">Schema statements are permanent. Modifying schema at a later time results in adding lines to schema, never replacing any of them. </p>
 
 <p class="pagetext"></p>
 
-<h2 id="setup_guide" class="pagesubtitle">7.4 Setup guide</h2>
+<h2 id="setup_guide" class="pagesubtitle">7.3 Setup guide</h2>
 
 <h3 class="pagesubtitle">FOR EVERY NODE</h3>            
 
@@ -322,63 +317,61 @@ typekv:
 
 <p class="pagetext">
     <ol>
-        <li>1. Open /etc/actordb/nodes.yaml and list all servers and organize them into groups</li>
-        <li>2. Open /etc/actordb/schema.yaml set your DB schema</li>
-        <li>3. Run: actordbctrl init</li>
-        <li>4. Backup your nodes and schema file.</li>
+        <li>1. Create your init.sql file, recommended path is /etc/actordb/init.sql</li>
+        <li>2. Run: actordb_console -f /etc/actordb/init.sql</li>
     </ol>
 </p>
 
 <p class="pagetext"></p>
 
-<h2 id="changing_schema" class="pagesubtitle">7.5 Changing schema</h2>
+<h2 id="changing_schema" class="pagesubtitle">7.4 Changing schema</h2>
 
 <p class="pagetext">
     <ol>
-        <li>1. Open schema.yaml file. Add statements or types.</li>
-        <li>2. Run: actordbctrl updateschema</li>
+        <li>1. Create a new file named /etc/actordb/v2.sql</li>
+        <li>2. Run: actordb_console -f /etc/actordb/v2.sql</li>
     </ol>
 </p>
 
 <p class="pagetext"></p>
 
-<h2 id="adding_cluster" class="pagesubtitle">7.6 Adding a cluster</h2>
+<h2 id="adding_cluster" class="pagesubtitle">7.5 Adding a cluster</h2>
 
 <p class="pagetext">
     <ol>
-        <li>1. Do steps 7.4.1-7.4.4 for every node in cluster.</li>
-        <li>2. Open nodes.yaml file. Add nodes and create a new group.</li>
-        <li>3. Run: actordbctrl updatenodes</li>
+        <li>1. Do steps 7.3.1-7.3.4 for every node in cluster.</li>
+        <li>2. Run actordb_console connect it to one of the active servers.</li>
+        <li>3. Insert to groups, nodes and commit. You must specifiy nodes with full name (ex. 'nodename@192.168.2.1').</li>
     </ol>
 </p>
 
 <p class="pagetext"></p>
 
-<h2 id="building_actordb" class="pagesubtitle">7.7 Building ActorDB</h2>
-
-<p class="pagetext">
-    <ol>
-        <li>1. Clone from github</li>
-        <li>2. make dist</li>
-        <li>3. make package</li>
-        <li>4. Release should be generated in: ./package/packages</li>
-    </ol>
-</p>
-
-<p class="pagetext"></p>
-
-<h2 id="running_dev_mode" class="pagesubtitle">7.8 Running ActorDB development mode</h2>
+<h2 id="building_actordb" class="pagesubtitle">7.6 Building ActorDB</h2>
 
 <p class="pagetext">
     <ol>
         <li>1. Clone from github</li>
-        <li>2. Move to actordb folder</li>
-        <li>3. ./startdev.sh</li>
-        <li>4. (in a new terminal) ./actordbctrl init</li>
+        <li>2. make package</li>
+        <li>3. Release should be generated in: ./package/packages</li>
     </ol>
 </p>
 
-<p class="pagetext">You can now execute commands in the console: actordb:exec("actor type1(actor1) create; select * from tab;").</p>
+<p class="pagetext"></p>
+
+<h2 id="running_dev_mode" class="pagesubtitle">7.7 Running ActorDB development mode</h2>
+
+<p class="pagetext">
+    <ol>
+        <li>1. git clone https://github.com/biokoda/actordb.git</li>
+        <li>2. cd actordb</li>
+        <li>3. make</li>
+        <li>4. ./startdev.sh</li>
+        <li>5. (in a new terminal) ./actordb_console -f etc/init.sql</li>
+    </ol>
+</p>
+
+<p class="pagetext">You can now execute commands in the erlang console: actordb:exec("actor type1(actor1) create; select * from tab;").</p>
 
 <div class="pageactions">
     <span class="goleft"><a href="docs-examples.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(6. Examples)</span>

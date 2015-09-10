@@ -120,7 +120,7 @@ $(document).ready(function(){
                         <a href="docs-howitworks.html#h_323" class="text last">3.2.3 Multi-actor transactions</a>
                     </div>
                     <a href="docs-howitworks.html#dbengine" class="title">
-                        <span class="text">3.3 Database engine</span>
+                        <span class="text">3.3 SQL engine</span>
                     </a>
                 </div>
             </div>
@@ -198,25 +198,22 @@ $(document).ready(function(){
                     <span>7.1 ActorDB configuration files</span>
                 </a>
                 <a href="docs-configuration.html#conf_nodes" class="last">
-                    <span>7.2 nodes.yaml</span>
-                </a>
-                <a href="docs-configuration.html#conf_schema" class="last">
-                    <span>7.3 schema.yaml</span>
+                    <span>7.2 init.sql</span>
                 </a>
                 <a href="docs-configuration.html#setup_guide" class="last">
-                    <span>7.4 Setup guide</span>
+                    <span>7.3 Setup guide</span>
                 </a>
                 <a href="docs-configuration.html#changing_schema" class="last">
-                    <span>7.5 Changing schema</span>
+                    <span>7.4 Changing schema</span>
                 </a>
                 <a href="docs-configuration.html#adding_cluster" class="last">
-                    <span>7.6 Adding a cluster</span>
+                    <span>7.5 Adding a cluster</span>
                 </a>
                 <a href="docs-configuration.html#building_actordb" class="last">
-                    <span>7.7 Building ActorDB</span>
+                    <span>7.6 Building ActorDB</span>
                 </a>
                 <a href="docs-configuration.html#running_dev_mode" class="last">
-                    <span>7.8 Running ActorDB development mode</span>
+                    <span>7.7 Running ActorDB development mode</span>
                 </a>
             </div>
 
@@ -232,18 +229,18 @@ $(document).ready(function(){
     <img class="img_right" src="imgs/multiple_cluster.png" alt=""/>
 </div>
     <p class="pagetext"></p>
-    <p class="pagetext">ActorDB is organised into clusters of 3 nodes. There can be as many clusters as you wish. Actors themselves are organised into shards. Logically a shard is a chunk of hash namespace. It is a special type of actor that holds a list of regular actors. Shards live within clusters and so do their actors.</p>
+    <p class="pagetext">ActorDB is organised into clusters (1,3,5 nodes). There can be as many clusters as you wish. Actors themselves are organised into shards. Logically a shard is a chunk of hash namespace. It is a special type of actor that holds a list of regular actors. Shards live within clusters and so do their actors.</p>
 
-    <p class="pagetext">An actor is a mini fully relational SQL database. It has a master node that processes reads and writes, it has slave nodes on other servers in the cluster that receive writes from master. Writes are replicated using a majority consensus commit. If a server is offline, one of the slaves will automatically become a master for that actor. As long as a majority of servers in a cluster are online, writes will succeed. </p>
+    <p class="pagetext">An actor is a mini fully relational SQL database. It has a leader node that processes reads and writes, it has follower nodes on other servers in the cluster that receive writes from leader. Writes are replicated using the Raft distributed consensus protocol. If a server is offline, one of the followers will automatically become a leader for that actor. As long as a majority of servers in a cluster are online, writes will succeed. </p>
 
-    <p class="pagetext">A single actor is not scalable, it is fast enough. The database as a whole is completely horizontally scalable, because actors are independent of each other.</p>
+    <p class="pagetext">A single actor is not scalable, it is fast enough. A single actor can do thousands of writes per second and tens of thousands of reads. The database as a whole is completely horizontally scalable, because actors are independent of each other.</p>
 
 <hr class="hr14color" />
 
 <h2 id="nodesyny" class="pagesubtitle">3.2 Node synchronisation</h2>
 <h3 id="h_321" class="pagesubtitle">3.2.1 Global state</h3>
     <p class="pagetext">ActorDB is designed around having to do the least possible inter-server synchronisation. That means each server should be as independent as possible and global state and the changing of that global state should be minimised. </p>
-    <p class="pagetext">Everything in ActorDB is an actor. This includes global state. It is a special actor that lives on up to 7 nodes (over multiple clusters). Those 7 nodes maintain strong consistency using Raft distributed consensus. If ActorDB has more than 7 nodes, the rest get their state by periodic pings from current master node.</p>
+    <p class="pagetext">Everything in ActorDB is an actor. This includes global state. It is a special actor that lives on up to 7 nodes (over multiple clusters). Those 7 nodes maintain strong consistency using Raft distributed consensus. If ActorDB has more than 7 nodes, the rest get their state by periodic pings from current leader node.</p>
     <p class="pagetext">Global state for ActorDB:</p>
     <div class="pagetext">
         <ol>
@@ -265,17 +262,19 @@ $(document).ready(function(){
         <ol>
             <li>1. Calculate a hash of actor name.</li>
             <li>2. Check the hash table of shards to find which node that actor lives in.</li>
-            <li>3. Send request to what should be master node.</li>
-            <li>4. If what should be master node is actually not, request will be redirected to the actual master.</li>
+            <li>3. Send request to what should be leader node.</li>
+            <li>4. If what should be leader node is actually not, request will be redirected to the actual leader.</li>
         </ol>
     </div>
+    <p class="pagetext">ActorDB has two distinct engines: SQLite for running SQL queries and LMDB for storage. The SQL engine uses pages to store data (chunks of 4096 bytes). Those pages are not stored to SQLite files, they are stored inside LMDB. We replaced the SQLite WAL implementation with our own, which is actually faster on an individual actor basis then just using SQLite. Unlike regular WAL mode we do not need to checkpoint pages somewhere else later on. Once a page is stored, it is kept where it is. It is also compressed using lz4.</p>
     <p class="pagetext"></p>
-    <p class="pagetext">Actors are replicated using the Raft distributed consensus protocol. The way we have integrated Raft with the database engine is by replicating the WAL (write-ahead log). Every write to the database is an append to WAL. For every append we send that data to the entire cluster to be replicated. Pages are simply inserted to WAL on all nodes. This means the master executes the SQL, but the slaves just append to WAL. </p>
+    <p class="pagetext">Unlike most other databases (especially SQL databases), ActorDB does not require checkpoints from WAL to the main database file. Using LMDB we are able to store pages in an append-only style. This way checkpoints are replaced with cleanups that only free up space for later use.</p>
     <p class="pagetext"></p>
-    <p class="pagetext">If a server is very stale or is added new, ActorDB will first send the base actor file to the new server, then it will send the WAL pages (if there are any). </p>
+    <p class="pagetext">Actors are replicated using the Raft distributed consensus protocol. Raft requires a write log to operate. Because our two engines are connected through the SQLite WAL module, Raft replication is a natural fit. Every write to the database is an append to WAL. For every append we send that data to the entire cluster to be replicated. Pages are simply inserted to WAL on all nodes. This means the leader executes the SQL, but the followers just append to WAL. </p>
     <p class="pagetext"></p>
-    <p class="pagetext">We use a combined WAL file for all actors. This means even with potentially thousands of actors doing writes at the same time, the server will not be appending to thousands of files at once. All writes are appends to the same file and that performs very well. </p>
-    <p class="pagetext">You can even configure the server to use multiple independent hard drives. ActorDB will balance actors across hard drives and they will each have their own write-ahead log.</p>
+    <p class="pagetext">If a server is very stale or is added new, ActorDB will first send the base actor pages to the new server, then it will send the WAL pages (if there are any). </p>
+    <p class="pagetext"></p>
+    <p class="pagetext">You can configure the server to use multiple independent hard drives and ActorDB will balance actors across all of them. This will significantly improve throughput as long as cpu and network are not saturated.</p>
 
     <hr class="hr14colorsmalmargin" />
 <h3 id="h_323" class="pagesubtitle">3.2.3 Multi-actor transactions</h3>
@@ -315,13 +314,11 @@ $(document).ready(function(){
 <p class="pagetext"></p>
 <hr class="hr14color" />
 
-<h2 id="dbengine" class="pagesubtitle">3.3 Database engine</h2>
+<h2 id="dbengine" class="pagesubtitle">3.3 SQL engine</h2>
 
-<p class="pagetext">ActorDB does not reinvent the storage engine. It relies on one of the most well tested and stable pieces of code in use: SQLite</p>
+<p class="pagetext">ActorDB does not reinvent the SQL engine. It relies on one of the most well tested and stable pieces of code in use: SQLite</p>
 
-<p class="pagetext">Remember that SQLite is not itself a separate program. It is a software library which is a part of ActorDB. Running many or just one actor on a server does not make a difference.</p>
-
-<p class="pagetext">Now if you've had experience with SQLite you may be thinking that is a terrible idea. SQLite is not scalable. That is true. SQLite is not scalable, but it is fast if configured to be. Remember that each actor in ActorDB is completely isolated. Every actor is a completely separate sqlite instance. SQLite is not where ActorDB scalability comes from.</p>
+<p class="pagetext">Remember that SQLite is not itself a separate program. It is a software library which is a part of ActorDB. Running many or just one actor on a server does not make a difference. There is no global SQLite lock that blocks one actor from doing work because another is using it.</p>
 
 <p class="pagetext">ActorDB can easily handle thousands of requests per second for a single actor. For our purposes SQLite is an ideal engine.</p>
 
