@@ -233,7 +233,7 @@ $(document).ready(function(){
 actor counters kv
 -- Every KV type must have a table named actors. id and hash are mandatory. 
 -- id is our key, hash is used by ActorDB, val is our data.
-CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)</pre>
+CREATE TABLE actors (id TEXT PRIMARY KEY, hash INTEGER, val INTEGER) WITHOUT ROWID</pre>
             </div>
 
 <p class="pagetext">Important:</p>
@@ -250,15 +250,15 @@ CREATE TABLE actors (id TEXT UNIQUE, hash INTEGER, val INTEGER)</pre>
 actordb> ACTOR counters(mykey);
 actordb (1)> INSERT INTO actors VALUES ('mykey', {{hash(mykey)}}, 42);
 actordb (2)> c
-Rowid: 1, Rows changed: 1
+Rowid: 4, Rows changed: 1
 actordb> ACTOR counters(mykey1);
 actordb (1)> INSERT INTO actors VALUES ('mykey1', {{hash(mykey1)}}, 43);
 actordb (2)> c
-Rowid: 2, Rows changed: 1
+Rowid: 9, Rows changed: 1
 actordb> ACTOR counters(mykey2);
 actordb (1)> INSERT INTO actors VALUES ('mykey2', {{hash(mykey2)}}, 44);
 actordb (2)> c
-Rowid: 1, Rows changed: 1</pre>
+Rowid: 4, Rows changed: 1</pre>
             </div>
 
 
