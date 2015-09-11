@@ -1,3 +1,6 @@
+**0.10.1 - ??**
+- Bugfix netw
+
 **0.10 - 9 Sept 2015**
 - Feature: ActorDB now uses LMDB as a storage engine. SQLite is still the SQL engine. Performace is vastly improved. Old versions are automatically imported. Old files will be left intact. A new file named lmdb will appear in every storage folder and it will contain all data.
 - Feature: Seperate Read/Write threads for improved concurrency.

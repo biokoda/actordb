@@ -31,10 +31,10 @@ actor type2
 CREATE TABLE asdf (id INTEGER PRIMARY KEY AUTOINCREMENT, txt BLOB)
 -- KV type of actor. This means counters is a sharded table across all nodes.
 actor counters kv
-CREATE TABLE actors (id TEXT UNIQUE NOT NULL, hash INTEGER, val INTEGER)
+CREATE TABLE actors (id TEXT PRIMARY KEY, hash INTEGER, val INTEGER) WITHOUT ROWID
 -- Another KV type. This one with a nother sub table. 
 -- Any sub table must use foreign key on actors.id and have "on delete cascade"
 actor filesystem kv
-CREATE TABLE actors (id TEXT UNIQUE NOT NULL, hash INTEGER, size INTEGER)
+CREATE TABLE actors (id TEXT PRIMARY KEY, hash INTEGER, size INTEGER)  WITHOUT ROWID
 CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, fileid TEXT, uid INTEGER, FOREIGN KEY (fileid) REFERENCES actors(id) ON DELETE CASCADE)
 commit
