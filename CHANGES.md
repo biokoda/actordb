@@ -1,5 +1,8 @@
 **0.10.1 - ??**
-- Bugfix netw
+- Bugfix: If api_network_interface was not set, thrift was not listening on all.
+- Bugfix: Cleanup error results in console a bit.
+- Bugfix: Improper error handling of certain kind of invalid read queries.
+
 
 **0.10 - 9 Sept 2015**
 - Feature: ActorDB now uses LMDB as a storage engine. SQLite is still the SQL engine. Performace is vastly improved. Old versions are automatically imported. Old files will be left intact. A new file named lmdb will appear in every storage folder and it will contain all data.
