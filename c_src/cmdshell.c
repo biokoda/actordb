@@ -17,6 +17,8 @@
 #include <readline/history.h>
 #include <curses.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #define READ 0
 #define WRITE 1
 
@@ -139,8 +141,8 @@ int main(int argc, char *argv[])
 	fwrite(buf,strlen(buf),1,comfile);
 	fclose(comfile);
 
-	mknod(pipe_req, S_IFIFO|0666, 0);
-	mknod(pipe_resp, S_IFIFO|0666, 0);
+	mkfifo(pipe_req, 0666);
+	mkfifo(pipe_resp, 0666);
 
 	resp = open(pipe_resp,O_RDONLY | O_NONBLOCK);
 	if (resp == -1)
