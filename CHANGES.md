@@ -1,6 +1,6 @@
-**0.10.1 - ??**
-- Bugfix: If api_network_interface was not set, thrift was not listening on all.
-- Bugfix: Cleanup error results in console a bit.
+**0.10.1 - 11 Sept 2015**
+- Bugfix: If api_network_interface was not set, thrift was not listening on all interfaces.
+- Bugfix: Cleaned up error results in console.
 - Bugfix: Improper error handling of certain kind of invalid read queries.
 
 
