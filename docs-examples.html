@@ -220,103 +220,79 @@ $(document).ready(function(){
         </div>
         <div class="content">
 
-   				   <h1 id="examples" class="pagetitle">6. Examples</h1>
+   				<h1 id="examples" class="pagetitle">6. Examples</h1>
 
+<h2 id="example_webforum" class="pagesubtitle">6.1 File sync</h2>
 
-            <p class="pagetext">Web forums, news sites, blogs and even websites like reddit can all fit within the same basic hierarchical structure.</p>
-
-
-            <div class="structure">
-                <pre class="latomono">
-
-Landing page    -> subsection1 -> article1
-                                                          article2
-                                                          ...
-                            -> subsection2 -> ...
-                            -> ...</pre>
-            </div>
-
-
-
-            <p class="pagetext">Each level is an actor type. Article actors are what gets changed most frequently and where the scalability and concurrency of ActorDB is most important.</p>
-            <p class="pagetext">Landing page contains the current emphasized articles and links to subsections. This is a single actor, but is easily cachable with memcached or varnish.</p>
-            <p class="pagetext">Subsection contains titles, ids and other basic information about articles that belong to it.</p>
-            <p class="pagetext">Articles cointain the article data (text,links) and comments.</p>
-
-            <h2 id="example_webforum" class="pagesubtitle">6.1 Web Forum</h2>
-
-            <p class="pagetext">Actor types: subforums, threads, users.</p>
-            <p class="pagetext">schema.yaml would look like this:</p>
+<p class="pagetext">A perfect use case for ActorDB is a file sync app (Dropbox, EmitCloud, ownCloud,..). A database for a file sync app needs to store:</p>
+<p class="pagetext">
+<ol>
+<li>- a file directory structure for every user,</li>
+<li>- an event log for every user (we will skip this part, its a simple continuous table with an auto increment id),</li>
+<li>- a list of files our users have uploaded (we must run a distributed file system)</li>
+</ol>
+</p>
+<p class="pagetext"></p>
+<p class="pagetext">Schema:</p>
 
 
             <div class="structure">
                 <pre class="latomono">
-user:
-- CREATE TABLE user (id INTEGER PRIMARY KEY, email TEXT, username TEXT, registered_at DATETIME);
-- CREATE TABLE mymessages (id INTEGER PRIMARY KEY, threadid INTEGER);
+-- Users have files and folders. Files always need a parent folder. All folders except root folder have parents.
+actor user
+CREATE TABLE file (id PRIMARY KEY INTEGER, parent INTEGER NOT NULL, name TEXT NULL, fsid TEXT, FOREIGN KEY (parent) REFERENCES dir(id) ON UPDATE CASCADE)
+CREATE TABLE dir (id PRIMERY KEY INTEGER, parent INTEGER, name TEXT NOT NULL, FOREIGN KEY (parent) REFERENCES dir(id) ON UPDATE CASCADE)
 
-thread:
-- CREATE TABLE messages (id INTEGER PRIMARY KEY, txt TEXT, user INTEGER, time DATETIME);
+-- A distributed filesystem is global. Create a kv to store the position of files.
+-- For every file, we also need a table of nodes that store this file.
+actor filesystem kv
+CREATE TABLE actors (id TEXT PRIMARY KEY, hash INTEGER, crc INTEGER NULL, mime TEXT NULL, size INTEGER NULL) WITHOUT ROWID
+CREATE TABLE nodes (id TEXT, node TEXT NOT NULL, FOREIGN KEY(id) REFERENCES actors(id) ON DELETE CASCADE, PRIMARY KEY (id,node)) WITHOUT ROWID
+</pre></div>
 
-subforum:
-- CREATE TABLE threads (id INTEGER PRIMARY KEY, title TEXT, created DATETIME);</pre>
-            </div>
 
+            <!-- <hr class="hr14colorsmalmargin" /> -->
+<p class="pagetext">Tables "file" and "dir" are inside an individual actor. When a user is changing his files and we must store that new info, we do not need to modify giant tables that also contain data for thousands of other users. </p>
+<p class="pagetext">Storing actual files in our system also requires a database. At least we must keep track which servers have those files. It is also ideal if we can avoid storing the same file more than once. Using the above schema for our filesystem does just that. If our file ID is SHA of the actual file, we do not need to store a file more than once.</p>
+<p class="pagetext"></p>
 
-            <hr class="hr14colorsmalmargin" />
-
-            <h3 class="pagesubtitle">create new thread query:</h3> 
+            <h3 class="pagesubtitle">Queries:</h3> 
             
+<p class="pagetext">User uploads a new file, we calculated the file SHA during upload. Check if it already exists:</p>
+
+<div class="structure">
+<pre class="latomono">
+ACTOR filesystem(MYSHA);
+SELECT * FROM actors WHERE id='MYSHA';
+</pre>
+</div>
 
 
-            <div class="structure">
-                <pre class="latomono">
-ACTOR thread({{uniqid.threadid}}) create;
-INSERT INTO messages VALUES ({{uniqid.msgid}}, 'txt', _userid_, datetime('now'));
-ACTOR user(_userid_);
-INSERT INTO mymessages VALUES ({{uniqid.msgid}},{{uniqid.threadid}});
-ACTOR subforum(_subforumid_);
-INSERT INTO threads VALUES ({{uniqid.threadid}},'Thread title',datetime('now'))</pre>
-            </div>
+<p class="pagetext">If no result, we can create a transaction:</p>
+
+<div class="structure">
+<pre class="latomono">
+ACTOR filesystem(MYSHA);
+INSERT OR REPLACE INTO actors VALUES ('MYSHA',{{hash(MYSHA)}}, 123, "text/plain", 123456);
+INSERT OR REPLACE INTO nodes VALUES ('MYSHA', 'myserver1'), ('MYSHA','myserver2'), ('MYSHA','myserver3');
+ACTOR user(MYUSER);
+INSERT INTO files VALUES (1,2, "myfile.txt", 'MYSHA');
+</pre>
+</div>
 
 
-            <p class="pagetext">This query is sent to ActorDB in a single call. Activities line by line:</p>
-            <p class="pagetext">
-                <ol>
-<li>1. Create an actor of type thread with a generated unique integer id named threadid. ACTOR command will either create an actor if it does not exist or switch to that actor and cause all sql statements to be sent to that actor until next ACTOR command.</li>
-<li>2. Insert first message into thread.</li>
-<li>3. Switch to actor with a known id userid of type user.</li>
-<li>4. Insert msg id into his own table of messages.</li>
-<li>5. Switch to subforum actor.</li>
-<li>6. Insert new thread.</li>
-                </ol>
-            </p>
+<p class="pagetext">We use insert or replace because in the rare event of the same file being uploaded at the exact same time, our transaction does not fail. After transaction is complete and file is uploaded, the individual servers storing it can check if they won the race.</p>
 
-            <hr class="hr14colorsmalmargin" />
+<p class="pagetext">Renaming a file:</p>
 
-            <h3 class="pagesubtitle">read thread</h3> 
+<div class="structure">
+<pre class="latomono">
+ACTOR user(MYUSER);
+UPDATE file SET name='newname' WHERE id=1;
+</pre>
+</div>
 
-
-            <div class="structure">
-                <pre class="latomono">
-ACTOR thread(_threadid_);
-SELECT * FROM messages LIMIT 30;</pre>
-            </div>
-
-            
-            <hr class="hr14colorsmalmargin" />
-
-           <h3 class="pagesubtitle">post message to existing thread</h3> 
-            
-
-            <div class="structure">
-                <pre class="latomono">
-ACTOR thread(_threadid_);
-INSERT INTO messages VALUES ({{uniqid.msgid}},'I disagree because of reasons.',_userid_,datetime('now'));
-ACTOR user(_userid_)
-INSERT INTO mymessages VALUES ({{uniqid.msgid}},_threadid_);</pre>
-            </div>
-
+<p class="pagetext">And so on.</p>
 
 <div class="pageactions">
     <span class="goleft"><a href="docs-kvstore.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(5. Key/Value store)</span>
