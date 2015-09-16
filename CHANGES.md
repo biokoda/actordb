@@ -1,7 +1,8 @@
-**0.10.2 - ?? Sept 2015**
+**0.10.2 - 16 Sept 2015**
 - Bugfix: Actor statement parsing could read wrong actor type.
 - Bugfix: PRAGMA list on kv types did not work.
 - Bugfix: Integer overflow in driver. 
+- Bugfix: Some write results could be ignored if write delays happen.
 
 
 **0.10.1 - 11 Sept 2015**
