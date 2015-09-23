@@ -12,7 +12,11 @@
 
 ## Enable kernel poll and a few async threads
 +K true
-##+A 5
+## This assumes a single disk. 3 per disk is enough.
++A 3
+
+## Bind schedulers to cores: http://www.erlang.org/doc/man/erl.html#+sbt
++stbt db
 
 ## Increase number of concurrent ports/sockets
 -env ERL_MAX_PORTS 65536
