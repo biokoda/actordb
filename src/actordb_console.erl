@@ -33,9 +33,6 @@ delim() ->
 
 main(Args) ->
 	register(home,self()),
-	{ok,Comfile} = file:read_file("/tmp/comfile"),
-	[Req,Resp] = binary:split(Comfile,<<"\n">>),
-	file:delete("/tmp/comfile"),
 	case os:type() of
 		{win32,_} ->
 			spawn(fun() -> (catch wxrun()),halt(1) end),
@@ -45,6 +42,9 @@ main(Args) ->
 		% 	spawn(fun() -> (catch wxrun()),halt(1) end),
 		% 	P = parse_args(#dp{env = wx}, Args);
 		_ ->
+			{ok,Comfile} = file:read_file("/tmp/comfile"),
+			[Req,Resp] = binary:split(Comfile,<<"\n">>),
+			file:delete("/tmp/comfile"),
 			ReqPipe = open_port(binary_to_list(Req), [in,eof,binary]),
 			RespPipe = open_port(binary_to_list(Resp), [out,eof,binary]),
 			P = setpw(parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args))
