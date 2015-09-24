@@ -131,6 +131,8 @@ parse_args(P,["-u",Username|T]) ->
 % 	parse_args(P#dp{password = prompt},T);
 parse_args(P,["-w"|T]) ->
 	parse_args(P#dp{wait = true},T);
+parse_args(P,["-"++_|T]) ->
+	parse_args(P,T);
 parse_args(P,[Addr]) ->
 	case string:tokens(Addr,":") of
 		[Address,Port] ->

@@ -1,3 +1,10 @@
+**0.10.3 - 24 Sept 2015**
+- Bugfix: When deleting actor, some data was left behind.
+- Bugfix: Backup fix for lmdb. 
+- Bugfix: Some vm.args changes that result in better erlang efficiency.
+- Bugfix: actordb_console ignore invalid flags. 
+
+
 **0.10.2 - 16 Sept 2015**
 - Bugfix: Actor statement parsing could read wrong actor type.
 - Bugfix: PRAGMA list on kv types did not work.
