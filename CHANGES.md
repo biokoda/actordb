@@ -1,3 +1,8 @@
+**0.10.4 - ??? 2015**
+- Bugfix: Batching writes to an actor is much improved.
+- Bugfix: sql parsing bug on insanely written sEleCT statements
+
+
 **0.10.3 - 24 Sept 2015**
 - Bugfix: When deleting actor, some data was left behind.
 - Bugfix: Backup fix for lmdb. 
