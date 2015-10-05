@@ -2,6 +2,7 @@
 - Bugfix: Batching writes to an actor is much improved.
 - Bugfix: sql parsing bug on insanely written sEleCT statements
 - Bugfix: Thrift interface returned error when doing multiple inserts using a single parameterized query.
+- Bugfix: On SQL error thrift interface was not returning the sql error code.
 
 
 **0.10.3 - 24 Sept 2015**
