@@ -33,7 +33,7 @@ cfg(Args) ->
 		["multicluster"|_] ->
 			Nodes = [?ND1,?ND2,?ND3,?ND4];
 			% Groups = ?TWOGRPS([?ND1,?ND2],[?ND3,?ND4]);
-		[TT|_] when TT == "addthentake"; TT == "addcluster"; TT == "endless2" ->
+		[TT|_] when TT == "addthentake"; TT == "addcluster"; TT == "endless2"; TT == "queue" ->
 			Nodes = [?ND1,?ND2];
 			% Groups = ?ONEGRP(Nodes);
 		{Nodes,_Groups} ->
@@ -129,6 +129,16 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 			ok
 	end,
 	basic_write(Ndl);
+run(Param,"queue") ->
+	Nd1 = butil:ds_val(node1,Param),
+	Nd2 = butil:ds_val(node2,Param),
+	Ndl = [Nd1,Nd2],
+	{ok,_} = rpc:call(Nd1,actordb_config,exec,[init(Ndl,"queue")],3000),
+	timer:sleep(100),
+	{ok,_} = rpc:call(Nd1,actordb_config,exec_schema,[schema1()],3000),
+	ok = wait_tree(Nd1,10000),
+	rpc:call(Nd1,actordb_test,q_test,[20,3000]),
+	ok;
 run(Param,"partitions") ->
 	Nd1 = butil:ds_val(node1,Param),
 	Nd2 = butil:ds_val(node2,Param),
@@ -407,7 +417,7 @@ usr() ->
 	"CREATE USER 'root' IDENTIFIED BY 'rootpass'".
 
 init(Ndl,TT) when TT == "single"; TT == "cluster"; TT == "addthentake"; TT == "addcluster"; TT == "endless2";
-		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; TT == "remnode"; TT == "partitions" ->
+		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; TT == "remnode"; TT == "partitions"; TT == "queue" ->
 	[grp(1),nds(Ndl,1),usr()];
 init([N1,N2,N3,N4],"multicluster") ->
 	[grp(1),grp(2),nds([N1,N2],1),nds([N3,N4],2),usr()].
