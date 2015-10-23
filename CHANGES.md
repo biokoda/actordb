@@ -1,3 +1,8 @@
+**0.10.5 - ???**
+- Feature: Add state table to config. This is to store various config items like schema version.
+- Bugfix: If {{RESULT}} was present in a multiactor write, query was wrongly interpreted as a read and failed when executing. 
+
+
 **0.10.4 - 5 Oct 2015**
 - Bugfix: Batching writes to an actor is much improved.
 - Bugfix: sql parsing bug on insanely written sEleCT statements.
