@@ -1,6 +1,7 @@
 **0.10.5 - ???**
 - Feature: Add state table to config. This is to store various config items like schema version.
 - Bugfix: If {{RESULT}} was present in a multiactor write, query was wrongly interpreted as a read and failed when executing. 
+- Bugfix: Invalid return result on pragma delete statements. Causing thrift to return error when in fact everything was ok.
 
 
 **0.10.4 - 5 Oct 2015**

@@ -434,10 +434,12 @@ print_help(#dp{curdb = config} = P) ->
 	Usr = "CREATE USER 'myuser' IDENTIFIED BY 'mypass'\n",
 	Usrg = "GRANT read,write ON * to 'myuser'\n",
 	U = "For user account management:\n"++Usr++Usrg,
-	E = "To create/modify servers, run inserts to these tables: \n",
-	G = "CREATE TABLE groups (name TEXT, type TEXT DEFAULT 'cluster');\n",
-	N = "CREATE TABLE nodes (name TEXT, group_name TEXT);\n",
-	print(P,delim()++U++delim()++E++G++N++delim());
+	E = "To create/modify servers, run inserts to these tables: \n"++
+		"CREATE TABLE groups (name TEXT, type TEXT DEFAULT 'cluster');\n"++
+		"CREATE TABLE nodes (name TEXT, group_name TEXT);\n",
+	N = "(optional) To store varius configuration info you can use:\n"++
+		"CREATE TABLE state (id TEXT, val);\n",
+	print(P,delim()++U++delim()++E++delim()++N++delim());
 print_help(#dp{curdb = schema} = P) ->
 	S = "actor type1; CREATE TABLE tab (id INTEGER PRIMARY KEY, val TEXT);\n",
 	R = "WARNING: Schema is not overwritten but appended.\n"++

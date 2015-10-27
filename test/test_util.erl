@@ -54,7 +54,7 @@ multiupdate_write(Ndl) ->
 					{rows,[{1,<<"a1">>,10}]}]},
 		exec(Ndl,["actor thread(second);select * from thread;"])),
 	?debugFmt("multiupdates fail",[]),
-	?assertMatch(abandoned,exec(Ndl,["actor thread(first) create;",
+	?assertMatch({error,abandoned},exec(Ndl,["actor thread(first) create;",
 		"update thread set msg='a3' where id=1;",
 		"actor thread(second) create;",
 		"update thread set msg='a3' where i=2;"])),
@@ -77,7 +77,7 @@ multiupdate_write(Ndl) ->
 	?debugFmt("multiupdates delete actors",[]),
 	?assertMatch({ok,{changes,0,5}},exec(Ndl,["actor type1(ac100,ac99,ac98,ac97,ac96);PRAGMA delete;"])),
 	?debugFmt("Deleting individual actor",[]),
-	?assertMatch(ok,exec(Ndl,["actor type1(ac95);PRAGMA delete;"])),
+	?assertMatch({ok,{changes,_,_}},exec(Ndl,["actor type1(ac95);PRAGMA delete;"])),
 
 	?debugFmt("multiupdates creating thread",[]),
 	?assertMatch({ok,{changes,_,_}},exec(Ndl,["actor thread(1) create;",
