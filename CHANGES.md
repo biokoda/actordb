@@ -1,9 +1,9 @@
 **0.10.5 - ???**
 - Feature: Add state table to config. This is to store various config items like schema version.
 - Feature: actordb_console flag: -q "select ...." to run single queries and exit.
-- Feature: actordb_console flag: -print <default|min|csv|csvh> to actordb_console.
+- Feature: actordb_console flag: -print < default|min|csv|csvh > to actordb_console.
 - Feature: actordb_console flag: -pw to set password directly (instead of being prompted).
-- Feature: actordb_console flag: -use <actordb|config|schema> which db to use by default.
+- Feature: actordb_console flag: -use < actordb|config|schema > which db to use by default.
 - Feature: actordb_console flag: -noshell for use with -q, recommended but not required.
 - Bugfix: If {{RESULT}} was present in a multiactor write, query was wrongly interpreted as a read and failed when executing. 
 - Bugfix: Invalid return result on pragma delete statements. Causing thrift to return error when in fact everything was ok.
