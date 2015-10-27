@@ -25,6 +25,8 @@
 // gcc c_src/cmdshell.c -I/usr/local/Cellar/readline/6.3.8/include/ /usr/local/Cellar/readline/6.3.8/lib/libreadline.a -lncurses  -o cmdshell
 
 char running=1;
+char havestdin=1;
+char doshell=1;
 int infp, outfp;
 int req = 0, resp = 0;
 const char *prompt = "actordb> ";
@@ -85,7 +87,8 @@ static void rl_handler(char* line)
 {
 	if (line == NULL)
 	{
-		running = 0;
+		// running = 0;
+		havestdin = 0;
 		return;
 	}
 	if (strlen(line) > 1)
@@ -120,7 +123,7 @@ int main(int argc, char *argv[])
 	signal(SIGCHLD, proc_exit);
 	signal(SIGQUIT, stop);
 	signal(SIGINT, stop);
-	int nread = 0, sread = 0;
+	int nread = 0, sread = 0, i;
 	char buf[1024*64];
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -131,6 +134,13 @@ int main(int argc, char *argv[])
 		printf("Missing program to execute\n");
 		return 0;
 	}
+
+	for (i = 1; i < argc; i++)
+	{
+		if (strcmp(argv[i],"-noshell") == 0)
+			doshell = 0;
+	}
+
 
 	mytime = tv.tv_sec*1000 + (tv.tv_usec / 1000);
 	snprintf(pipe_req,125,"/tmp/actordb.%llu.req",mytime);
@@ -163,23 +173,49 @@ int main(int argc, char *argv[])
 		printf("Unable to open req pipe\n");
 		goto finished;
 	}
-	rl_callback_handler_install(prompt, &rl_handler);
+	if (doshell)
+		rl_callback_handler_install(prompt, &rl_handler);
 
 	while (running)
 	{
 		int rc;
 		fd_set fdread;
 		FD_ZERO(&fdread);
-		FD_SET(STDIN_FILENO, &fdread);
+		if (havestdin)
+			FD_SET(STDIN_FILENO, &fdread);
 		FD_SET(resp, &fdread);
 
 		rc = select(resp+1, &fdread, NULL, NULL, NULL);
 		if (!running)
 			break;
 
-		if (FD_ISSET(STDIN_FILENO, &fdread))
+		if (havestdin && FD_ISSET(STDIN_FILENO, &fdread))
 		{
-			rl_callback_read_char();
+			if (doshell)
+				rl_callback_read_char();
+			else
+			{
+				char line[256];
+				memset(line,0,sizeof(line));
+				fgets(line,sizeof(line),fdopen(STDIN_FILENO,"r"));
+				for (i = 0; line[i] != 0 && i < sizeof(line); i++)
+				{
+					if (line[i] == '\n')
+					{
+						line[i] = 0;
+						break;
+					}
+				}
+
+				if (line[0] == 0)
+				{
+					havestdin = 0;
+				}
+				else if (write(req, line, strlen(line)) < 0)
+				{
+					havestdin = 0;
+				}
+			}
 		}
 		else if (FD_ISSET(resp, &fdread))
 		{

@@ -29,7 +29,8 @@ delim() ->
 % config - for adding groups and nodes
 % schema - for changing schema
 -record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = [], wait = false,
-	addr = "127.0.0.1", port = 33306, username = "", password = "", filebin}).
+	addr = "127.0.0.1", port = 33306, username = "", 
+	password = "", execute, timeout_after = infinity, print, noshell = false}).
 
 main(Args) ->
 	register(home,self()),
@@ -50,21 +51,33 @@ main(Args) ->
 			P = setpw(parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args))
 	end,
 	dologin(P),
-	% print(P,"SALT=~p",[actordb_client:salt()]),
-	case P#dp.filebin of
+	case P#dp.execute of
 		undefined ->
-			% port_command(RespPipe, [?COMMANDS,<<"\r\n">>]),
-			print(P,?COMMANDS),
-			dopipe(P);
-		_ ->
-			cmd_lines(P,binary:split(P#dp.filebin,<<"\n">>,[global])),
-			halt(1)
+			case P#dp.curdb of
+				actordb ->
+					print(P,?COMMANDS),
+					dopipe(P);
+				_ ->
+					change_prompt(P),
+					print(P,?COMMANDS),
+					dopipe(P)
+			end;
+		{script,Bin} ->
+			cmd_lines(P,binary:split(Bin,<<"\n">>,[global])),
+			halt(1);
+		{qry,Q} ->
+			cmd(P#dp{timeout_after = 2000},list_to_binary(Q))
 	end.
 
 setpw(#dp{password = prompt} = P) ->
-	print(P,"~~~~getpass"),
-	Pw = dopipe(P),
-	P#dp{password = Pw};
+	case dopipe(P#dp{timeout_after = 50}) of
+		timeout ->
+			print(P,"~~~~getpass"),
+			Pw = dopipe(P),
+			P#dp{password = Pw};
+		Pw ->
+			P#dp{password = Pw}
+	end;
 setpw(P) ->
 	P.
 
@@ -114,23 +127,49 @@ rem_spaces(X) ->
 
 parse_args(P,["-h"|_]) ->
 	L = "Flags:\n"++
-	"  -h            Print this help and exit.\n"++
-	"  -u <username> Set username. You will be prompted for password. Not required if ActorDB is uninitalized.\n"++
-	"  -f <file>     Execute statements from file and exit.\n",
+	"  -h                   Print this help and exit.\n"++
+	"  -u   <username>      Set username. You will be prompted for password. Not required if ActorDB is uninitalized.\n"++
+	"  -pw  <password>      Set login password (optional). This will avoid the prompt.\n"++
+	"  -f   <file>          Execute statements from file and exit.\n"++
+	"  -use <database>      actordb (def), config or schema.\n"++
+	"  -q   \"query\"         Execute query and exit.\n"++
+	"  -noshell             Do not create a shell. Useful when running queries with -q.\n"++
+	"  -print <default|min|csv|csvh>\n",
 	% "  -w   wait for commit to send query to actordb\n",
 	print(P,"Call with: actordb_console -u username IP[:ThriftPort]\n"++L),
 	halt(1);
 parse_args(P,["-f",File|T]) ->
 	{ok,F} = file:read_file(File),
-	parse_args(P#dp{filebin = F},T);
+	parse_args(P#dp{execute = {script,F}},T);
 parse_args(P,["-u",Username|T]) ->
-	parse_args(P#dp{username = Username, password = prompt},T);
-% parse_args(P,["-p",Password|T]) ->
-% 	parse_args(P#dp{password = Password},T);
-% parse_args(P,["-p"|T]) ->
-% 	parse_args(P#dp{password = prompt},T);
+	case P#dp.password of
+		[_|_] ->
+			parse_args(P#dp{username = Username},T);
+		_ ->
+			parse_args(P#dp{username = Username, password = prompt},T)
+	end;
+parse_args(P,["-use",A|T]) when A == "a"; A == "actordb"; A == "actor" ->
+	parse_args(P#dp{curdb = actordb},T);
+parse_args(P,["-use",A|T]) when A == "c"; A == "config" ->
+	parse_args(P#dp{curdb = config},T);
+parse_args(P,["-use",A|T]) when A == "s"; A == "schema" ->
+	parse_args(P#dp{curdb = schema},T);
+parse_args(P,["-q",Q|T]) ->
+	parse_args(P#dp{execute = {qry, Q}, wait = false},T);
+parse_args(P,["-pw",Password|T]) ->
+	parse_args(P#dp{password = Password},T);
 parse_args(P,["-w"|T]) ->
 	parse_args(P#dp{wait = true},T);
+parse_args(P,["-print", "min"|T]) ->
+	parse_args(P#dp{print = min},T);
+parse_args(P,["-print", "csv"|T]) ->
+	parse_args(P#dp{print = csv},T);
+parse_args(P,["-print", "csvh"|T]) ->
+	parse_args(P#dp{print = csvh},T);
+parse_args(P,["-print", _|T]) ->
+	parse_args(P,T);
+parse_args(P,["-noshell"|T]) ->
+	parse_args(P#dp{noshell = true},T);
 parse_args(P,["-"++_|T]) ->
 	parse_args(P,T);
 parse_args(P,[Addr]) ->
@@ -140,6 +179,8 @@ parse_args(P,[Addr]) ->
 		[Address] ->
 			P#dp{addr = Address}
 	end;
+parse_args(P,[]) when P#dp.noshell, P#dp.execute == undefined ->
+	halt(1);
 parse_args(P,[]) ->
 	P.
 
@@ -298,6 +339,8 @@ cmd_actor(P,_,Bin) ->
 
 cmd_insert(#dp{curdb = actordb, wait = false} = P,_,Bin) ->
 	send_query(P,Bin);
+cmd_insert(#dp{curdb = config, wait = false} = P, _, Bin) ->
+	send_cfg_query(P,Bin);
 cmd_insert(P,_,Bin) ->
 	append(P,Bin).
 
@@ -308,6 +351,8 @@ cmd_usermng(P,_,_) ->
 
 cmd_update(#dp{curdb = actordb, wait = false} = P,_,Bin) ->
 	send_query(P,Bin);
+cmd_update(#dp{curdb = config, wait = false} = P,_,Bin) ->
+	send_cfg_query(P,Bin);
 cmd_update(P,_,Bin) ->
 	append(P,Bin).
 
@@ -450,6 +495,7 @@ print_help(#dp{curdb = schema} = P) ->
 dopipe(#dp{stop = true}) ->
 	ok;
 dopipe(#dp{env = wx} = P) ->
+	After = P#dp.timeout_after,
 	receive
 		{login,U,Pw} ->
 			NP = P#dp{username = U, password = Pw},
@@ -466,8 +512,11 @@ dopipe(#dp{env = wx} = P) ->
 					print(P,io_lib:fwrite("~p",[X])),
 					dopipe(P)
 			end
+	after After ->
+		timeout
 	end;
 dopipe(P) ->
+	After = P#dp.timeout_after,
 	receive
 		{_, {data, Data}} ->
 			Line = string:tokens(binary_to_list(Data),"\n"),
@@ -490,6 +539,8 @@ dopipe(P) ->
 		X ->
 			port_command(P#dp.resp, [io_lib:fwrite("~p",[X]),<<"\n">>]),
 			io:format("Received ~p~n",[X])
+	after After ->
+		timeout
 	end.
 
 -record(wc,{wx, dlg, input, disp, prompt = ?PROMPT,history_pos = 0,current = "",history = []}).
@@ -710,11 +761,39 @@ map_print(M) when is_list(M) ->
 	map_print(#dp{env = test},M);
 map_print(M) ->
 	map_print([M]).
+map_print(#dp{print = Pr} = P,[]) when Pr /= undefined ->
+	P;
 map_print(P,[]) ->
 	print(P,"No results.");
+map_print(#dp{print = min} = P,L) ->
+	Str = [begin
+		ML = lists:keysort(1,[{atom_to_list(K),V} || {K,V} <- maps:to_list(M)]),
+		[butil:iolist_join([to_unicode(V) || {_,V} <- ML],"|")]
+	end || M <- L],
+	print(P,butil:iolist_join(Str,"\n")),
+	P;
+map_print(#dp{print = Csv} = P,L) when Csv == csv; Csv == csvh ->
+	Str = [begin
+		ML = lists:keysort(1,[{atom_to_list(K),V} || {K,V} <- maps:to_list(M)]),
+		[butil:iolist_join([quote(V) || {_,V} <- ML],",")]
+	end || M <- L],
+	case Csv of
+		csvh ->
+			Keys = lists:sort([atom_to_list(K) || K <- maps:keys(hd(L))]),
+			print(P,butil:iolist_join(Keys,","));
+		_ ->
+			ok
+	end,
+	print(P,butil:iolist_join(Str,"\n")),
+	P;
 map_print(P,M) ->
 	Keys = maps:keys(hd(M)),
 	map_print(P,Keys,M,[]).
+
+quote(X) when is_list(X); is_binary(X) ->
+	[$\",to_unicode(re:replace(X, "\"", "\"\"", [global, unicode,{return,list}])),$\"];
+quote(X) ->
+	to_unicode(X).
 
 to_unicode(B) when is_binary(B) ->
 	unicode:characters_to_list(B);
