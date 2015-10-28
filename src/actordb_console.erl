@@ -170,14 +170,15 @@ parse_args(P,["-print", _|T]) ->
 	parse_args(P,T);
 parse_args(P,["-noshell"|T]) ->
 	parse_args(P#dp{noshell = true},T);
-parse_args(P,["-"++_|T]) ->
+parse_args(P,["-"++Something|T]) ->
+	print(P,"Unrecognized option: ~s",["-"++Something]),
 	parse_args(P,T);
-parse_args(P,[Addr]) ->
+parse_args(P,[Addr|T]) ->
 	case string:tokens(Addr,":") of
 		[Address,Port] ->
-			P#dp{addr = Address, port = list_to_integer(Port)};
+			parse_args(P#dp{addr = Address, port = list_to_integer(Port)},T);
 		[Address] ->
-			P#dp{addr = Address}
+			parse_args(P#dp{addr = Address},T)
 	end;
 parse_args(P,[]) when P#dp.noshell, P#dp.execute == undefined ->
 	halt(1);
