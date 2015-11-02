@@ -1,3 +1,6 @@
+**0.10.6 - 2 Nov 2015**
+- Bugfix: Initialization with actordb_console -f "path/to/file.sql" fixed. Bug was created in 0.10.5.
+
 **0.10.5 - 28 Oct 2015**
 - Feature: Add state table to config. This is to store various config items like schema version.
 - Feature: actordb_console flag: -q "select ...." to run single queries and exit.
