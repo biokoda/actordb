@@ -28,7 +28,7 @@ delim() ->
 % actordb - default can run queries directly
 % config - for adding groups and nodes
 % schema - for changing schema
--record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = [], wait = false,
+-record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = [], wait = true,
 	addr = "127.0.0.1", port = 33306, username = "", 
 	password = "", execute, timeout_after = infinity, print, noshell = false}).
 
