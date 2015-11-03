@@ -66,6 +66,7 @@ enum ErrorCode {
   MissingRootUser = 12,       // When creating a cluster, if no root user was specified
   LoginFailed     = 13,       // Username and/or password was incorrect
   NotInitialized  = 14,       // Query before actordb initialized
+  NoCreate        = 15,       // Query without create flag was attempted on an actor which does not exist.
   Error = 100                 // Unknown error
 }
 
