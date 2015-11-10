@@ -1,6 +1,7 @@
 **0.10.7 - ??**
 - Bugfix: Cleaner handling of nocreate error (trying to execute on an actor that does not exist without create flag).
 - Bugfix: Updating schema for an actor failed. Bug in schema check before updating.
+- Bugfix: For certain types of rare sql execute errors, sqlite statement may not have been cleaned up.
 
 
 **0.10.6 - 2 Nov 2015**
