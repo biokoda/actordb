@@ -8,7 +8,7 @@ namespace rb ActordbThrift
 namespace erl adbt
 namespace go actordb
 
-const string VERSION = "1.2.0"
+const string VERSION = "1.3.0"
 
 union Val
 {
@@ -18,7 +18,8 @@ union Val
   4: double real,
   5: bool bval,
   6: string text,
-  7: bool isnull
+  7: bool isnull,
+  8: binary bin
 }
 
 struct ReadResult
