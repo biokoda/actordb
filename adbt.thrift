@@ -19,7 +19,7 @@ union Val
   5: bool bval,
   6: string text,
   7: bool isnull,
-  8: binary bin
+  8: binary blob
 }
 
 struct ReadResult

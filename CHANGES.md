@@ -1,3 +1,8 @@
+**0.10.8 - ??**
+- Bugfix: Schema was updated right after a read to an actor instead of before.
+- Feature: Added blob to thrift value type. Somehow we managed to forget about it.
+
+
 **0.10.7 - 10 Nov 2015**
 - Bugfix: Cleaner handling of nocreate error (trying to execute on an actor that does not exist without create flag).
 - Bugfix: Updating schema for an actor failed. Bug in schema check before updating.
