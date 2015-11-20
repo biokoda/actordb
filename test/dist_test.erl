@@ -431,7 +431,7 @@ usr() ->
 
 init(Ndl,TT) when TT == "single"; TT == "cluster"; TT == "addthentake"; TT == "addcluster"; TT == "endless2";
 		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; 
-		TT == "remnode"; TT == "partitions"; TT == "queue"; TT == "checkredirect" ->
+		TT == "remnode"; TT == "partitions"; TT == "queue"; TT == "checkredirect"; TT == "missingnode" ->
 	[grp(1),nds(Ndl,1),usr()];
 init([N1,N2,N3,N4],"multicluster") ->
 	[grp(1),grp(2),nds([N1,N2],1),nds([N3,N4],2),usr()].
