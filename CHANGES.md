@@ -1,4 +1,4 @@
-**0.10.8 - ??**
+**0.10.8 - 20 Nov 2015**
 - Bugfix: Schema was updated right after a read to an actor instead of before.
 - Bugfix: When actor moves to a new shard, replace original actor database with redirect marker. This way we do not waste space.
 - Feature: Added blob to thrift value type. Somehow we managed to forget about it.
