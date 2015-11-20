@@ -19,36 +19,29 @@ numactors() ->
 -define(ND3,[{name,node3},{rpcport,50003}]).
 -define(ND4,[{name,node4},{rpcport,50004}]).
 -define(ND5,[{name,node5},{rpcport,50005}]).
-% -define(ONEGRP(XX),[[{name,"grp1"},{nodes,[butil:ds_val(name,Nd) || Nd <- XX]}]]).
-% -define(TWOGRPS(X,Y),[[{name,"grp1"},{nodes,[butil:ds_val(name,Nd) || Nd <- X]}],
-% 					  [{name,"grp2"},{nodes,[butil:ds_val(name,Nd) || Nd <- Y]}]]).
 
 %{erlcmd,"../otp/bin/cerl -valgrind"},{erlenv,[{"VALGRIND_MISC_FLAGS","-v --leak-check=full --tool=memcheck --track-origins=no  "++
 %                                       "--suppressions=../otp/erts/emulator/valgrind/suppress.standard --show-possibly-lost=no"}]}
 cfg(Args) ->
 	case Args of
-		[TT|_] when TT == "single"; TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql" ->
+		[TT|_] when TT == "single"; TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; TT == "checkredirect" ->
 			Nodes = [?ND1];
-			% Groups = ?ONEGRP(Nodes);
 		["multicluster"|_] ->
 			Nodes = [?ND1,?ND2,?ND3,?ND4];
-			% Groups = ?TWOGRPS([?ND1,?ND2],[?ND3,?ND4]);
 		[TT|_] when TT == "addthentake"; TT == "addcluster"; TT == "endless2"; TT == "queue" ->
 			Nodes = [?ND1,?ND2];
-			% Groups = ?ONEGRP(Nodes);
 		{Nodes,_Groups} ->
 			ok;
 		[] = Nodes ->
 			io:format("ERROR:~n"),
 			io:format("No test type provided. Available tests: "++
-			"single, cluster, multicluster, mysql, addsecond, missingnode, addthentake, addcluster, failednodes,"++
+			"single, cluster, multicluster, mysql, addsecond, missingnode, addthentake, addcluster, failednodes, checkredirect, "++
 			"endless1, endless2, addclusters~n~n"),
 			throw(noparam);
 		["partitions"] ->
 			Nodes = [?ND1,?ND2,?ND3,?ND4,?ND5];
 		_ ->
 			Nodes = [?ND1,?ND2,?ND3]
-			% Groups = ?ONEGRP(Nodes)
 	end,
 	[
 		% these dtl files get nodes value as a parameter and whatever you add here.
@@ -254,6 +247,26 @@ run(Param,"mysql" = TType) ->
 	io:format("Res:~p~n",[emysql:execute(pool,"actor type1(emysql);select * from sqlite_sequence;")]),
 	io:format("mysql: ~p~n",[mysql:query(Pid,"actor type1(emysql);select * from tabau;")]),
 	ok;
+run(Param,"checkredirect" = TType) ->
+	[Nd1,Path] = butil:ds_vals([node1,path],Param),
+	Ndl = [Nd1],
+	{ok,_} = rpc:call(Nd1,actordb_config,exec,[init(Ndl,TType)],3000),
+	timer:sleep(100),
+	{ok,_} = rpc:call(Nd1,actordb_config,exec_schema,[schema1()],3000),
+	ok = wait_tree(Nd1,10000),
+	basic_write(Ndl),
+
+	% Add second node
+	Nd2 = detest:add_node(?ND2),
+	% Configure it in its own cluster
+	{ok,_} = rpc:call(Nd1,actordb_config,exec,[iolist_to_binary([grp(2), nds([Nd2],2)])],3000),
+	ok = wait_modified_tree(Nd2,[Nd1,Nd2],30000),
+	basic_write(Ndl),
+	NoopRes = [rpc:call(Nd1,actordb_sqlproc,call, [{<<"ac",(butil:tobin(N))/binary>>,type1},[],noop,actordb_actor,onlylocal]) || N <- lists:seq(1,100)],
+	Redirect = [ok || {redirect, _} <- NoopRes],
+	true = length(Redirect) > length(NoopRes)*0.3,
+	lager:info("Moved actors=~p, out of total=~p",[length(Redirect), length(NoopRes)]),
+	ok;
 run(Param,"addsecond" = TType) ->
 	[Nd1,Path] = butil:ds_vals([node1,path],Param),
 	Ndl = [Nd1],
@@ -417,7 +430,8 @@ usr() ->
 	"CREATE USER 'root' IDENTIFIED BY 'rootpass'".
 
 init(Ndl,TT) when TT == "single"; TT == "cluster"; TT == "addthentake"; TT == "addcluster"; TT == "endless2";
-		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; TT == "remnode"; TT == "partitions"; TT == "queue" ->
+		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; 
+		TT == "remnode"; TT == "partitions"; TT == "queue"; TT == "checkredirect" ->
 	[grp(1),nds(Ndl,1),usr()];
 init([N1,N2,N3,N4],"multicluster") ->
 	[grp(1),grp(2),nds([N1,N2],1),nds([N3,N4],2),usr()].
