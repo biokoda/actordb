@@ -1,3 +1,7 @@
+**0.10.9 - 21 Nov 2015**
+- Bugfix: If actor was inactive and schema was updated during, it might not update it on next start.
+
+
 **0.10.8 - 20 Nov 2015**
 - Bugfix: Schema was updated right after a read to an actor instead of before.
 - Bugfix: When actor moves to a new shard, replace original actor database with redirect marker. This way we do not waste space.
