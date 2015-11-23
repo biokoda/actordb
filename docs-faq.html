@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head prefix="og: http://ogp.me/ns#">
+        <!--<meta charset="utf-8">-->
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>ActorDB | Documentation</title>        
+        <meta name="description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors.">
+        <meta name="viewport" content="width=device-width">
+        <meta property="og:title" content="ActorDB | Documentation" />
+        <meta property="og:description" content="ActorDB is strongly consistent, distributed and horizontally scalable. Unlike traditional monolithic databases, ActorDB is made out of any number of independent and concurrent SQL databases called actors." />
+        <meta property="og:site_name" content="ActorDB" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="http://www.actordb.com/" />
+        <meta property="og:image" content="http://www.actordb.com/imgs/actordb_fb_logo.png" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/actordb-website.css">
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="js/vendor/jquery-1.10.1.min.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet' type='text/css'>
+        <style>
+            .block {
+                display:block !Important;
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+                $("#mobile_menu").click(function(evt){
+                    $(this).siblings(".navigation").toggleClass("block");
+                });
+            });
+        </script>
+        <!--[if gte IE 9]>
+          <style type="text/css">
+            .gradient {filter: none;}
+          </style>
+        <![endif]-->
+    </head>    
+    <body id="view320logo" >
+        <!--[if lt IE 9]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+        <div class="header">
+            <div class="pagewrapper clearfix">
+                <a href="" class="global-header_logo"></a>
+                <a href="" class="global320-header_logo_text global-header_logo_text"></a>
+                <ul class="navigation">
+                    <li ><a href="index.html">Home</a></li>
+                    <li  class="sel"><a href="docs-about.html">Documentation</a></li>
+                    <li><a target="_blank" href="https://www.github.com/biokoda/actordb">Source</a></li>
+                    <li class=" "><a href="downloads.html">Downloads</a></li>
+                    <!-- <li class="  right"><a target="_blank" href="downloads.html">Downloads</a></li> -->
+                </ul>
+                <span id="mobile_menu" class="menu"></span>
+            </div>
+        </div>
+
+        <script>
+$(document).ready(function(){
+    $(".collapsed > .title").click(function(evt){        
+        $(this).parent().toggleClass("expanded");
+        return false;
+    });
+});
+</script>
+<div class="pagecontainer">
+    <div class="pagewrapper clearfix">
+        <div class="leftmenu">
+
+            <div class="l1">
+                <a href="docs-about.html" class="title">
+                    <span class="text">1. ABOUT</span>
+                </a>
+            </div>
+            <div class="l1 collapsed ">
+                <a href="docs-getstarted.html" class="title">
+                    <span class="bullet"></span>
+                    <span class="text">2. GET STARTED</span>
+                </a>
+                <div class="l2">
+                    <a href="docs-getstarted.html#download_run" class="title">
+                        <span class="text">2.1 Download and run ActorDB</span>
+                    </a>
+                    <a href="docs-getstarted.html#run" class="title">
+                        <span class="text">2.2 Run ActorDB</span>
+                    </a>
+                    <a href="docs-getstarted.html#insertandquery" class="title">
+                        <span class="text">2.3 Simple insert and query data</span>
+                    </a>
+
+                    <div class="l3 collapsed expanded">
+                        <a href="docs-getstarted.html#crud" class="title">
+                            <span class="bullet"></span>
+                            <span class="text">2.4 CRUD in ActorDB</span>
+                        </a>
+                        <a href="docs-getstarted.html#create" class="text last">2.4.1 Create</a>
+                        <a href="docs-getstarted.html#read" class="text last">2.4.2 Reading actors and tables</a>
+                        <a href="docs-getstarted.html#update" class="text last">2.4.3 Updating tables in actors</a>
+                        <a href="docs-getstarted.html#delete" class="text last">2.4.4 Deleting tables in actors and actors itself</a>
+                    </div>
+                </div>
+            </div>
+            <div class="l1 collapsed ">
+                <a href="docs-howitworks.html" class="title">
+                    <span class="bullet"></span>
+                    <span class="text">3. HOW IT WORKS</span>
+                </a>
+                <div class="l2">
+                    <a href="docs-howitworks.html#overview" class="title">
+                        <span class="text">3.1 Overview</span>
+                    </a>
+                    <div class="l3 collapsed expanded">
+                        <a href="docs-howitworks.html#nodesyny" class="title">
+                            <span class="bullet"></span>
+                            <span class="text">3.2 Node synchronisation</span>
+                        </a>
+                        <a href="docs-howitworks.html#h_321" class="text last">3.2.1 Global state</a>
+                        <a href="docs-howitworks.html#h_322" class="text last">3.2.2 Actors</a>
+                        <a href="docs-howitworks.html#h_323" class="text last">3.2.3 Multi-actor transactions</a>
+                    </div>
+                    <a href="docs-howitworks.html#dbengine" class="title">
+                        <span class="text">3.3 SQL engine</span>
+                    </a>
+                </div>
+            </div>
+            <div class="l1 collapsed ">
+                <a href="docs-querymodel.html" class="title">
+                    <span class="bullet"></span>
+                    <span class="text">4. QUERY MODEL</span>
+                </a>
+                <div class="l2">
+                    <div class="l3 collapsed expanded">
+                        <a href="docs-querymodel.html#query_actor" class="title">
+                            <span class="bullet"></span>
+                            <span class="text">4.1 ACTOR statement</span>
+                        </a>
+                        <a href="docs-querymodel.html#h_411" class="last">4.1.1 Single actor</a>
+                        <a href="docs-querymodel.html#h_412" class="last">4.1.2 Multiple actors</a>
+                        <a href="docs-querymodel.html#h_413" class="last">4.1.3 All actors of a type</a>
+                        <a href="docs-querymodel.html#h_414" class="last">4.1.4 Loop over actors</a>
+                    </div>
+                </div>
+                <div class="l2">
+                    <div class="l3 collapsed expanded">
+                        <a href="docs-querymodel.html#query_variables" class="title">
+                            <span class="bullet"></span>
+                            <span class="text">4.2 Variables</span>
+                        </a>
+                        <a href="docs-querymodel.html#h_421" class="last">4.2.1 Appending columns to result</a>
+                    </div>
+                    
+                        
+                </div>
+               
+                        <a href="docs-querymodel.html#query_pragma" class="last">
+                            
+                            <span class="text">4.3 Pragma statement</span>
+                        </a>
+                   
+
+            </div>
+
+
+            <div class="l1">
+                <div class="l3 collapsed ">
+                        <a href="docs-kvstore.html" class="title">
+                            <span class="bullet"></span>
+                            <span class="text">5. KEY/VALUE STORE</span>
+                        </a>
+                        <a href="docs-kvstore.html#about_kv_store" class="last">5.1 About</a>
+                        <a href="docs-kvstore.html#reliable_distributed_counters" class="last">5.2 Use case: reliable distributed counters</a>
+                </div>
+                
+
+                
+            </div>
+           
+            <div class="l1 collapsed ">
+                <a href="docs-examples.html" class="title">
+                    <span class="bullet"></span>
+                    <span>6. EXAMPLES</span>
+                </a>
+                <!-- <a href="docs-examples.html" class="last">
+                    <span>Introduction</span>
+                </a> -->
+                <a href="docs-examples.html#example_filesync" class="last">
+                    <span>6.1 File sync</span>
+                </a>
+            </div>
+
+            <div class="l1 collapsed ">
+            <!-- <div class="l1"> -->
+                <a href="docs-configuration.html" class="title">
+                    <span class="bullet"></span>
+                    <span class="text">7. CONFIGURATION</span>
+                </a>
+                <a href="docs-configuration.html#conf_files" class="last">
+                    <span>7.1 ActorDB configuration files</span>
+                </a>
+                <a href="docs-configuration.html#conf_nodes" class="last">
+                    <span>7.2 init.sql</span>
+                </a>
+                <a href="docs-configuration.html#setup_guide" class="last">
+                    <span>7.3 Setup guide</span>
+                </a>
+                <a href="docs-configuration.html#changing_schema" class="last">
+                    <span>7.4 Changing schema</span>
+                </a>
+                <a href="docs-configuration.html#adding_cluster" class="last">
+                    <span>7.5 Adding a cluster</span>
+                </a>
+                <a href="docs-configuration.html#building_actordb" class="last">
+                    <span>7.6 Building ActorDB</span>
+                </a>
+                <a href="docs-configuration.html#running_dev_mode" class="last">
+                    <span>7.7 Running ActorDB development mode</span>
+                </a>
+            </div>
+
+            <!-- <div class="l1"> -->
+            <div class="l1 collapsed expanded">
+                <a href="docs-faq.html" class="title">
+                    <span class="bullet"></span>
+                    <span class="text">8. FAQ</span>
+                </a>
+                <a href="docs-faq.html#storage" class="last">
+                    <span>8.1 Storage/Hardware</span>
+                </a>
+                <a href="docs-faq.html#clustering" class="last">
+                    <span>8.2 Clustering</span>
+                </a>
+                <a href="docs-faq.html#querying" class="last">
+                    <span>8.3 Querying</span>
+                </a>
+            </div>
+        </div>
+        <div class="content">
+
+   				<h1 id="examples" class="pagetitle">8. FAQ</h1>
+
+<h2 id="storage" class="pagesubtitle">8.1 Storage/Hardware</h2> 
+
+<h3 class="pagesubtitle">1. How does ActorDB store data?</h3> 
+<p class="pagetext">How data is stored in the storage engine is described in this <a href="http://blog.biokoda.com/post/133121776825/actordb-how-and-why-we-run-sqlite-on-top-of-lmdb">blog post</a>. 
+Essentially every actor is an SQLite database and every actor that is inside a node is stored within a single LMDB file.</p>
+
+<h3 class="pagesubtitle">2. Where does ActorDB store data?</h3> 
+<p class="pagetext">On linux default directory is /var/lib/actordb</p>
+<p class="pagetext">On OSX/Windows default directory is ./data/</p>
+<p class="pagetext">Data directories contain a lmdb file. This is where everything is stored.</p>
+
+<h3 class="pagesubtitle">3. How do I backup my data?</h3> 
+<p class="pagetext">Execute: actordb_tool backup /path/to/source/lmdb /path/to/backup/lmdb</p>
+<p class="pagetext">Unless the load on the database is small, you should backup to a second disk. Running it on the same disk will have a severe negative effect on write performance while it is running.</p>
+<p class="pagetext">You must do this for at least one node of every cluster. </p>
+
+<h3 class="pagesubtitle">4. What kind of hardware should my nodes have?</h3> 
+<p class="pagetext">SSD drives are highly recommended. The more RAM you have the better. At least a gigabit connection between nodes.</p>
+
+<p class="pagetext"></p>
+<h2 id="clustering" class="pagesubtitle">8.2 Clustering</h2> 
+
+<h3 class="pagesubtitle">5. Can I run multiple ActorDBs on a single node?</h3> 
+<p class="pagetext">Yes. Install them into separate locations. They must have different names (in vm.args) and different ports (thrift_port, mysql_protocol, rpcport settings in app.config).</p>
+
+<h3 class="pagesubtitle">6. How are actors distributed across nodes?</h3> 
+<p class="pagetext">ActorDB has nodes and clusters. Every node must be a part of a cluster. There can be as many clusters as you wish. </p>
+<p class="pagetext">ActorDB uses sharding to distribute actors. Every node holds ~4 shards. For every query, actor name for query is hashed. This determines which shard actor falls into, which then determines which node actor must live in.</p>
+
+
+<h3 class="pagesubtitle">7. How do I set replication factor?</h3> 
+<p class="pagetext">You set it indirectly with the size of your cluster(s). An actor lives within a cluster, it is replicated across all nodes within that cluster. </p>
+
+
+<h3 class="pagesubtitle">8. How many nodes should I add to a cluster?</h3>
+<p class="pagetext">It should be an odd number: 1, 3 or 5. Single node clusters have no redundancy but are fastest. Three node clusters are a good compromise. Five node clusters provide lots of safety at the cost of performance. If you want to start small, a single node cluster with regular backups may be fine. If your needs start growing, you can add nodes at any time. </p>
+
+<h3 class="pagesubtitle">9. If I want to add nodes to an existing cluster, what is the right process?</h3>
+<p class="pagetext">
+<ol>
+<li>1. Create a backup of an existing node in that cluster. </li>
+<li>2. Copy backup lmdb file to the new server. If on linux put it in /var/lib/actordb/lmdb </li>
+<li>3. Configure app.config, vm.args. </li>
+<li>4. Start up node.</li>
+<li>5. Go back to the node for step 1, add new node using actordb_console.</li>
+</ol>
+</p>
+
+<p class="pagetext"></p>
+<h3 class="pagesubtitle">10. What happens when a new node is added to ActorDB?</h3>
+<p class="pagetext">
+<ol>
+<li>1. New node is stored to global state.</li>
+<li>2. New node receives global state.</li>
+<li>3. New node initializes itself with state</li>
+<li>4. It notices it has less shards than other nodes.</li>
+<li>5. It finds a node which has the largest chunk of shard space. It tells it wants half of one shard (upper half).</li>
+<li>6. Copy process starts.</li>
+<li>7. Once complete, it checks again how much shard space it has. If it has less than other nodes, move to step 5.</li>
+</ol></p>
+<p class="pagetext"></p>
+<p class="pagetext">Once a shard is placed on a node, it will remain there forever. If new nodes are added, existing shards get smaller and new shards are created from them.</p>
+
+
+<h3 class="pagesubtitle">11. When a shard is placed on a new node, what happens to existing actors within that shard are they moved as well?</h3>
+<p class="pagetext">Actors get moved to that new node (and its cluster) one by one. Moving a shard means moving actors. </p>
+<p class="pagetext">For KV types, the entire KV shard is copied to new node, then a DELETE statement is executed to delete the unused half. Origin shard deletes upper half, destination shard deletes lower half.</p>
+
+
+<h3 class="pagesubtitle">12. While an actor is being moved, is it locked for reads/writes?</h3>
+<p class="pagetext">You can think of actors as being in two parts. Base data and write log. Every write hits the write log, base data remains unchanged.</p>
+
+<p class="pagetext">Actor move/copy is done in stages:
+<ol>
+<li>1. Copy the base chunk of data. </li>
+<li>2. Copy everything in the write log up to the point of where actor has started copy process. </li>
+<li>3. Lock actor for writes.</li>
+<li>4. Copy the remainder.</li>
+<li>5. Unlock source. If operation is move (not copy), source is deleted and replaced with a redirect marker. Any queries in-flight will be redirected to new node. </li>
+</ol>
+</p>
+
+<p class="pagetext"></p>
+<h2 id="querying" class="pagesubtitle">8.3 Querying</h2> 
+
+<h3 class="pagesubtitle">13. Does ActorDB have map/reduce?</h3>
+<p class="pagetext">Not at the moment. If you have an opinion where it would make sense, let us know: <a href="https://github.com/biokoda/actordb/issues">https://github.com/biokoda/actordb/issues</a></p>
+
+<h3 class="pagesubtitle">14. How do KV types work?</h3>
+<p class="pagetext">Normal actors belong to shards and there can be any number of actors. KV actors are shards. If every node has ~4 shards on it, this means for KV types it will have 4 actors of that KV schema.</p>
+<p class="pagetext">Actor statements like this one: actor kvtype(kvkey);</p>
+<p class="pagetext">Mean ActorDB will hash kvkey to determine which shard it falls into. Then send the query to that shard. That shard may hold many other keys in the same actor database.</p>
+
+<h3 class="pagesubtitle">15. How do schema updates work?</h3>
+<p class="pagetext">Once schema has been updated, every actor will execute it before its next read or write call. This means the database will incrementally update itself. The currently active actors will do it immediately, the inactive ones later.</p>
+
+<h3 class="pagesubtitle">16. How do I reset the database and start over?</h3>
+<p class="pagetext">Stop ActorDB, delete the lmdb file (/var/lib/actordb/lmdb on linux) then start ActorDB again.</p>
+
+<h3 class="pagesubtitle">17. How do I use thrift interface?</h3>
+<p class="pagetext">Install thrift using your package manager. Run thrift --help and find your language in the list.
+Download ActorDB thrift file: https://github.com/biokoda/actordb/blob/master/adbt.thrift</p>
+<p class="pagetext">Run: thrift --gen mylang adbt.thrift</p>
+<p class="pagetext">Local folder should now contain the code you can directly put in your project to connect and run queries.</p>
+
+<h3 class="pagesubtitle">18. Should I use thrift or a mysql driver?</h3>
+<p class="pagetext">We recommend thrift. </p>
+
+<h3 class="pagesubtitle">19. Which node should my clients connect to?</h3>
+<p class="pagetext">Does not matter. They can connect to any node. Using a pool of connections to multiple nodes is recommended. Every ActorDB node can easily handle thousand of client connections.</p>
+<p class="pagetext"></p>
+
+
+
+<div class="ass="goleft"><a href="docs-configuration.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(7. Configuration)</span>
+</div>
+
+
+            <p class="pagetext"></p>
+
+
+
+   			<p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+            <p class="pagetext">&nbsp;</p>
+
+        </div>
+    </div>
+</div>
+
+        <div class="footer">
+            <div class="pagewrapper">
+                <div class="linkholder">
+                    <a href="https://www.github.com/biokoda/actordb" class="link">GitHub</a>
+                    <a href="https://github.com/biokoda/actordb/issues" class="link">Issues</a>
+                    <a href="https://github.com/biokoda/actordb/blob/master/README.md" class="link marginrightzero">Changelog</a>
+                </div>
+                <p class="text">Product by Biokoda. <br/ >
+                    Licensed under Mozilla Public License 2.0.
+                </p>
+                <a class="global-footer_logo"></a>        
+            </div>
+        </div>
+
+        <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>-->
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        
+        <script type="text/javascript">
+            var isAtLeastIE11 = !!(navigator.userAgent.match(/Trident/) && !navigator.userAgent.match(/MSIE/));
+            if (isAtLeastIE11) {
+                $("html").addClass("ieedge");
+            }
+            if (navigator.platform.indexOf("Win") != -1 && navigator.userAgent.indexOf("MSIE") != -1 || navigator.platform.indexOf("Win") != -1 && isAtLeastIE11){
+                $("html").addClass("iecomm");
+            } 
+            if (navigator.platform.indexOf("Win") !=-1 && navigator.userAgent.indexOf("Chrome") != -1) {
+                $("html").addClass("winchrome");
+            }
+        </script>
+        <!--<script src="js/actordb-website.js"></script>-->
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-47379916-1', 'actordb.com');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>
