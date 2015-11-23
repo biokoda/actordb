@@ -19,7 +19,9 @@ delim()++
 "commit (c)   execute transaction\n"++
 "rollback (r) abort transaction\n"++
 "print (p)    print transaction\n"
-"show (s)     show schema\n"++delim()).
+"show (s)     show schema\n"
+"show status  show database status\n"
+"show shards  show shards on node\n"++delim()).
 
 delim() ->
 	"*******************************************************************\n".
@@ -260,6 +262,15 @@ cmd(P,Bin,Tuple) ->
 					print_help(change_prompt(P#dp{curdb = schema}));
 				_ ->
 					print(P,"Invalid db")
+			end;
+		{show,Show} ->
+			case string:to_lower(binary_to_list(Show)) of
+				"schema" ->
+					cmd(P,Bin,show);
+				"status" ->
+					send_query(change_prompt(P#dp{buffer = []}), <<"show status;">>);
+				"shards" ->
+					send_query(change_prompt(P#dp{buffer = []}), <<"show shards;">>)
 			end;
 		show when P#dp.curdb == config ->
 			send_cfg_query(change_prompt(P#dp{buffer = []}),<<"show schema;">>);
