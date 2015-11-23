@@ -807,6 +807,8 @@ quote(X) when is_list(X); is_binary(X) ->
 quote(X) ->
 	to_unicode(X).
 
+to_unicode(undefined) ->
+	"null";
 to_unicode(B) when is_binary(B) ->
 	unicode:characters_to_list(B);
 to_unicode(B) when is_list(B) ->
