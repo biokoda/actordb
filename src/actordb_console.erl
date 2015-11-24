@@ -455,6 +455,8 @@ print(P,F,A) ->
 	port_command(P#dp.resp, [unicode:characters_to_binary(io_lib:format(F,A)),<<"\r\n">>]),
 	P.
 
+change_prompt(P) when P#dp.execute /= undefined ->
+	P;
 change_prompt(#dp{env = wx} = P) ->
 	case P#dp.curdb of
 		actordb ->
@@ -480,6 +482,8 @@ uncommited(#dp{buffer = []}) ->
 uncommited(P) ->
 	" ("++integer_to_list(length(P#dp.buffer))++")".
 
+print_help(P) when P#dp.execute /= undefined ->
+	P;
 print_help(#dp{env = test} = P) ->
 	P;
 print_help(#dp{curdb = actordb} = P) ->

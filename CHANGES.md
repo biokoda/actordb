@@ -1,8 +1,11 @@
 **0.10.10 - 24 Nov 2015**
-- Bugfix: Go mysql driver compatibility bugfix.
-- Bugfix: Bugfix for boolean bind parameters.
 - Feature: "show status" command to display status of ActorDB node
 - Feature: "show shards" command to display shards running on an ActorDB node
+- Bugfix: Go mysql driver compatibility bugfix.
+- Bugfix: Bugfix for boolean bind parameters.
+- Bugfix: On initialize through actordb_console do not print help headers.
+- Bugfix: On import from backup, carry over idmax.
+- Bugfix: Race condition on saving global state.
 
 
 **0.10.9 - 21 Nov 2015**
