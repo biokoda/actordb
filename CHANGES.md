@@ -1,3 +1,10 @@
+**0.10.10 - 24 Nov 2015**
+- Bugfix: Go mysql driver compatibility bugfix.
+- Bugfix: Bugfix for boolean bind parameters.
+- Feature: "show status" command to display status of ActorDB node
+- Feature: "show shards" command to display shards running on an ActorDB node
+
+
 **0.10.9 - 21 Nov 2015**
 - Bugfix: If actor was inactive and schema was updated during, it might not update it on next start.
 
