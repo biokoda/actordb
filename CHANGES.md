@@ -1,3 +1,9 @@
+**0.10.11 - 26 Nov 2015**
+- Bugfix: Thrift bugfix for blobs, data may have been returned in text instead of blob.
+- Bugfix: Thrift bugfix for returning floats, bug was created in 0.10.8.
+- Bugfix: PRAGMA exists failed with parameterized queries.
+
+
 **0.10.10 - 24 Nov 2015**
 - Feature: "show status" command to display status of ActorDB node
 - Feature: "show shards" command to display shards running on an ActorDB node
