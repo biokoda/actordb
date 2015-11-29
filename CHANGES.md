@@ -1,3 +1,9 @@
+**0.10.12 - ??**
+- Bugfix: Mysql protocol bugfix for passing strings using parameterized queries.
+- Bugfix: Import from backup. It now imports users, schema and idmax. Only nodes/groups need to be recreated.
+- Change: Server will now always return integers in bigint from thrift. This simplifies clients.
+
+
 **0.10.11 - 26 Nov 2015**
 - Bugfix: Thrift bugfix for blobs, data may have been returned in text instead of blob.
 - Bugfix: Thrift bugfix for returning floats, bug was created in 0.10.8.
