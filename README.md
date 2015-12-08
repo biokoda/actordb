@@ -2,13 +2,11 @@
 
 with the scalability of a KV store, while keeping the query capabilities of a relational database.
 
-ActorDB is based on the actor model of computation. Unlike traditional monolithic databases, ActorDB is made out of any number of small independent and concurrent SQL databases called actors.
+ActorDB is ideal as a server side database for [apps](http://www.actordb.com/docs-examples.html#example_filesync). Think of running a large mail service, dropbox, evernote, etc. They all require server side storage for user data, but the vast majority of queries is within a specific user. With many users, the server side database can get very large. Using ActorDB you can keep a full relational database for every user and not be forced into painful scaling strategies that require you to throw away everything that makes relational databases good.
 
-You can think of ActorDB is a maximally sharded SQL database. Instead of splitting a database into N shards of M users, every user has his own shard in ActorDB.
+ActorDB is database that does not hide sharding from you. It makes it explicit, so you can keep fully relational chunks (i.e. actors) for the 99% of your database queries. 
 
-ActorDB is ideal as a server side database for [apps](http://www.actordb.com/docs-examples.html#example_filesync). Think of running a large mail service, dropbox, evernote, etc. They all require server side storage for user data, but the vast majority of queries is within a specific user. With many users, the server side database can get very large. Using ActorDB you can keep a full relational database for every user and not be forced into painful scaling strategies like using a KV store, manual sharding, etc.
-
-Even if your data model is not per-user partitioned, ActorDB has a powerful KV data type that you can use instead. An [ActorDB KV](http://www.actordb.com/docs-kvstore.html#about_kv_store) type is an sql table that is partitioned across all servers. That table can have sub tables linked to it using foreign keys. 
+Even if your data model is not easily partitioned, ActorDB has a powerful KV data type that you can use instead. An [ActorDB KV](http://www.actordb.com/docs-kvstore.html#about_kv_store) type is an sql table that is partitioned across all servers. That table can have sub tables linked to it using foreign keys. 
 
 You can run queries or transactions on a single actor or across any number of actors. ActorDB can run on a single server or many servers. Writing to one actor is completely independent of writes to another actor, unless they are participating in the same transaction. 
 
