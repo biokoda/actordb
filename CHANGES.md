@@ -1,6 +1,7 @@
-**0.10.12 - ??**
+**0.10.12 - 27 Nov 2015**
 - Bugfix: Mysql protocol bugfix for passing strings using parameterized queries.
 - Bugfix: Import from backup. It now imports users, schema and idmax. Only nodes/groups need to be recreated.
+- Bugfix: Bugfix with {{uniqid}} tags in sql. Previously they only worked in multi-actor transactions.
 - Change: Server will now always return integers in bigint from thrift. This simplifies clients.
 
 
