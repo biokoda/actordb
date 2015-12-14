@@ -60,6 +60,10 @@ Centos 6: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.12-1.el6.x86_6
 
 Centos 7: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.12-1.el7.centos.x86_64.rpm
 
+**general linux build (64bit)**
+
+https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.12-linux.tar.gz
+
 **windows package (64bit):**
 
 https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.12-win-x86_64.zip
