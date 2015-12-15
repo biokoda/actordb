@@ -242,7 +242,6 @@ cmd(P,Bin,Tuple) ->
 		{use,<<"c">>} ->
 			cmd(P,<<>>,{use,<<"config">>});
 		{use,<<"s">>} ->
-			print(P,"SCHEMA"),
 			cmd(P,<<>>,{use,<<"schema">>});
 		{use,<<"a">>} ->
 			cmd(P,<<>>,{use,<<"actordb">>});
@@ -263,6 +262,8 @@ cmd(P,Bin,Tuple) ->
 				_ ->
 					print(P,"Invalid db")
 			end;
+		{show,<<>>} ->
+			cmd(P,Bin,{show,<<"schema">>});
 		{show,Show} ->
 			case string:to_lower(binary_to_list(Show)) of
 				"schema" ->
