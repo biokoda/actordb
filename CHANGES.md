@@ -1,3 +1,8 @@
+**0.10.13 - 16 Dec 2015**
+- Bugfix: Parameterized queries over thrift were failing. Bug was created in 0.10.12.
+- Feature: Upgrade LMDB to 0.9.17
+
+
 **0.10.12 - 27 Nov 2015**
 - Bugfix: Mysql protocol bugfix for passing strings using parameterized queries.
 - Bugfix: Import from backup. It now imports users, schema and idmax. Only nodes/groups need to be recreated.
