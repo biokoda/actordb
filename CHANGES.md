@@ -1,5 +1,6 @@
 **0.10.13 - 16 Dec 2015**
-- Bugfix: Parameterized queries over thrift were failing. Bug was created in 0.10.12.
+- Bugfix: Parameterized queries over thrift with create flag were failing. Bug was created in 0.10.12.
+- Bugfix: actordb_client can now be started without parameters and pool connections added later.
 - Feature: Upgrade LMDB to 0.9.17
 
 
