@@ -342,10 +342,16 @@ commit
 <p class="pagetext"></p>
 
 <h2 id="changing_schema" class="pagesubtitle">7.4 Changing schema</h2>
-
+<p class="pagetext">Changing schema in ActorDB means adding new sql statements. So when a new actor gets created, ActorDB will initialize it with the original schema statements and any additional ones that are set later. Existing actors who have already been created before a schema change will execute only the new statements.</p>
 <p class="pagetext">
     <ol>
         <li>1. Create a new file named /etc/actordb/v2.sql</li>
+        <li>2. Add lines:</li>
+        <li>use schema</li>
+        <li>actor mytype</li>
+        <li>CREATE TABLE....</li>
+        <li>ALTER TABLE....</li>
+        <li>commit</li>
         <li>2. Run: actordb_console -f /etc/actordb/v2.sql</li>
     </ol>
 </p>
