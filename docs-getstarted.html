@@ -98,6 +98,7 @@ $(document).ready(function(){
                         <a href="docs-getstarted.html#read" class="text last">2.4.2 Reading actors and tables</a>
                         <a href="docs-getstarted.html#update" class="text last">2.4.3 Updating tables in actors</a>
                         <a href="docs-getstarted.html#delete" class="text last">2.4.4 Deleting tables in actors and actors itself</a>
+                        <a href="docs-getstarted.html#cleanup" class="text last">2.5 Cleanup</a>
                     </div>
                 </div>
             </div>
@@ -292,17 +293,17 @@ Let's run ActorDB for the first time!</p>
  actordb_console -f etc/init.example.sql</pre>
             </div>
 
-<p class="pagetext">Once actordb_console is finished running (should be quick), you have an initialized ActorDB setup.</p>
+<p class="pagetext">Once actordb_console is finished running (should be quick), you have an initialized ActorDB setup. You should take a look at the init.example.sql file. It contains clustering settings, user accounts and schema.</p>
 
 <h2 id="insertandquery" class="pagesubtitle">2.3 Simple insert and query data</h2>
 
 <p class="pagetext">Queries to ActorDB can be executed using actordb_console. You can run actordb_console -h to print call options. If connecting to local node that is using default thrift interface port, IP can be omitted.</p>
 
             <div class="structure">
-<pre class="latomono">actordb_console -u myuser 127.0.0.1 </pre>
+<pre class="latomono">actordb_console -u myuser -pw mypass 127.0.0.1 </pre>
             </div>
 
-<p class="pagetext"> You should now be connected to ActorDB. Next, run this command:
+<p class="pagetext"> You should now be connected to ActorDB. You can connect without -pw (password), in that case you will be prompted for it. Next, run this command:
 </p>
 
             <div class="structure">
@@ -512,9 +513,8 @@ No results.
             </div>
 
 
-
-
-
+<h3 id="cleanup" class="pagesubtitle">2.5 Cleanup</h3> 
+<p class="pagetext">You can reset ActorDB back to uninitialized state by first shutting it down using: actordb stop. Then deleting the lmdb file. On linux this is: /var/lib/actordb/. On osx/windows this is: ./data/</p>
 
 
 
