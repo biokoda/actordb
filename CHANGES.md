@@ -1,3 +1,10 @@
+**0.10.14 - ???**
+- Bugfix: PRAGMA copy response. Copy succeeded, but error was returned.
+- Bugfix: When initializing with localnode() rpcport was ignored so only default worked.
+- Feature: Remove some LMDB workarounds that are no longer necessary in 0.9.17. Performance and reliability is improved as a result.
+- Feature: Added client_inactivity_timeout setting to app.config.
+
+
 **0.10.13 - 16 Dec 2015**
 - Bugfix: Parameterized queries over thrift with create flag were failing. Bug was created in 0.10.12.
 - Bugfix: actordb_client can now be started without parameters and pool connections added later.
