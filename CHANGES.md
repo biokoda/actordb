@@ -3,7 +3,7 @@
 - Bugfix: When initializing with localnode() rpcport was ignored so only default worked.
 - Feature: Remove some LMDB workarounds that are no longer necessary in 0.9.17. Performance and reliability is improved as a result.
 - Feature: Added client_inactivity_timeout setting to app.config.
-- Feature: Update sqlite to 3.10.1.
+- Feature: Update sqlite to 3.10.2.
 
 
 **0.10.13 - 16 Dec 2015**
