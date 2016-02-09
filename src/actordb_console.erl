@@ -54,9 +54,9 @@ main(Args) ->
 			file:delete("/tmp/comfile"),
 			ReqPipe = open_port(binary_to_list(Req), [in,eof,binary]),
 			RespPipe = open_port(binary_to_list(Resp), [out,eof,binary]),
-			P = setpw(parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args)),
-			dologin(P)
+			P = setpw(parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args))
 	end,
+	dologin(P),
 	case P#dp.execute of
 		undefined ->
 			case P#dp.curdb of
@@ -88,6 +88,7 @@ setpw(P) ->
 	P.
 
 dologin(P) ->
+	application:stop(actordb_client),
 	PoolInfo = [{size, 1}, {max_overflow, 5}],
 	WorkerParams = [{hostname, P#dp.addr},
 		{username, P#dp.username},
@@ -402,7 +403,7 @@ send_cfg_query(P,Bin) ->
 			map_print(P,Map);
 		{ok,{changes,_Rowid,_NChanged}} ->
 			print(P,"Config updated.",[]);
-		{'EXIT',{noproc,_}} when P#dp.env == wx ->
+		{error,{login_failed,_}} when P#dp.env == wx ->
 			wxproc ! dologin,
 			P;
 		{'EXIT',{noproc,_}} ->
@@ -418,7 +419,7 @@ send_schema_query(P,Bin) ->
 			map_print(P,Map);
 		{ok,{changes,_Rowid,_NChanged}} ->
 			print(P,"Schema updated.",[]);
-		{'EXIT',{noproc,_}} when P#dp.env == wx ->
+		{error,{login_failed,_}} when P#dp.env == wx ->
 			wxproc ! dologin,
 			P;
 		{'EXIT',{noproc,_}} ->
@@ -436,7 +437,7 @@ send_query(P,Bin) ->
 			map_print(P,Map);
 		{ok,{changes,Rowid,NChanged}} ->
 			print(P,"Rowid: ~p, Rows changed: ~p",[Rowid,NChanged]);
-		{'EXIT',{noproc,_}} when P#dp.env == wx ->
+		{error,{login_failed,_}} when P#dp.env == wx ->
 			wxproc ! dologin,
 			P;
 		{'EXIT',{noproc,_}} ->
