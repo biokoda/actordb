@@ -1,4 +1,4 @@
-**0.10.14 - ???**
+**0.10.14 - 9 Feb 2016**
 - Bugfix: PRAGMA copy response. Copy succeeded, but error was returned.
 - Bugfix: When initializing with localnode() rpcport was ignored so only default worked.
 - Feature: Remove some LMDB workarounds that are no longer necessary in 0.9.17. Performance and reliability is improved as a result.
