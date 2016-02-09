@@ -36,6 +36,10 @@ delim() ->
 
 main(Args) ->
 	register(home,self()),
+	% For some reason we must call this to load crypto immediately.
+	% Otherwise it fails when using wx.
+	application:ensure_all_started(crypto),
+	crypto:hash(sha, "asdf"),
 	case os:type() of
 		{win32,_} ->
 			spawn(fun() -> (catch wxrun()),halt(1) end),
@@ -50,9 +54,9 @@ main(Args) ->
 			file:delete("/tmp/comfile"),
 			ReqPipe = open_port(binary_to_list(Req), [in,eof,binary]),
 			RespPipe = open_port(binary_to_list(Resp), [out,eof,binary]),
-			P = setpw(parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args))
+			P = setpw(parse_args(#dp{req = ReqPipe, resp = RespPipe, env = shell},Args)),
+			dologin(P)
 	end,
-	dologin(P),
 	case P#dp.execute of
 		undefined ->
 			case P#dp.curdb of
