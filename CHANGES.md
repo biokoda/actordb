@@ -1,3 +1,9 @@
+**0.10.15 - ??**
+- Bugfix: Driver work queue thread safety issue.
+- Bugfix: Windows backup fix.
+- Feature: Compact backup which is slower, but produces a smaller file.
+
+
 **0.10.14 - 9 Feb 2016**
 - Bugfix: PRAGMA copy response. Copy succeeded, but error was returned.
 - Bugfix: When initializing with localnode() rpcport was ignored so only default worked.
