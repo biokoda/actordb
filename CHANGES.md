@@ -1,6 +1,8 @@
 **0.10.15 - ??**
 - Bugfix: Driver work queue thread safety issue.
 - Bugfix: Windows backup fix.
+- Bugfix: Bugfix for :memory: sqlite instances, on close sqlite may call undo in wal.c.
+- Feature: Update sqlite to 3.11.0
 - Feature: Compact backup which is slower, but produces a smaller file.
 
 
