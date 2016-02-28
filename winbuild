@@ -32,7 +32,7 @@ main(_Args) ->
   file:write_file("win/stop-background-processes.bat",epmd()),
 
   os:cmd("escript.exe priv/mkconsole.escript"),
-  file:copy("priv/actordb_console","win/priv/actordb_console"),
+  file:copy("priv/actordb_wxconsole","win/priv/actordb_wxconsole"),
 
   file:copy("rel/files/vm.args","win/etc/vm.args"),
   file:copy("etc/init.sql","win/etc/init.sql"),
@@ -66,7 +66,7 @@ epmd() ->
 ctrl() ->
   check("escript.exe") ++
   %"%CD%/erl7.2.1/bin/escript.exe priv/actordb_console %*\n"++
-  "start /min \"\" \"%CD%/erl7.2.1/bin/escript.exe\" priv/actordb_console %*\n".
+  "start /min \"\" \"%CD%/erl7.2.1/bin/escript.exe\" priv/actordb_wxconsole %*\n".
   %"pause".  
 
 check(_Name) ->
