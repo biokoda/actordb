@@ -9,7 +9,7 @@ main(BinFiles1) ->
 
   file:make_dir("ebin"),
 
-  {ok, _Mod,Bin} = compile:file("src/actordb_console.erl", [binary]),
+  {ok, _Mod,Bin} = compile:file("src/actordb_console.erl", [binary,return_errors]),
   filelib:ensure_dir("ebin/"),
   file:write_file("ebin/actordb_console.beam",Bin),
 
