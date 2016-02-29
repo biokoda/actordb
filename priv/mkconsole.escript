@@ -16,7 +16,7 @@ main(BinFiles1) ->
   case os:type() of
     {win32, _} ->
       EndName = "actordb_wxconsole",
-      {ok, _Mod,WxBin} = compile:file("src/actordb_wxconsole.erl", [binary,return_errors]),
+      {ok, _,WxBin} = compile:file("src/actordb_wxconsole.erl", [binary,return_errors]),
       filelib:ensure_dir("ebin/"),
       file:write_file("ebin/actordb_wxconsole.beam",WxBin);
     _ ->
