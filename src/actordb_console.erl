@@ -397,7 +397,8 @@ cmd_delete(P,_,Bin) ->
 	append(P,Bin).
 
 send_cfg_query(P,Bin) ->
-	case catch actordb_client:exec_config(butil:tobin(Bin)) of
+	Cfg = actordb_client:config(default_pool, 5000),
+	case catch actordb_client:exec_config(Cfg,butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
 		{ok,{changes,_Rowid,_NChanged}} ->
@@ -413,7 +414,8 @@ send_cfg_query(P,Bin) ->
 	end.
 
 send_schema_query(P,Bin) ->
-	case catch actordb_client:exec_schema(butil:tobin(Bin)) of
+	Cfg = actordb_client:config(default_pool, 5000),
+	case catch actordb_client:exec_schema(Cfg, butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
 		{ok,{changes,_Rowid,_NChanged}} ->
@@ -431,7 +433,8 @@ send_schema_query(P,Bin) ->
 send_query(P,Bin) when P#dp.buffer /= [] ->
 	send_query(P#dp{buffer = []},lists:reverse(append(P,Bin)));
 send_query(P,Bin) ->
-	case catch actordb_client:exec(butil:tobin(Bin)) of
+	Cfg = actordb_client:config(default_pool, 5000),
+	case catch actordb_client:exec(Cfg, butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
 		{ok,{changes,Rowid,NChanged}} ->
