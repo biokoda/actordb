@@ -2,6 +2,9 @@
 - Bugfix: Driver work queue thread safety issue.
 - Bugfix: Windows backup fix. Windows backups are now always compact.
 - Bugfix: Bugfix for :memory: sqlite instances. On close sqlite may call undo in wal.c.
+- Bugfix: Bugfixes in catchup code. When a node comes back online, so it knows what actors to update.
+- Bugfix: Build of actordb_console required erlang-wx to be installed, even though it was only used on windows.
+- Bugfix: Replication bug caused unnecessary node chatter until next write.
 - Feature: Update sqlite to 3.11.0
 - Feature: Compact backup which produces a smaller file, but may take longer and use more CPU time.
 
