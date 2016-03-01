@@ -36,6 +36,18 @@ Advantages
 *   No global locks. Only the actors (one or many) involved in a transaction are locked during a write. All other actors are unaffected.
 *   Uses stable reliable SQL and storage engines: SQLite on top of LMDB.
 
+### Would you like to contribute?
+
+What we would most like to see is more client libraries on top of Thrift. Thrift generated code can be a bit verbose. Generally it is much nicer to implement an interface to it that hides some boilerplate code and uses nicer types.
+
+Also if you have any ideas, thoughts on possible improvements or bugs to report, contact us using github issues.
+
+So if you're interested in contributing. Use your language of choice. Generate a thrift interface using our [adbt.thrift](https://github.com/biokoda/actordb/blob/master/adbt.thrift), then write a clean interface to it.
+
+We will list any outside contributions here.
+
+### Learn more
+
 Documentation: http://www.actordb.com/docs-about.html
 
 Story: http://blog.biokoda.com/post/112206754025/why-we-built-actordb
@@ -45,6 +57,8 @@ How SQLite runs on top of LMDB: http://blog.biokoda.com/post/133121776825/actord
 How to configure and run: http://www.actordb.com/docs-configuration.html
 
 Change log: https://github.com/biokoda/actordb/blob/master/CHANGES.md
+
+### Builds
 
 **ubuntu/debian package (64bit)**
 
