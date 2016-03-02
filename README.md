@@ -35,6 +35,7 @@ Advantages
 *   Easy to configure and administer.
 *   No global locks. Only the actors (one or many) involved in a transaction are locked during a write. All other actors are unaffected.
 *   Uses stable reliable SQL and storage engines: SQLite on top of LMDB.
+*   Inherits SQLite features like JSON support and common table expressions.
 
 ### Would you like to contribute?
 
