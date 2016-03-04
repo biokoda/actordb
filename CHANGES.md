@@ -1,3 +1,7 @@
+**0.10.16 - ??**
+- Bugfix: Increase sqlite per actor cache_size. It seems having it too low makes some queries fail.
+
+
 **0.10.15 - 29 Feb 2016**
 - Bugfix: Driver work queue thread safety issue.
 - Bugfix: Windows backup fix. Windows backups are now always compact.
