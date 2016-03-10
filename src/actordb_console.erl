@@ -271,13 +271,13 @@ cmd(P,Bin,Tuple) ->
 			cmd(P,Bin,{show,<<"schema">>});
 		{show,Show} ->
 			case string:to_lower(binary_to_list(Show)) of
-				"queries" ->
+				"queries"++_ ->
 					send_query(change_prompt(P#dp{buffer = []}), <<"show queries;">>);
-				"schema" ->
+				"schema"++_ ->
 					cmd(P,Bin,show);
-				"status" ->
+				"status"++_ ->
 					send_query(change_prompt(P#dp{buffer = []}), <<"show status;">>);
-				"shards" ->
+				"shards"++_ ->
 					send_query(change_prompt(P#dp{buffer = []}), <<"show shards;">>)
 			end;
 		show when P#dp.curdb == config ->
