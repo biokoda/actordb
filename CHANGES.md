@@ -1,5 +1,6 @@
 **0.10.16 - ??**
 - Bugfix: Increase sqlite per actor cache_size. It seems having it too low makes some queries fail.
+- Feature: show queries to see currently running queries.
 
 
 **0.10.15 - 29 Feb 2016**

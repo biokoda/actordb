@@ -20,6 +20,7 @@ delim()++
 "print (p)    print transaction\n"
 "show (s)     show schema\n"
 "show status  show database status\n"
+"show queries show currently running queries\n"
 "show shards  show shards on node\n"++delim()).
 
 delim() ->
@@ -270,6 +271,8 @@ cmd(P,Bin,Tuple) ->
 			cmd(P,Bin,{show,<<"schema">>});
 		{show,Show} ->
 			case string:to_lower(binary_to_list(Show)) of
+				"queries" ->
+					send_query(change_prompt(P#dp{buffer = []}), <<"show queries;">>);
 				"schema" ->
 					cmd(P,Bin,show);
 				"status" ->
