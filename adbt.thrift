@@ -8,7 +8,7 @@ namespace rb ActordbThrift
 namespace erl adbt
 namespace go actordb
 
-const string VERSION = "1.3.0"
+const string VERSION = "1.4.0"
 
 union Val
 {
@@ -113,15 +113,15 @@ service Actordb {
   Result exec_sql_param(1: required string sql, 2: list<list<Val>> bindingvals = []) throws (1:InvalidRequestException ire),
 
   // Which actor types in schema.
-  list<string> actor_types(),
+  list<string> actor_types() throws (1:InvalidRequestException ire),
 
   // Which tables are in an actor type.
-  list<string> actor_tables(1: required string actor_type),
+  list<string> actor_tables(1: required string actor_type) throws (1:InvalidRequestException ire),
 
   // Which columns for actor type and table.
-  map<string,string> actor_columns(1: required string actor_type, 2: required string actor_table),
+  map<string,string> actor_columns(1: required string actor_type, 2: required string actor_table) throws (1:InvalidRequestException ire),
 
   // Returns a unique integer
-  i64 uniqid()
+  i64 uniqid() throws (1:InvalidRequestException ire)
 
 }
