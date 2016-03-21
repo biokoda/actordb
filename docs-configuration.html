@@ -172,21 +172,30 @@ $(document).ready(function(){
                         <a href="docs-kvstore.html#about_kv_store" class="last">5.1 About</a>
                         <a href="docs-kvstore.html#reliable_distributed_counters" class="last">5.2 Use case: reliable distributed counters</a>
                 </div>
-                
+            </div>
 
-                
+            <div class="l1">
+                <div class="l3 collapsed ">
+                        <a href="docs-efficiency.html" class="title">
+                            <span class="bullet"></span>
+                            <span class="text">6. EFFICIENCY</span>
+                        </a>
+                        <a href="docs-efficiency.html#batching" class="last">6.1 Batching</a>
+                        <a href="docs-efficiency.html#parameterized" class="last">6.2 Parameterized queries</a>
+                        <a href="docs-efficiency.html#schema" class="last">6.3 Schema</a>
+                </div>
             </div>
            
             <div class="l1 collapsed ">
                 <a href="docs-examples.html" class="title">
                     <span class="bullet"></span>
-                    <span>6. EXAMPLES</span>
+                    <span>7. EXAMPLES</span>
                 </a>
                 <!-- <a href="docs-examples.html" class="last">
                     <span>Introduction</span>
                 </a> -->
                 <a href="docs-examples.html#example_filesync" class="last">
-                    <span>6.1 File sync</span>
+                    <span>7.1 File sync</span>
                 </a>
             </div>
 
@@ -194,28 +203,28 @@ $(document).ready(function(){
             <!-- <div class="l1"> -->
                 <a href="docs-configuration.html" class="title">
                     <span class="bullet"></span>
-                    <span class="text">7. CONFIGURATION</span>
+                    <span class="text">8. CONFIGURATION</span>
                 </a>
                 <a href="docs-configuration.html#conf_files" class="last">
-                    <span>7.1 ActorDB configuration files</span>
+                    <span>8.1 ActorDB configuration files</span>
                 </a>
                 <a href="docs-configuration.html#conf_nodes" class="last">
-                    <span>7.2 init.sql</span>
+                    <span>8.2 init.sql</span>
                 </a>
                 <a href="docs-configuration.html#setup_guide" class="last">
-                    <span>7.3 Setup guide</span>
+                    <span>8.3 Setup guide</span>
                 </a>
                 <a href="docs-configuration.html#changing_schema" class="last">
-                    <span>7.4 Changing schema</span>
+                    <span>8.4 Changing schema</span>
                 </a>
                 <a href="docs-configuration.html#adding_cluster" class="last">
-                    <span>7.5 Adding a cluster</span>
+                    <span>8.5 Adding a cluster</span>
                 </a>
                 <a href="docs-configuration.html#building_actordb" class="last">
-                    <span>7.6 Building ActorDB</span>
+                    <span>8.6 Building ActorDB</span>
                 </a>
                 <a href="docs-configuration.html#running_dev_mode" class="last">
-                    <span>7.7 Running ActorDB development mode</span>
+                    <span>8.7 Running ActorDB development mode</span>
                 </a>
             </div>
 
@@ -223,24 +232,24 @@ $(document).ready(function(){
             <div class="l1 collapsed ">
                 <a href="docs-faq.html" class="title">
                     <span class="bullet"></span>
-                    <span class="text">8. FAQ</span>
+                    <span class="text">9. FAQ</span>
                 </a>
                 <a href="docs-faq.html#storage" class="last">
-                    <span>8.1 Storage/Hardware</span>
+                    <span>9.1 Storage/Hardware</span>
                 </a>
                 <a href="docs-faq.html#clustering" class="last">
-                    <span>8.2 Clustering</span>
+                    <span>9.2 Clustering</span>
                 </a>
                 <a href="docs-faq.html#querying" class="last">
-                    <span>8.3 Querying</span>
+                    <span>9.3 Querying</span>
                 </a>
             </div>
         </div>
         <div class="content">
 
-   					<h1 id="configuration" class="pagetitle">7. Configuration</h1>
+   					<h1 id="configuration" class="pagetitle">8. Configuration</h1>
 
-	<h2 id="conf_files" class="pagesubtitle">7.1 ActorDB configuration files</h2>
+	<h2 id="conf_files" class="pagesubtitle">8.1 ActorDB configuration files</h2>
 
     <p class="pagetext">ActorDB configuration files:</p>
 
@@ -261,7 +270,7 @@ $(document).ready(function(){
 
 	<p class="pagetext">On install, default configuration files are placed in /etc/actordb or whichever is equivalent for your platform.</p>	
 
-	<h2 id="conf_nodes" class="pagesubtitle">7.2 init.sql</h2>
+	<h2 id="conf_nodes" class="pagesubtitle">8.2 init.sql</h2>
 
 	<p class="pagetext">Default example initialize script is divided into three sections. First section which initializes cluster is mandatory. Setting schema can be done later, users can be added at any time.</p>
 
@@ -318,7 +327,7 @@ commit
 
 <p class="pagetext"></p>
 
-<h2 id="setup_guide" class="pagesubtitle">7.3 Setup guide</h2>
+<h2 id="setup_guide" class="pagesubtitle">8.3 Setup guide</h2>
 
 <h3 class="pagesubtitle">FOR EVERY NODE</h3>            
 
@@ -342,7 +351,7 @@ commit
 
 <p class="pagetext"></p>
 
-<h2 id="changing_schema" class="pagesubtitle">7.4 Changing schema</h2>
+<h2 id="changing_schema" class="pagesubtitle">8.4 Changing schema</h2>
 <p class="pagetext">Changing schema in ActorDB means adding new sql statements. So when a new actor gets created, ActorDB will initialize it with the original schema statements and any additional ones that are set later. Existing actors who have already been created before a schema change will execute only the new statements.</p>
 <p class="pagetext">
     <ol>
@@ -359,7 +368,7 @@ commit
 
 <p class="pagetext"></p>
 
-<h2 id="adding_cluster" class="pagesubtitle">7.5 Adding a cluster</h2>
+<h2 id="adding_cluster" class="pagesubtitle">8.5 Adding a cluster</h2>
 
 <p class="pagetext">
     <ol>
@@ -371,7 +380,7 @@ commit
 
 <p class="pagetext"></p>
 
-<h2 id="building_actordb" class="pagesubtitle">7.6 Building ActorDB</h2>
+<h2 id="building_actordb" class="pagesubtitle">8.6 Building ActorDB</h2>
 
 <p class="pagetext">
     <ol>
@@ -383,7 +392,7 @@ commit
 
 <p class="pagetext"></p>
 
-<h2 id="running_dev_mode" class="pagesubtitle">7.7 Running ActorDB development mode</h2>
+<h2 id="running_dev_mode" class="pagesubtitle">8.7 Running ActorDB development mode</h2>
 
 <p class="pagetext">
     <ol>
@@ -398,8 +407,8 @@ commit
 <p class="pagetext">You can now execute commands in the erlang console: actordb:exec("actor type1(actor1) create; select * from tab;").</p>
 
 <div class="pageactions">
-    <span class="goleft"><a href="docs-examples.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(6. Examples)</span>
-    <span class="goright">(8. FAQ)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="docs-faq.html"><span class="pagebtn">Next >></span></a></span>
+    <span class="goleft"><a href="docs-examples.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(7. Examples)</span>
+    <span class="goright">(9. FAQ)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="docs-faq.html"><span class="pagebtn">Next >></span></a></span>
 </div>
 
 

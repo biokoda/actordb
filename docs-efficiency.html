@@ -229,7 +229,7 @@ $(document).ready(function(){
             </div>
 
             <!-- <div class="l1"> -->
-            <div class="l1 collapsed expanded">
+            <div class="l1 collapsed ">
                 <a href="docs-faq.html" class="title">
                     <span class="bullet"></span>
                     <span class="text">9. FAQ</span>
@@ -247,129 +247,41 @@ $(document).ready(function(){
         </div>
         <div class="content">
 
-   				<h1 id="examples" class="pagetitle">9. FAQ</h1>
+   				<h1 id="about" class="pagetitle">6. Efficiency</h1>
+<!--<h2 class="pagesubtitle">1. Why</h2>                    -->
 
-<h2 id="storage" class="pagesubtitle">9.1 Storage/Hardware</h2> 
+    <h2 id="batching" class="pagesubtitle">6.1 Batching</h2>
+    <p class="pagetext"></p>
+    <p class="pagetext">ActorDB is very good at batching multiple operations together into a single event.</p>
 
-<h3 class="pagesubtitle">1. How does ActorDB store data?</h3> 
-<p class="pagetext">How data is stored in the storage engine is described in this <a href="http://blog.biokoda.com/post/133121776825/actordb-how-and-why-we-run-sqlite-on-top-of-lmdb">blog post</a>. 
-Essentially every actor is an SQLite database and every actor that is inside a node is stored within a single LMDB file.</p>
+    <p class="pagetext">Per-actor it will batch reads and writes before sending them to the SQL engine. If two concurrent writes are sent to the same actor, they are likely to be combined into a single call to SQL/storage engine.</p>
 
-<h3 class="pagesubtitle">2. Where does ActorDB store data?</h3> 
-<p class="pagetext">On linux default directory is /var/lib/actordb</p>
-<p class="pagetext">On OSX/Windows default directory is ./data/</p>
-<p class="pagetext">Data directories contain a lmdb file. This is where everything is stored.</p>
+    <p class="pagetext">If concurrent writes are sent to different actors on the same node, they are likely to be a part of the same LMDB transaction. </p>
+    <p class="pagetext">ActorDB will even batch together RPC calls between nodes.</p>
 
-<h3 class="pagesubtitle">3. How do I backup my data?</h3> 
-<p class="pagetext">Execute: actordb_tool backup /path/to/source/lmdb /path/to/backup/lmdb</p>
-<p class="pagetext">Unless the load on the database is small, you should backup to a second disk. Running it on the same disk will have a severe negative effect on write performance while it is running.</p>
-<p class="pagetext">You must do this for at least one node of every cluster. </p>
+    <p class="pagetext">To make batching work well, ActorDB should be accessed concurrently through many connections. Having a single connection and running queries only through it will work poorly.</p>
 
-<h3 class="pagesubtitle">4. What kind of hardware should my nodes have?</h3> 
-<p class="pagetext">SSD drives are highly recommended. The more RAM you have the better. At least a gigabit connection between nodes.</p>
+    <h2 id="parameterized" class="pagesubtitle">6.2 Parameterized queries</h2>
+    <p class="pagetext">You should always use parameterized queries. This will cut down on the SQL parsing time and it will prevent any SQL injection attacks.</p>
 
-<p class="pagetext"></p>
-<h2 id="clustering" class="pagesubtitle">9.2 Clustering</h2> 
+    <h2 id="schema" class="pagesubtitle">6.3 Schema</h2>
+    <p class="pagetext">A common question is how to split your data model into actors. There can be multiple ways of thinking about it. </p>
+    <p class="pagetext">
+        <ol>
+            <li>- <b>Scalability</b>: keep a single actor under 1000 reqs/s.</li>
+            <li>- <b>Size</b>: keep an actor in the megabyte range. Though having 100GB should work fine. But once the actor gets this large, so do its indexes and tables. Large actors are much more cumbersome and schema changes and queries get slower.</li>
+            <li>- <b>Natural sharding key</b>: are your queries almost always relating to a user, file or some other identity? This is your actor name.</li>
+        </ol>
+    </p>
+    <p class="pagetext"></p>
+    <p class="pagetext">ActorDB encourages splitting the problem into a smaller chunk. If you find yourself using actor mytype(*), think about extracting your data into a new actor type. Even if that data is a single actor. There is nothing wrong with having an actor type and only having a single actor for that type.</p>
+    <p class="pagetext"></p>
+    <p class="pagetext">If your sharding factor is fine grained (i.e. small amount of data per key), instead of using regular actors use the KV store.</p>
 
-<h3 class="pagesubtitle">5. Can I run multiple ActorDBs on a single node?</h3> 
-<p class="pagetext">Yes. Install them into separate locations. They must have different names (in vm.args) and different ports (thrift_port, mysql_protocol, rpcport settings in app.config).</p>
-
-<h3 class="pagesubtitle">6. How are actors distributed across nodes?</h3> 
-<p class="pagetext">ActorDB has nodes and clusters. Every node must be a part of a cluster. There can be as many clusters as you wish. </p>
-<p class="pagetext">ActorDB uses sharding to distribute actors. Every node holds ~4 shards. For every query, actor name for query is hashed. This determines which shard actor falls into, which then determines which node actor must live in.</p>
-
-
-<h3 class="pagesubtitle">7. How do I set replication factor?</h3> 
-<p class="pagetext">You set it indirectly with the size of your cluster(s). An actor lives within a cluster, it is replicated across all nodes within that cluster. </p>
-
-
-<h3 class="pagesubtitle">8. How many nodes should I add to a cluster?</h3>
-<p class="pagetext">It should be an odd number: 1, 3 or 5. Single node clusters have no redundancy but are fastest. Three node clusters are a good compromise. Five node clusters provide lots of safety at the cost of performance. If you want to start small, a single node cluster with regular backups may be fine. If your needs start growing, you can add nodes at any time. </p>
-
-<h3 class="pagesubtitle">9. If I want to add nodes to an existing cluster, what is the right process?</h3>
-<p class="pagetext">
-<ol>
-<li>1. Create a backup of an existing node in that cluster. </li>
-<li>2. Copy backup lmdb file to the new server. If on linux put it in /var/lib/actordb/lmdb </li>
-<li>3. Configure app.config, vm.args. </li>
-<li>4. Start up node.</li>
-<li>5. Go back to the node for step 1, add new node using actordb_console.</li>
-</ol>
-</p>
-
-<p class="pagetext"></p>
-<h3 class="pagesubtitle">10. What happens when a new node is added to ActorDB?</h3>
-<p class="pagetext">
-<ol>
-<li>1. New node is stored to global state.</li>
-<li>2. New node receives global state.</li>
-<li>3. New node initializes itself with state</li>
-<li>4. It notices it has less shards than other nodes.</li>
-<li>5. It finds a node which has the largest chunk of shard space. It tells it wants half of one shard (upper half).</li>
-<li>6. Copy process starts.</li>
-<li>7. Once complete, it checks again how much shard space it has. If it has less than other nodes, move to step 5.</li>
-</ol></p>
-<p class="pagetext"></p>
-<p class="pagetext">Once a shard is placed on a node, it will remain there forever. If new nodes are added, existing shards get smaller and new shards are created from them.</p>
-
-
-<h3 class="pagesubtitle">11. When a shard is placed on a new node, what happens to existing actors within that shard are they moved as well?</h3>
-<p class="pagetext">Actors get moved to that new node (and its cluster) one by one. Moving a shard means moving actors. </p>
-<p class="pagetext">For KV types, the entire KV shard is copied to new node, then a DELETE statement is executed to delete the unused half. Origin shard deletes upper half, destination shard deletes lower half.</p>
-
-
-<h3 class="pagesubtitle">12. While an actor is being moved, is it locked for reads/writes?</h3>
-<p class="pagetext">You can think of actors as being in two parts. Base data and write log. Every write hits the write log, base data remains unchanged.</p>
-
-<p class="pagetext">Actor move/copy is done in stages:
-<ol>
-<li>1. Copy the base chunk of data. </li>
-<li>2. Copy everything in the write log up to the point of where actor has started copy process. </li>
-<li>3. Lock actor for writes.</li>
-<li>4. Copy the remainder.</li>
-<li>5. Unlock source. If operation is move (not copy), source is deleted and replaced with a redirect marker. Any queries in-flight will be redirected to new node. </li>
-</ol>
-</p>
-
-<p class="pagetext"></p>
-<h2 id="querying" class="pagesubtitle">9.3 Querying</h2> 
-
-<h3 class="pagesubtitle">13. Does ActorDB have map/reduce?</h3>
-<p class="pagetext">Not at the moment. If you have an opinion where it would make sense, let us know: <a href="https://github.com/biokoda/actordb/issues">https://github.com/biokoda/actordb/issues</a></p>
-
-<h3 class="pagesubtitle">14. How do KV types work?</h3>
-<p class="pagetext">Normal actors belong to shards and there can be any number of actors. KV actors are shards. If every node has ~4 shards on it, this means for KV types it will have 4 actors of that KV schema.</p>
-<p class="pagetext">Actor statements like this one: actor kvtype(kvkey);</p>
-<p class="pagetext">Mean ActorDB will hash kvkey to determine which shard it falls into. Then send the query to that shard. That shard may hold many other keys in the same actor database.</p>
-
-<h3 class="pagesubtitle">15. How do schema updates work?</h3>
-<p class="pagetext">Once schema has been updated, every actor will execute it before its next read or write call. This means the database will incrementally update itself. The currently active actors will do it immediately, the inactive ones later.</p>
-
-<h3 class="pagesubtitle">16. How do I reset the database and start over?</h3>
-<p class="pagetext">Stop ActorDB, delete the lmdb file (/var/lib/actordb/lmdb on linux) then start ActorDB again.</p>
-
-<h3 class="pagesubtitle">17. How do I use thrift interface?</h3>
-<p class="pagetext">Install thrift using your package manager. Run thrift --help and find your language in the list.
-Download the <a href="https://github.com/biokoda/actordb/blob/master/adbt.thrift">ActorDB thrift file.</a></p>
-<p class="pagetext">Run: thrift --gen mylang adbt.thrift</p>
-<p class="pagetext">Local folder should now contain the code you can directly put in your project to connect and run queries.</p>
-
-<h3 class="pagesubtitle">18. Should I use thrift or a mysql driver?</h3>
-<p class="pagetext">We recommend thrift. </p>
-
-<h3 class="pagesubtitle">19. Which node should my clients connect to?</h3>
-<p class="pagetext">Does not matter. They can connect to any node. Using a pool of connections to multiple nodes is recommended. Every ActorDB node can easily handle thousand of client connections.</p>
-<p class="pagetext"></p>
-
-
-
-<div class="ass="goleft"><a href="docs-configuration.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(8. Configuration)</span>
+<div class="pageactions">
+    <span class="goleft"><a href="docs-kvstore.html"><span class="pagebtn"><< Previous</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(5. Key/Value store)</span>
+    <span class="goright">(7. Examples)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="docs-examples.html"><span class="pagebtn">Next >></span></a></span>   
 </div>
-
-
-            <p class="pagetext"></p>
-
-
 
    			<p class="pagetext">&nbsp;</p>
             <p class="pagetext">&nbsp;</p>
