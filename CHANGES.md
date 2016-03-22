@@ -1,3 +1,7 @@
+**0.10.17 - 22 Mar 2016**
+- Bugfix: Bug in new query interrupt code for 0.10.16 caused queries to get terminated too early.
+
+
 **0.10.16 - 22 Mar 2016**
 - Bugfix: Thrift API update. Some non SQL query calls were not checking user.
 - Bugfix: Increase sqlite per actor cache_size. It seems having it too low makes some queries fail.
