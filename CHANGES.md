@@ -2,6 +2,7 @@
 - Bugfix: Thrift API update. Some non SQL query calls were not checking user.
 - Bugfix: Increase sqlite per actor cache_size. It seems having it too low makes some queries fail.
 - Bugfix: Election RPCs are now limited to 200ms.
+- Bugfix: query_timeout only worked for read queries. Default timeout has been lowered to 10s.
 - Feature: show queries to see currently running queries.
 - Feature: Use a lock free task queue for the storage engine.
 - Feature: RPC optimizations by using batching.
