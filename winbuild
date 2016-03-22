@@ -50,23 +50,23 @@ main(_Args) ->
 
 run() ->
   check("erl.exe") ++
-  "start \"\" \"%CD%/erl7.2.1/bin/werl\" -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n"++
+  "start \"\" \"%CD%/erl7.3/bin/werl\" -pa ebin -config etc/app.config -s actordb_core -args_file etc/vm.args\n"++
   "exit\n".
 
 deps() ->
   check("")++
-  "start \"\" \"%CD%/erl7.2.1/vcredist_x64.exe\" /q /norestart\n"++
+  "start \"\" \"%CD%/erl7.3/vcredist_x64.exe\" /q /norestart\n"++
   "exit\n".
 
 epmd() ->
   check("")++
-  "\"%CD%/erl7.2.1/erts-7.2.1/bin/epmd\" -kill\n"++
+  "\"%CD%/erl7.3/erts-7.3/bin/epmd\" -kill\n"++
   "exit\n".
 
 ctrl() ->
   check("escript.exe") ++
   %"%CD%/erl7.2.1/bin/escript.exe priv/actordb_console %*\n"++
-  "start /min \"\" \"%CD%/erl7.2.1/bin/escript.exe\" priv/actordb_wxconsole %*\n".
+  "start /min \"\" \"%CD%/erl7.3/bin/escript.exe\" priv/actordb_wxconsole %*\n".
   %"pause".  
 
 check(_Name) ->
