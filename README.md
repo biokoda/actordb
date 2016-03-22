@@ -63,20 +63,20 @@ Change log: https://github.com/biokoda/actordb/blob/master/CHANGES.md
 
 **ubuntu/debian package (64bit)**
 
-https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.10.15-1_amd64.deb
+https://s3-eu-west-1.amazonaws.com/biokoda/actordb_0.10.16-1_amd64.deb
 
 **osx package (64bit):**
 
-https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.15-OSX-x86_64.tar.gz
+https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.16-OSX-x86_64.tar.gz
 
 **red hat/centos package (64bit):**
 
-Centos 7: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.15-1.el7.centos.x86_64.rpm
+Centos 7: https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.16-1.el7.centos.x86_64.rpm
 
 **general linux build (64bit)**
 
-https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.15-linux.tar.gz
+https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.16-linux.tar.gz
 
 **windows package (64bit):**
 
-https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.15-win-x86_64.zip
+https://s3-eu-west-1.amazonaws.com/biokoda/actordb-0.10.16-win-x86_64.zip
