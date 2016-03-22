@@ -1,10 +1,11 @@
 **0.10.16 - ??**
 - Bugfix: Thrift API update. Some non SQL query calls were not checking user.
 - Bugfix: Increase sqlite per actor cache_size. It seems having it too low makes some queries fail.
+- Bugfix: Election RPCs are now limited to 200ms.
 - Feature: show queries to see currently running queries.
 - Feature: Use a lock free task queue for the storage engine.
 - Feature: RPC optimizations by using batching.
-- Feature: Use C based atomic integers to count queries for backpressure mechanism. Important because we need constant reads and writes, which is hard to achieve efficiently in Erlang.
+- Feature: Use C based atomic integers to count queries for backpressure mechanism. Important because we need constant global reads and writes, which is hard to achieve efficiently in Erlang.
 
 
 **0.10.15 - 29 Feb 2016**
