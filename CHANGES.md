@@ -1,4 +1,4 @@
-**0.10.16 - ??**
+**0.10.16 - 22 Mar 2016**
 - Bugfix: Thrift API update. Some non SQL query calls were not checking user.
 - Bugfix: Increase sqlite per actor cache_size. It seems having it too low makes some queries fail.
 - Bugfix: Election RPCs are now limited to 200ms.
