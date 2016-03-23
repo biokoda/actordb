@@ -1,3 +1,8 @@
+**0.10.18 - 23 Mar 2016**
+- Bugfix: Better fix for yesterdays bug.
+- Bugfix: Self-heal mechanism when an actor is left in an intermediate state due to abnormal shutdown. 
+
+
 **0.10.17 - 22 Mar 2016**
 - Bugfix: Bug in new query interrupt code for 0.10.16 caused queries to get terminated too early.
 
