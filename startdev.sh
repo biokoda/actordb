@@ -8,7 +8,7 @@ case $1 in
         exec ../otp/bin/cerl -debug -pa ebin deps/*/ebin -config etc/app.config -s actordb_core -args_file etc/vm.args
         ;;
     *)
-        exec erl -pa ebin deps/*/ebin -config etc/app.config -s actordb_core -args_file etc/vm.args +stbt db 
+        exec erl +C multi_time_warp -pa ebin deps/*/ebin -config etc/app.config -s actordb_core -args_file etc/vm.args +stbt db 
 esac
 
 

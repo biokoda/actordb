@@ -22,6 +22,8 @@
 ## Bind schedulers to cores: http://www.erlang.org/doc/man/erl.html#+sbt
 +stbt db
 
++C multi_time_warp
+
 ## Max number of concurrent ports/sockets.
 -env ERL_MAX_PORTS 65536
 
