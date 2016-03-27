@@ -142,21 +142,25 @@ $(document).ready(function(){
                         <a href="docs-querymodel.html#h_414" class="last">4.1.4 Loop over actors</a>
                     </div>
                 </div>
+                <div>
+                <a href="docs-querymodel.html#flags" class="last">
+                            
+                            <span class="text">4.2 Flags</span>
+                        </a>
+                </div>
                 <div class="l2">
                     <div class="l3 collapsed expanded">
                         <a href="docs-querymodel.html#query_variables" class="title">
                             <span class="bullet"></span>
-                            <span class="text">4.2 Variables</span>
+                            <span class="text">4.3 Variables</span>
                         </a>
-                        <a href="docs-querymodel.html#h_421" class="last">4.2.1 Appending columns to result</a>
+                        <a href="docs-querymodel.html#h_421" class="last">4.3.1 Appending columns to result</a>
                     </div>
-                    
-                        
                 </div>
                
                         <a href="docs-querymodel.html#query_pragma" class="last">
                             
-                            <span class="text">4.3 Pragma statement</span>
+                            <span class="text">4.4 Pragma statement</span>
                         </a>
                    
 
@@ -315,6 +319,17 @@ INSERT INTO sometable VALUES (1,'txt');</pre>
                 This query will run on all actors of type1. If there are many actors of type1 calling this is not recommended.
             </p>
 
+            <p class="pagetext">
+                You can also limit by actor name. This will return all actors whose name starts with 'some_prefix':
+            </p>
+
+            <div class="structure">
+                <pre class="latomono">
+ACTOR type1(* where id like 'some_prefix%');
+INSERT INTO sometable VALUES (1,'txt');</pre>
+            </div>
+
+
             <hr class="hr14colorsmalmargin" />
 
             <h3 id="h_414" class="pagesubtitle">4.1.4 Loop over actors</h3>            
@@ -346,7 +361,19 @@ INSERT INTO sometable VALUES (1,'{{X.val}}');</pre>
 
             <p class="pagetext"></p>
 
-            <h2 id="query_variables" class="pagesubtitle">4.2 Variables</h2>
+            <h2 id="flags" class="pagesubtitle">4.2 Flags</h2>
+
+            <p class="pagetext">ActorDB supports two flags in the actor statement. Flags must be seperated by spaces or commas. </p>
+
+            <p class="pagetext">
+                <ol>
+                    <li><b>create</b> - create an actor with this query if it does not exist.</li>
+                    <li><b>safe</b> - require a majority of nodes to verify that what has been read, is safely replicated accross the cluster.</li>
+                </ol>
+            </p>
+            <p class="pagetext"></p>
+
+            <h2 id="query_variables" class="pagesubtitle">4.3 Variables</h2>
 
             <p class="pagetext">As mentioned in 4.1.4 ActorDB uses variables to pass data around when doing queries over multiple actors.</p>
 
@@ -400,7 +427,7 @@ ACTOR type1(actor1,actor2,actor3);
 
             <p class="pagetext"></p>
 
-            <h3 id="h_421" class="pagesubtitle">4.2.1 Appending columns to result</h3>            
+            <h3 id="h_421" class="pagesubtitle">4.3.1 Appending columns to result</h3>            
 
             <p class="pagetext">Say you have a forum thread actor. Every post in the thread contains the user id of the user that wrote the message. But when reading the thread you need more than just the user id, you need his username:
 </p>
@@ -432,7 +459,7 @@ ACTOR user(for X.userid in RESULT);
             <p class="pagetext"></p>
 
 
-            <h2 id="query_pragma" class="pagesubtitle">4.3 PRAGMA statement</h2>
+            <h2 id="query_pragma" class="pagesubtitle">4.4 PRAGMA statement</h2>
 
             <p class="pagetext">PRAGMA commands do specific operations or queries over one or many actors.</p>
 
@@ -453,6 +480,15 @@ PRAGMA list;    </pre>
             <div class="structure">
                 <pre class="latomono">
 ACTOR thread(*);
+PRAGMA list LIMIT 100 OFFSET 100;    </pre>
+            </div>
+
+
+<p class="pagetext">Or limit the list by actor id.</p>
+
+            <div class="structure">
+                <pre class="latomono">
+ACTOR thread(* where id like 'actorname%');
 PRAGMA list LIMIT 100 OFFSET 100;    </pre>
             </div>
 
