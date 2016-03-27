@@ -19,7 +19,7 @@ basic_read(Ndl) ->
 	[begin
 		?INF("Read ac~p",[N]),
 		{ok,[{columns,_},{rows,[{_,<<_/binary>>,_}|_]}]} =
-			exec(Ndl,<<"actor type1(ac",(integer_to_binary(N))/binary,") create; select * from tab;">>)
+			exec(Ndl,<<"actor type1(ac",(integer_to_binary(N))/binary,") create safe; select * from tab;">>)
 	 end
 	 || N <- lists:seq(1,?NUMACTORS)].
 

@@ -1,3 +1,9 @@
+**0.10.19 - 27 Mar 2016**
+- Bugfix: In rare cases an endless loop could develop while waiting for a write to complete on an actor.
+- Feature: Select only certain actors by name: actor mytype(* when id like 'actorname%')
+- Feature: safe flag on reads. Requires a read to be confirmed by a majority of nodes.
+
+
 **0.10.18 - 23 Mar 2016**
 - Bugfix: Better fix for yesterdays bug.
 - Bugfix: Self-heal mechanism when an actor is left in an intermediate state due to abnormal shutdown. 
