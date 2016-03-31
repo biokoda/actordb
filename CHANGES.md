@@ -1,5 +1,6 @@
-**0.10.20 - ??**
+**0.10.20 - 31 mar 2016**
 - Bugfix: Running an empty write that increases evnum but does not actually execute one could result in checkpoints not completing because of the gap in the eventlog.
+- Bugfix: Errors for update/insert statements did not clean up the transaction properly.
 - Feature: actordb_tool print now has an optional actorindex parameter.
 
 
