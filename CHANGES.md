@@ -1,3 +1,8 @@
+**0.10.20 - ??**
+- Bugfix: Running an empty write that increases evnum but does not actually execute one could result in checkpoints not completing because of the gap in the eventlog.
+- Feature: actordb_tool print now has an optional actorindex parameter.
+
+
 **0.10.19 - 27 Mar 2016**
 - Bugfix: In rare cases an endless loop could develop while waiting for a write to complete on an actor.
 - Feature: Select only certain actors by name: actor mytype(* when id like 'actorname%')
