@@ -14,6 +14,18 @@ basic_write(Ndl,Txt) ->
 	end
 	 || N <- lists:seq(1,?NUMACTORS)].
 
+err_write(Ndl) ->
+	err_write(Ndl,<<"SOME TEXT">>).
+err_write(Ndl,Txt) ->
+	?INF("Error write!",[]),
+	[begin
+		?INF("Write ac~p",[N]),
+		{sql_error,_} = _R = exec(Ndl,<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into ta values (",
+									(integer_to_binary(flatnow()))/binary,",'",Txt/binary,"',1);">>)
+		% ?INF("~p",[R])
+	end
+	 || N <- lists:seq(1,?NUMACTORS)].
+
 basic_read(Ndl) ->
 	?INF("Basic read",[]),
 	[begin

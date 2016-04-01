@@ -121,6 +121,14 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 		_ ->
 			ok
 	end,
+	basic_write(Ndl),
+	basic_write(Ndl),
+	basic_write(Ndl),
+	err_write(Ndl),
+	basic_write(Ndl),
+	basic_write(Ndl),
+	basic_write(Ndl),
+	basic_write(Ndl),
 	basic_write(Ndl);
 run(Param,"queue") ->
 	Nd1 = butil:ds_val(node1,Param),
