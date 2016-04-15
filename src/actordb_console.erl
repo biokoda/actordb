@@ -611,7 +611,12 @@ quote(X) ->
 to_unicode(undefined) ->
 	"null";
 to_unicode(B) when is_binary(B) ->
-	unicode:characters_to_list(B);
+	case unicode:characters_to_list(B) of
+		R when is_list(R) ->
+			R;
+		_ ->
+			"b64:"++binary_to_list(base64:encode(B))]
+	end;
 to_unicode(B) when is_list(B) ->
 	to_unicode(iolist_to_binary(B));
 to_unicode(B) ->
