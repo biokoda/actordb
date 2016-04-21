@@ -615,7 +615,7 @@ to_unicode(B) when is_binary(B) ->
 		R when is_list(R) ->
 			R;
 		_ ->
-			"b64:"++binary_to_list(base64:encode(B))]
+			"b64:"++binary_to_list(base64:encode(B))
 	end;
 to_unicode(B) when is_list(B) ->
 	to_unicode(iolist_to_binary(B));
