@@ -4,7 +4,7 @@
 - Bugfix: Update to SQLite 3.12.2 (http://www.sqlite.org/news.html).
 - Bugfix: On OSX fix linking to SSL.
 - Bugfix: actordb_console printing blobs.
-- Change: Increase number of generated shards per-node. From 4 to 12. The previously low number was a leftover of old days. Existing installations are unafected. 
+- Change: Increase number of generated shards per-node. From 4 to 12. The previously low number was a leftover of old days. Existing installations are unaffected.
 
 
 **0.10.20 - 31 mar 2016**
