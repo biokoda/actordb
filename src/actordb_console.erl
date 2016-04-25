@@ -400,7 +400,7 @@ cmd_delete(P,_,Bin) ->
 	append(P,Bin).
 
 send_cfg_query(P,Bin) ->
-	Cfg = actordb_client:config(default_pool, 5000),
+	Cfg = actordb_client:config([{query_timeout, 5000},{blob_tuple,true}]),
 	case catch actordb_client:exec_config(Cfg,butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
@@ -417,7 +417,7 @@ send_cfg_query(P,Bin) ->
 	end.
 
 send_schema_query(P,Bin) ->
-	Cfg = actordb_client:config(default_pool, 5000),
+	Cfg = actordb_client:config([{query_timeout, 5000},{blob_tuple,true}]),
 	case catch actordb_client:exec_schema(Cfg, butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
@@ -436,7 +436,7 @@ send_schema_query(P,Bin) ->
 send_query(P,Bin) when P#dp.buffer /= [] ->
 	send_query(P#dp{buffer = []},lists:reverse(append(P,Bin)));
 send_query(P,Bin) ->
-	Cfg = actordb_client:config(default_pool, 5000),
+	Cfg = actordb_client:config([{query_timeout, 5000},{blob_tuple,true}]),
 	case catch actordb_client:exec(Cfg, butil:tobin(Bin)) of
 		{ok,{false,Map}} ->
 			map_print(P,Map);
@@ -610,12 +610,14 @@ quote(X) ->
 
 to_unicode(undefined) ->
 	"null";
+to_unicode({blob,B}) ->
+	"0x"++binary_to_list(butil:dec2hex(B));
 to_unicode(B) when is_binary(B) ->
 	case unicode:characters_to_list(B) of
 		R when is_list(R) ->
 			R;
 		_ ->
-			"b64:"++binary_to_list(base64:encode(B))
+			"0x"++butil:tolist(butil:dec2hex(B))
 	end;
 to_unicode(B) when is_list(B) ->
 	to_unicode(iolist_to_binary(B));
