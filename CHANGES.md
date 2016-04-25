@@ -1,3 +1,12 @@
+**0.10.21 - ??**
+- Bugfix: Memory leak on read lmdb transactions.
+- Bugfix: Distributed transactions, the actor where transaction failed could crash needlessly.
+- Bugfix: Update to SQLite 3.12.2 (http://www.sqlite.org/news.html).
+- Bugfix: On OSX fix linking to SSL.
+- Bugfix: actordb_console printing blobs.
+- Change: Increase number of generated shards per-node. From 4 to 12. The previously low number was a leftover of old days. Existing installations are unafected. 
+
+
 **0.10.20 - 31 mar 2016**
 - Bugfix: Running an empty write that increases evnum but does not actually execute one could result in checkpoints not completing because of the gap in the eventlog.
 - Bugfix: Errors for update/insert statements did not clean up the transaction properly.
