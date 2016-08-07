@@ -31,7 +31,7 @@ delim() ->
 % config - for adding groups and nodes
 % schema - for changing schema
 -record(dp,{env = shell, curdb = actordb, req, resp, stop = false, buffer = [], wait = true,
-	addr = "127.0.0.1", port = 33306, username = "", 
+	addr = "127.0.0.1", port = 33306, username = "", framed = false,
 	password = "", execute, timeout_after = infinity, print, noshell = false}).
 
 main(Args) ->
@@ -93,7 +93,8 @@ dologin(P) ->
 	WorkerParams = [{hostname, P#dp.addr},
 		{username, P#dp.username},
 		{password, P#dp.password},
-		{port,P#dp.port}
+		{port,P#dp.port},
+		{framed, P#dp.framed}
 	],
 	case actordb_client:start(PoolInfo,WorkerParams) of
 		ok ->
@@ -141,6 +142,7 @@ parse_args(P,["-h"|_]) ->
 	"  -use <database>      actordb (def), config or schema.\n"++
 	"  -q   \"query\"         Execute query and exit.\n"++
 	"  -noshell             Do not create a shell. Useful when running queries with -q.\n"++
+	"  -framed              Use framed thrift protocol (must be enabled on server as well).\n"++
 	"  -print <default|min|csv|csvh>\n",
 	% "  -w   wait for commit to send query to actordb\n",
 	print(P,"Call with: actordb_console -u username IP[:ThriftPort]\n"++L),
@@ -167,6 +169,8 @@ parse_args(P,["-pw",Password|T]) ->
 	parse_args(P#dp{password = Password},T);
 parse_args(P,["-w"|T]) ->
 	parse_args(P#dp{wait = true},T);
+parse_args(P,["-framed"|T]) ->
+	parse_args(P#dp{framed = true}, T);
 parse_args(P,["-print", "min"|T]) ->
 	parse_args(P#dp{print = min},T);
 parse_args(P,["-print", "csv"|T]) ->
