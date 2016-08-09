@@ -1,3 +1,9 @@
+**0.10.22 ??**
+- Bugfix: ActorDB did not start when running on more than 8 cores.
+- Feature: Upgrade to sqlite 3.14.0
+- Feature: thrift_framed setting in app.config and -framed in actordb_console.
+
+
 **0.10.21 - 26 Apr 2016**
 - Bugfix: Memory leak on read lmdb transactions.
 - Bugfix: Distributed transactions, the actor where transaction failed could crash needlessly.
