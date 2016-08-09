@@ -1,4 +1,4 @@
-**0.10.22 ??**
+**0.10.22 - 9 Aug 2016**
 - Bugfix: ActorDB did not start when running on more than 8 cores.
 - Feature: Upgrade to sqlite 3.14.0
 - Feature: thrift_framed setting in app.config and -framed in actordb_console.
