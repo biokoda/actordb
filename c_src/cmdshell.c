@@ -105,7 +105,12 @@ static void rl_handler(char* line)
 	// 	}
 	// }
 	// #endif
-	if (write(req, line, strlen(line)) < 0)
+	if (strlen(line) == 0)
+	{
+		if (write(req, "\n", strlen("\n")) < 0)
+			running = 0;
+	}
+	else if (write(req, line, strlen(line)) < 0)
 	{
 		running = 0;
 	}
