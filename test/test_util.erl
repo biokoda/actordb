@@ -14,6 +14,36 @@ basic_write(Ndl,Txt) ->
 	end
 	 || N <- lists:seq(1,?NUMACTORS)].
 
+check_multiupdate_deadlock(Ndl) ->
+	L = ["ac1","ac2","ac3","ac4","ac5"],
+	Pids = [begin 
+		% Sort L randomly
+		RL = lists:sort(fun(_,_) -> rand:uniform() > rand:uniform() end,L),
+		{Pid,_} = spawn_monitor(fun() -> 
+			Ins = ["insert into tab values (",
+				  (integer_to_binary(flatnow())),",'deadlock?',1);"],
+			SQL = [["actor type1(",Actor,"); ",Ins] || Actor <- RL],
+			SQLB = iolist_to_binary(SQL),
+			?INF("Running: ~p",[SQLB]),
+			{ok,_} = exec(Ndl,SQLB),
+			exit(ok)
+		end),
+		Pid 
+	end || _ <- lists:seq(1,50)],
+	wait_dl_resp(Pids).
+wait_dl_resp([H|T]) ->
+	receive
+		{'DOWN',_Monitor,_,H,ok} ->
+			?INF("got deadlock test multiupdate response"),
+			wait_dl_resp(T);
+		{'DOWN',_Monitor,_,H,Resp} ->
+			Resp
+	after 10000 ->
+		timeout
+	end;
+wait_dl_resp([]) ->
+	ok.
+
 err_write(Ndl) ->
 	err_write(Ndl,<<"SOME TEXT">>).
 err_write(Ndl,Txt) ->

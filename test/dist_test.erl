@@ -129,7 +129,8 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 	basic_write(Ndl),
 	basic_write(Ndl),
 	basic_write(Ndl),
-	basic_write(Ndl);
+	basic_write(Ndl),
+	ok = check_multiupdate_deadlock(Ndl);
 run(Param,"queue") ->
 	Nd1 = butil:ds_val(node1,Param),
 	Nd2 = butil:ds_val(node2,Param),
