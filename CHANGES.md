@@ -1,3 +1,9 @@
+**0.10.23 - ??**
+- Bugfix: Multiple multiactor transactions could deadlock each other. A mechanism was added that guarantees progress.
+- Feature: extensions folder where you can add .dll/.so./.dylib sqlite extension files. This way you can use custom SQL functionality.
+- Feature: allow SQLite's pragma statements: freelist_count, page_count, table_info, index_list, index_xinfo.
+
+
 **0.10.22 - 9 Aug 2016**
 - Bugfix: ActorDB did not start when running on more than 8 cores.
 - Feature: Upgrade to sqlite 3.14.0

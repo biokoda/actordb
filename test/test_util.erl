@@ -355,7 +355,7 @@ flatnow() ->
 ltime() ->
 	element(2,lager_util:localtime_ms()).
 exec(Nodes,Bin) ->
-	rpc:call(findnd(Nodes),actordb,exec,[iolist_to_binary(Bin)]).
+	rpc:call(findnd(Nodes),actordb,exec,[iolist_to_binary(Bin)], 10000).
 exec(Nodes,Bin,Timeout) ->
 	rpc:call(findnd(Nodes),actordb,exec,[iolist_to_binary(Bin)],Timeout).
 

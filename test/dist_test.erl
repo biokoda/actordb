@@ -52,7 +52,7 @@ cfg(Args) ->
 		{per_node_cfg,["test/etc/app.config"]},
 		% cmd is appended to erl execute command, it should execute your app.
 		% It can be set for every node individually. Add it to that list if you need it, it will override this value.
-		{cmd,"-s actordb_core +S 2 +A 2"},
+		{cmd,"-s actordb_core +S 2 +A 2 +sfwi 100 +sbwt none"},
 
 		% optional command to start erlang with
 		% {erlcmd,"../otp/bin/cerl -valgrind"},
@@ -148,7 +148,7 @@ run(Param,"partitions") ->
 	Nd4 = butil:ds_val(node4,Param),
 	Nd5 = butil:ds_val(node5,Param),
 	Ndl = [N || N <- [Nd1,Nd2,Nd3,Nd4,Nd5], N /= undefined],
-	{ok,_} = rpc:call(Nd1,actordb_config,exec,[init(Ndl,"partitions")],3000),
+	{ok,_} = rpc:call(Nd1,actordb_config,exec,[init(Ndl,"partitions")],6000),
 	timer:sleep(100),
 	{ok,_} = rpc:call(Nd1,actordb_config,exec_schema,[schema2()],3000),
 	ok = wait_tree(Nd1,10000),
