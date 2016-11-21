@@ -1,4 +1,4 @@
-**0.10.23 - ??**
+**0.10.23 - 21 Nov 2016**
 - Bugfix: Multiple multiactor transactions could deadlock each other. A mechanism was added that guarantees progress.
 - Feature: extensions folder where you can add .dll/.so./.dylib sqlite extension files. This way you can use custom SQL functionality.
 - Feature: allow SQLite's pragma statements: freelist_count, page_count, table_info, index_list, index_xinfo.
