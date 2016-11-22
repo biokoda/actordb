@@ -1,3 +1,7 @@
+**0.10.24 - 22 Nov 2016**
+- Bugfix: 0.10.23 shipped with a broken app.config
+
+
 **0.10.23 - 21 Nov 2016**
 - Bugfix: Multiple multiactor transactions could deadlock each other. A mechanism was added that guarantees progress.
 - Feature: extensions folder where you can add .dll/.so./.dylib sqlite extension files. This way you can use custom SQL functionality.
