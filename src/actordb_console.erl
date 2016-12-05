@@ -72,7 +72,7 @@ main(Args) ->
 			cmd_lines(P,binary:split(Bin,<<"\n">>,[global])),
 			halt(1);
 		{qry,Q} ->
-			cmd(P#dp{timeout_after = 2000},list_to_binary(Q))
+			send_query(P#dp{timeout_after = 2000},list_to_binary(Q))
 	end.
 
 setpw(#dp{password = prompt} = P) ->
