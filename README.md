@@ -14,6 +14,8 @@ Servers can be added and schema can be updated at any time while the database is
 
 Homepage: http://www.actordb.com/
 
+For any questions you can use: https://gitter.im/actordb/
+
 ActorDB is:
 
 *   A distributed relational SQL database.
