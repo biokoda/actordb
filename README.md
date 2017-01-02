@@ -4,7 +4,7 @@ with the scalability of a KV store, while keeping the query capabilities of a re
 
 ActorDB is ideal as a server side database for [apps](http://www.actordb.com/docs-examples.html#example_filesync). Think of running a large mail service, dropbox, evernote, etc. They all require server side storage for user data, but the vast majority of queries is within a specific user. With many users, the server side database can get very large. Using ActorDB you can keep a full relational database for every user and not be forced into painful scaling strategies that require you to throw away everything that makes relational databases good.
 
-ActorDB is database that does not hide sharding from you. It makes it explicit, so you can keep fully relational chunks (i.e. actors) for the 99% of your database queries. 
+ActorDB is a database that does not hide sharding from you. It makes it explicit, so you can keep fully relational chunks (i.e. actors) for the 99% of your database queries. 
 
 Even if your data model is not easily partitioned, ActorDB has a powerful KV data type that you can use instead. An [ActorDB KV](http://www.actordb.com/docs-kvstore.html#about_kv_store) type is an sql table that is partitioned across all servers. That table can have sub tables linked to it using foreign keys. 
 
