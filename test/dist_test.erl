@@ -221,6 +221,7 @@ run(Param,"mysql" = TType) ->
 	SecondInsert = [1,<<"insert with prepared statement!">>,3.0],
 	ThirdInsert = [2,<<"second insert with prepared statement!">>,5.0],
 	
+	lager:info("SHOW SCHEMA; ~p",[mysql:query(Pid, <<"show schema">>)]),
 	ok = mysql:query(Pid, <<"actor type1(ac1) create;INSERT INTO tab VALUES (111,'aaaa',1.2);">>),
 	{ok,_Cols,[FirstInsert] = _Rows} = mysql:query(Pid, <<"actor type1(ac1); select * from tab;">>),
 	lager:info("Cols=~p, rows=~p", [_Cols, _Rows]),
