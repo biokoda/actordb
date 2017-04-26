@@ -1,3 +1,9 @@
+**0.10.25 - 26 Aor 2017**
+- Bugfix: Proper handling of CREATE TRIGGER statements in schema.
+- Bugfix: actordb_console -noshell -q was not printing output.
+- Bugfix: show schema was not working from mysql console.
+
+
 **0.10.24 - 22 Nov 2016**
 - Bugfix: 0.10.23 shipped with a broken app.config
 
@@ -39,7 +45,7 @@
 
 **0.10.18 - 23 Mar 2016**
 - Bugfix: Better fix for yesterdays bug.
-- Bugfix: Self-heal mechanism when an actor is left in an intermediate state due to abnormal shutdown. 
+- Bugfix: Self-heal mechanism when an actor is left in an intermediate state due to abnormal shutdown.
 
 
 **0.10.17 - 22 Mar 2016**
@@ -135,7 +141,7 @@
 - Feature: actordb_console flag: -use < actordb|config|schema > which db to use by default.
 - Feature: actordb_console flag: -noshell for use with -q, recommended but not required.
 - Feature: new thrift calls: uniqid, actor_types, actor_tables, actor_columns
-- Bugfix: If {{RESULT}} was present in a multiactor write, query was wrongly interpreted as a read and failed when executing. 
+- Bugfix: If {{RESULT}} was present in a multiactor write, query was wrongly interpreted as a read and failed when executing.
 - Bugfix: Invalid return result on pragma delete statements. Causing thrift to return error when in fact everything was ok.
 
 
@@ -148,15 +154,15 @@
 
 **0.10.3 - 24 Sept 2015**
 - Bugfix: When deleting actor, some data was left behind.
-- Bugfix: Backup fix for lmdb. 
+- Bugfix: Backup fix for lmdb.
 - Bugfix: Some vm.args changes that result in better erlang efficiency.
-- Bugfix: actordb_console ignore invalid flags. 
+- Bugfix: actordb_console ignore invalid flags.
 
 
 **0.10.2 - 16 Sept 2015**
 - Bugfix: Actor statement parsing could read wrong actor type.
 - Bugfix: PRAGMA list on kv types did not work.
-- Bugfix: Integer overflow in driver. 
+- Bugfix: Integer overflow in driver.
 - Bugfix: Some write results could be ignored if write delays happen.
 
 
@@ -169,19 +175,19 @@
 **0.10 - 9 Sept 2015**
 - Feature: ActorDB now uses LMDB as a storage engine. SQLite is still the SQL engine. Performace is vastly improved. Old versions are automatically imported. Old files will be left intact. A new file named lmdb will appear in every storage folder and it will contain all data.
 - Feature: Seperate Read/Write threads for improved concurrency.
-- Feature: Write batching. If an actor receives many writes at once, they will be a part of a single replication event. 
+- Feature: Write batching. If an actor receives many writes at once, they will be a part of a single replication event.
 - Feature: Added LIMIT and OFFSET to pragma list: "actor type1(*);PRAGMA list LIMIT 1000 OFFSET 10;"
 - Feature: actordb_console to manage the database. It replaces actordbctrl.
 - Feature: actordb_tool for backups and diagnostics.
 - Feature: Expanded thrift interface. ActorDB can now be completely controled through thrift.
 - Feature: Finally added user management. Thrift interface supports safer mysql style login that does not send the actual password over the wire.
-- Feature: Expanded configuration options in app.config. 
+- Feature: Expanded configuration options in app.config.
 - Feature: Added fsync flag to queries. Writes with fsync will be synced to disk before response is sent to client. You can set fsync to safe in app.config, which will have the same result for all writes.
 - Feature: MySQL protocol support for prepared statements.
 - Feature: Thrift protocol support for parameterized queries.
-- Bugfix: MySQL console bugfix for pragma statements. 
+- Bugfix: MySQL console bugfix for pragma statements.
 - Bugfix: ActorDB was listening on all interfaces instead of just the one it actually is configured to use.
-- Bugfix: Removing nodes was broken. 
+- Bugfix: Removing nodes was broken.
 
 
 **0.9 - 7 May 2015**
