@@ -4,13 +4,13 @@ with the scalability of a KV store, while keeping the query capabilities of a re
 
 ActorDB is ideal as a server side database for [apps](http://www.actordb.com/docs-examples.html#example_filesync). Think of running a large mail service, dropbox, evernote, etc. They all require server side storage for user data, but the vast majority of queries is within a specific user. With many users, the server side database can get very large. Using ActorDB you can keep a full relational database for every user and not be forced into painful scaling strategies that require you to throw away everything that makes relational databases good.
 
-ActorDB is a database that does not hide sharding from you. It makes it explicit, so you can keep fully relational chunks (i.e. actors) for the 99% of your database queries. 
+ActorDB is a database that does not hide sharding from you. It makes it explicit, so you can keep fully relational chunks (i.e. actors) for the 99% of your database queries.
 
-Even if your data model is not easily partitioned, ActorDB has a powerful KV data type that you can use instead. An [ActorDB KV](http://www.actordb.com/docs-kvstore.html#about_kv_store) type is an sql table that is partitioned across all servers. That table can have sub tables linked to it using foreign keys. 
+Even if your data model is not easily partitioned, ActorDB has a powerful KV data type that you can use instead. An [ActorDB KV](http://www.actordb.com/docs-kvstore.html#about_kv_store) type is an sql table that is partitioned across all servers. That table can have sub tables linked to it using foreign keys.
 
-You can run queries or transactions on a single actor or across any number of actors. ActorDB can run on a single server or many servers. Writing to one actor is completely independent of writes to another actor, unless they are participating in the same transaction. 
+You can run queries or transactions on a single actor or across any number of actors. ActorDB can run on a single server or many servers. Writing to one actor is completely independent of writes to another actor, unless they are participating in the same transaction.
 
-Servers can be added and schema can be updated at any time while the database is running. 
+Servers can be added and schema can be updated at any time while the database is running.
 
 Homepage: http://www.actordb.com/
 
@@ -65,20 +65,20 @@ Change log: https://github.com/biokoda/actordb/blob/master/CHANGES.md
 
 **ubuntu/debian package (64bit)**
 
-https://dzbscw1ubdtyw.cloudfront.net/actordb_0.10.24-1_amd64.deb
+https://dzbscw1ubdtyw.cloudfront.net/actordb_0.10.25-1_amd64.deb
 
 **osx package (64bit):**
 
-https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.24-OSX-x86_64.tar.gz
+https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.25-OSX-x86_64.tar.gz
 
 **red hat/centos package (64bit):**
 
-Centos 7: https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.24-1.el7.centos.x86_64.rpm
+Centos 7: https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.25-1.el7.centos.x86_64.rpm
 
 **general linux build (64bit)**
 
-https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.24-linux.tar.gz
+https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.25-linux.tar.gz
 
 **windows package (64bit):**
 
-https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.24-win-x86_64.zip
+https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.25-win-x86_64.zip

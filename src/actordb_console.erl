@@ -534,7 +534,7 @@ dopipe(#dp{env = wx} = P) ->
 			dopipe(NP);
 		{dofile,Pth} ->
 			{ok,Bin} = file:read_file(Pth),
-			dopipe(cmd_lines(P,binary:split(Bin,<<"\r\n">>,[global])));
+			dopipe(cmd_lines(P,binary:split(Bin,<<"\n">>,[global])));
 		{exec,Str} ->
 			case catch cmd(P,Str) of
 				#dp{} = NP ->
