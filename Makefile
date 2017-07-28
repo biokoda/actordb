@@ -8,7 +8,7 @@ OVERLAY_VARS    ?=
 uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 
 ifeq ($(uname_S),Darwin)
-	SHELLCMD = gcc c_src/cmdshell.c -I/usr/local/Cellar/readline/6.3.8/include/ /usr/local/Cellar/readline/6.3.8/lib/libreadline.a -lncurses  -o priv/cmdshell
+	SHELLCMD = gcc c_src/cmdshell.c -I/usr/local/opt/readline/include/ /usr/local/opt/readline/lib/libreadline.a -lncurses  -o priv/cmdshell
 else
 	SHELLCMD = gcc c_src/cmdshell.c -lreadline -lncurses  -o priv/cmdshell
 endif
