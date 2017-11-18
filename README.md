@@ -61,6 +61,12 @@ How to configure and run: http://www.actordb.com/docs-configuration.html
 
 Change log: https://github.com/biokoda/actordb/blob/master/CHANGES.md
 
+### Client libs
+
+Erlang: https://github.com/biokoda/actordb_client
+
+.NET 2.0: https://github.com/hq-io/actordb-net
+
 ### Builds
 
 **ubuntu/debian package (64bit)**

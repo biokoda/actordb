@@ -6,8 +6,12 @@
 -- Which means you should not create more than one. Add additional users later.
 use config
 insert into groups values ('grp1','cluster')
+insert into groups values ('grp2','fs')
 -- localnode() is whatever is in vm.args (-name ....) for node we are connected to.
 insert into nodes values (localnode(),'grp1')
+insert into nodes values ('node2@192.168.2.2,www.mydomain.com','grp2')
+insert into nodes values ('node3@192.168.2.3','grp2')
+insert into nodes values ('node4@192.168.2.4','grp2')
 CREATE USER 'root' IDENTIFIED BY 'rootpass'
 commit
 
@@ -32,7 +36,7 @@ CREATE TABLE asdf (id INTEGER PRIMARY KEY AUTOINCREMENT, txt BLOB)
 -- KV type of actor. This means counters is a sharded table across all nodes.
 actor counters kv
 CREATE TABLE actors (id TEXT PRIMARY KEY, hash INTEGER, val INTEGER) WITHOUT ROWID
--- Another KV type. This one with a nother sub table. 
+-- Another KV type. This one with a nother sub table.
 -- Any sub table must use foreign key on actors.id and have "on delete cascade"
 actor filesystem kv
 CREATE TABLE actors (id TEXT PRIMARY KEY, hash INTEGER, size INTEGER)  WITHOUT ROWID
