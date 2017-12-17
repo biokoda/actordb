@@ -16,10 +16,10 @@ basic_write(Ndl,Txt) ->
 
 check_multiupdate_deadlock(Ndl) ->
 	L = ["ac1","ac2","ac3","ac4","ac5"],
-	Pids = [begin 
+	Pids = [begin
 		% Sort L randomly
 		RL = lists:sort(fun(_,_) -> rand:uniform() > rand:uniform() end,L),
-		{Pid,_} = spawn_monitor(fun() -> 
+		{Pid,_} = spawn_monitor(fun() ->
 			Ins = ["insert into tab values (",
 				  (integer_to_binary(flatnow())),",'deadlock?',1);"],
 			SQL = [["actor type1(",Actor,"); ",Ins] || Actor <- RL],
@@ -28,7 +28,7 @@ check_multiupdate_deadlock(Ndl) ->
 			{ok,_} = exec(Ndl,SQLB),
 			exit(ok)
 		end),
-		Pid 
+		Pid
 	end || _ <- lists:seq(1,50)],
 	wait_dl_resp(Pids).
 wait_dl_resp([H|T]) ->
@@ -232,7 +232,7 @@ writer(Home,Nd,N,SleepMax,RC) ->
 	Start = os:timestamp(),
 	case get(bin) of
 		undefined ->
-			Bin = base64:encode(crypto:rand_bytes(128)),
+			Bin = base64:encode(crypto:strong_rand_bytes(128)),
 			put(bin,Bin);
 		Bin ->
 			ok
@@ -267,7 +267,7 @@ make_actors(N) when N > 100 ->
 	ok;
 make_actors(N) ->
 	case exec(nodes(connected),<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
-			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:rand_bytes(128)))/binary,"',1);">>) of
+			(integer_to_binary(flatnow()))/binary,",'",(base64:encode(crypto:strong_rand_bytes(128)))/binary,"',1);">>) of
 		{ok,_} ->
 			ok;
 		Err ->
@@ -290,7 +290,7 @@ addclusters(Path,Nd1,Nodes) ->
 	Port = 50000 + Len,
 	NI = [{name,butil:toatom("node"++butil:tolist(Len))},{rpcport,Port}],
 	Nodes1 = [NI|Nodes],
-	
+
 	% Grps = [[{name,butil:ds_val(name,Ndi)},{nodes,[butil:ds_val(name,Ndi)]}] || Ndi <- Nodes1],
 	% cfg({Nodes1,Grps})
 	DistName = detest:add_node(NI),
