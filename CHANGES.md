@@ -1,4 +1,8 @@
-**0.10.25 - 26 Aor 2017**
+**0.10.26 - ??**
+- Bugfix: Fixes for Erlang 20.0+
+
+
+**0.10.25 - 26 Apr 2017**
 - Bugfix: Proper handling of CREATE TRIGGER statements in schema.
 - Bugfix: actordb_console -noshell -q was not printing output.
 - Bugfix: show schema was not working from mysql console.

@@ -6,12 +6,8 @@
 -- Which means you should not create more than one. Add additional users later.
 use config
 insert into groups values ('grp1','cluster')
-insert into groups values ('grp2','fs')
 -- localnode() is whatever is in vm.args (-name ....) for node we are connected to.
 insert into nodes values (localnode(),'grp1')
-insert into nodes values ('node2@192.168.2.2,www.mydomain.com','grp2')
-insert into nodes values ('node3@192.168.2.3','grp2')
-insert into nodes values ('node4@192.168.2.4','grp2')
 CREATE USER 'root' IDENTIFIED BY 'rootpass'
 commit
 
