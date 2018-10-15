@@ -69,6 +69,9 @@ copyactor(Ndl) ->
 	?INF("Copy actor",[]),
 	{ok,_} = exec(Ndl,["actor type1(newcopy);PRAGMA copy=ac1;"]),
 	{ok,[{columns,_},{rows,[{_,<<_/binary>>,_}|_]}]} = exec(Ndl,<<"actor type1(newcopy) create; select * from tab;">>),
+	{ok,[{columns,_},{rows,Rows1}]} = exec(Ndl,["actor type1(*);pragma list;"]),
+	?debugFmt("List actors ~p",[Rows1]),
+	?assertEqual(true, lists:member({<<"newcopy">>},Rows1)),
 	[begin
 		{ok,_} = exec(Ndl,["actor type1(newcopy",integer_to_list(N),");PRAGMA copy=ac",integer_to_list(N),";"]),
 		{ok,[{columns,_},{rows,[{_,<<_/binary>>,_}|_]}]} = exec(Ndl,<<"actor type1(newcopy) create; select * from tab;">>)
