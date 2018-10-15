@@ -129,8 +129,8 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 	basic_write(Ndl),
 	basic_write(Ndl),
 	basic_write(Ndl),
-	basic_write(Ndl),
-	ok = check_multiupdate_deadlock(Ndl);
+	basic_write(Ndl);
+	% ok = check_multiupdate_deadlock(Ndl);
 run(Param,"queue") ->
 	Nd1 = butil:ds_val(node1,Param),
 	Nd2 = butil:ds_val(node2,Param),
@@ -161,13 +161,13 @@ run(Param,"partitions") ->
 	timer:sleep(1000),
 	lager:info("Calling write on ac1 to minority partition"),
 	{error,consensus_timeout} = exec([Nd1],<<"actor type1(ac1) create; insert into tab values (2,'minority',2);">>,infinity),
-	
+
 	lager:info("Calling write on ac1 to majority partition"),
 	Res1 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},{rows,[{1,<<"sometext">>,2.0}]}]},
 	Res2 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},{rows,[{2,<<"majority">>,2.0},{1,<<"sometext">>,2.0}]}]},
 	Res3 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},
 		{rows,[{3,<<"majority_2">>,2.0},{2,<<"majority">>,2.0},{1,<<"sometext">>,2.0}]}]},
-	
+
 	Res1 = exec([Nd3],<<"actor type1(ac1); select * from tab;">>),
 	{ok,_} = exec([Nd3],<<"actor type1(ac1) create; insert into tab values (2,'majority',2);">>),
 	Res2 = exec([Nd3],<<"actor type1(ac1); select * from tab;">>),
@@ -220,7 +220,7 @@ run(Param,"mysql" = TType) ->
 	FirstInsert = [111,<<"aaaa">>,1.2],
 	SecondInsert = [1,<<"insert with prepared statement!">>,3.0],
 	ThirdInsert = [2,<<"second insert with prepared statement!">>,5.0],
-	
+
 	lager:info("SHOW SCHEMA; ~p",[mysql:query(Pid, <<"show schema">>)]),
 	ok = mysql:query(Pid, <<"actor type1(ac1) create;INSERT INTO tab VALUES (111,'aaaa',1.2);">>),
 	{ok,_Cols,[FirstInsert] = _Rows} = mysql:query(Pid, <<"actor type1(ac1); select * from tab;">>),
@@ -440,7 +440,7 @@ usr() ->
 	"CREATE USER 'root' IDENTIFIED BY 'rootpass'".
 
 init(Ndl,TT) when TT == "single"; TT == "cluster"; TT == "addthentake"; TT == "addcluster"; TT == "endless2";
-		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql"; 
+		TT == "addsecond"; TT == "endless1"; TT == "addclusters"; TT == "mysql";
 		TT == "remnode"; TT == "partitions"; TT == "queue"; TT == "checkredirect"; TT == "missingnode" ->
 	[grp(1),nds(Ndl,1),usr()];
 init([N1,N2,N3,N4],"multicluster") ->
