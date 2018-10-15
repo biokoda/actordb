@@ -9,6 +9,8 @@ uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 
 ifeq ($(uname_S),Darwin)
 	SHELLCMD = gcc c_src/cmdshell.c -I/usr/local/opt/readline/include/ /usr/local/opt/readline/lib/libreadline.a -lncurses  -o priv/cmdshell
+else ifeq ($(shell cat /etc/redhat-release | cut -d' ' -f1),CentOS)
+	SHELLCMD = gcc c_src/cmdshell.c -Wl,-Bstatic -lreadline -lncurses  -o priv/cmdshell
 else
 	SHELLCMD = gcc c_src/cmdshell.c -static -Wl,-Bdynamic,-lgcc_s,-Bstatic -lreadline -lncurses -ltinfo  -o priv/cmdshell
 endif
