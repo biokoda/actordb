@@ -43,10 +43,17 @@ struct LoginResult
   4: optional list<string> writeaccess;
 }
 
+union QueryResult
+{
+  1: ReadResult rdRes,
+  2: WriteResult wrRes,
+}
+
 union Result
 {
   1: ReadResult rdRes,
-  2: WriteResult wrRes
+  2: WriteResult wrRes,
+  3: list<QueryResult> batchRes
 }
 
 enum ErrorCode {
@@ -98,7 +105,9 @@ service Actordb {
 
   // query for a single actor of type with parameterized query (ex.: "insert into tab values (?1,?2,?3)")
   // This is faster and safer.
-  Result exec_single_param(1: required string actorname, 2: required string actortype, 3: required string sql, 4: list<string> flags = [], 5: list<list<Val>> bindingvals = []) throws (1:InvalidRequestException ire),
+  Result exec_single_param(1: required string actorname, 2: required string actortype, 3: required string sql, 4: list<string> flags = [], 5: list<list<list<Val>>> bindingvals = []) throws (1:InvalidRequestException ire),
+
+  Result exec_single_batch_param(1: required string actorname, 2: required string actortype, 3: required string sql, 4: list<string> flags = [], 5: list<list<list<Val>>> bindingvals = []) throws (1:InvalidRequestException ire),
 
   // query over multiple actors of type
   Result exec_multi(1: required list<string> actors, 2: required string actortype, 3: required string sql, 4: list<string> flags = []) throws (1:InvalidRequestException ire),
