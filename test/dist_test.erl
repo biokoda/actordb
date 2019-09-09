@@ -158,7 +158,7 @@ run(Param,"partitions") ->
 	timer:sleep(2000),
 	lager:info("Isolating nd1, nd2"),
 	detest:isolate([Nd1,Nd2],minority),
-	timer:sleep(1000),
+	% timer:sleep(1000),
 	lager:info("Calling write on ac1 to minority partition"),
 	{error,consensus_timeout} = exec([Nd1],<<"actor type1(ac1) create; insert into tab values (2,'minority',2);">>,infinity),
 
@@ -167,16 +167,21 @@ run(Param,"partitions") ->
 	Res2 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},{rows,[{2,<<"majority">>,2.0},{1,<<"sometext">>,2.0}]}]},
 	Res3 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},
 		{rows,[{3,<<"majority_2">>,2.0},{2,<<"majority">>,2.0},{1,<<"sometext">>,2.0}]}]},
-
+	Res4 = {ok,[{columns,{<<"id">>,<<"txt">>,<<"i">>}},
+		{rows,[{4,<<"majority_3">>,2.0},{3,<<"majority_2">>,2.0},{2,<<"majority">>,2.0},{1,<<"sometext">>,2.0}]}]},
 	Res1 = exec([Nd3],<<"actor type1(ac1); select * from tab;">>),
 	{ok,_} = exec([Nd3],<<"actor type1(ac1) create; insert into tab values (2,'majority',2);">>),
 	Res2 = exec([Nd3],<<"actor type1(ac1); select * from tab;">>),
 	detest:isolate_end([Nd1,Nd2]),
-	timer:sleep(100),
+	% timer:sleep(100),
 	{ok,_} = exec([Nd3],<<"actor type1(ac1) create; insert into tab values (3,'majority_2',2);">>),
 	Res3 = exec([Nd1],<<"actor type1(ac1); select * from tab;">>),
 	lager:info("Majority wins!"),
-	timer:sleep(1000),
+	% timer:sleep(1000),
+	detest:isolate([Nd4,Nd5],minority),
+	{ok,_} = exec([Nd3],<<"actor type1(ac1) create; insert into tab values (4,'majority_3',2);">>),
+	Res4 = exec([Nd3],<<"actor type1(ac1); select * from tab;">>),
+	% lager:info("Read ~p",[Res4]),
 	ok;
 run(Param,"remnode" = TType) ->
 	Nd1 = butil:ds_val(node1,Param),

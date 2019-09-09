@@ -1,4 +1,12 @@
-**0.10.26 - ??**
+**0.10.28 - ??**
+- Bugfix: Starting a node in a cluster might not complete successfully.
+- Bugfix: Raft tunnel connection within driver had a missing send timeout.
+- Bugfix: Tunnel connection might not update due to queue being full.
+
+**0.10.27 - 26 Jan 2019**
+- Improvements for when LMDB larger than RAM
+
+**0.10.26 - 23 Nov 2018**
 - Bugfix: Fixes for Erlang 20.0+
 
 

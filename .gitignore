@@ -1,4 +1,7 @@
-/deps
+# /deps
 /distdir
 /log
-
+.detest
+var/
+ebin/
+*.beam
