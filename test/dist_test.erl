@@ -14,11 +14,17 @@
 -include("test_util.erl").
 numactors() ->
 	?NUMACTORS.
--define(ND1,[{name,node1},{rpcport,50001}]).
--define(ND2,[{name,node2},{rpcport,50002}]).
--define(ND3,[{name,node3},{rpcport,50003}]).
--define(ND4,[{name,node4},{rpcport,50004}]).
--define(ND5,[{name,node5},{rpcport,50005}]).
+-define(ND1,[{name,node1},{rpcport,50101},{dist_port, 50100},{connect_offset, 1000},
+	{pmd_nodes,["'node1@127.0.0.1:50100'","'node2@127.0.0.1:50200'","'node3@127.0.0.1:50300'","'node4@127.0.0.1:50400'","'node5@127.0.0.1:50500'"]}]).
+-define(ND2,[{name,node2},{rpcport,50201},{dist_port, 50200},{connect_offset, 2000},
+	{pmd_nodes,["'node1@127.0.0.1:50100'","'node2@127.0.0.1:50200'","'node3@127.0.0.1:50300'","'node4@127.0.0.1:50400'","'node5@127.0.0.1:50500'"]}]).
+-define(ND3,[{name,node3},{rpcport,50301},{dist_port, 50300},{connect_offset, 3000},
+	{pmd_nodes,["'node1@127.0.0.1:50100'","'node2@127.0.0.1:50200'","'node3@127.0.0.1:50300'","'node4@127.0.0.1:50400'","'node5@127.0.0.1:50500'"]}]).
+-define(ND4,[{name,node4},{rpcport,50401},{dist_port, 50400},{connect_offset, 4000},
+	{pmd_nodes,["'node1@127.0.0.1:50100'","'node2@127.0.0.1:50200'","'node3@127.0.0.1:50300'","'node4@127.0.0.1:50400'","'node5@127.0.0.1:50500'"]}]).
+-define(ND5,[{name,node5},{rpcport,50501},{dist_port, 50500},{connect_offset, 5000},
+	{pmd_nodes,["'node1@127.0.0.1:50100'","'node2@127.0.0.1:50200'","'node3@127.0.0.1:50300'","'node4@127.0.0.1:50400'","'node5@127.0.0.1:50500'"]}]).
+-define(ALL_NODES,[?ND1,?ND2,?ND3,?ND4,?ND5]).
 
 %{erlcmd,"../otp/bin/cerl -valgrind"},{erlenv,[{"VALGRIND_MISC_FLAGS","-v --leak-check=full --tool=memcheck --track-origins=no  "++
 %                                       "--suppressions=../otp/erts/emulator/valgrind/suppress.standard --show-possibly-lost=no"}]}
@@ -52,7 +58,7 @@ cfg(Args) ->
 		{per_node_cfg,["test/etc/app.config"]},
 		% cmd is appended to erl execute command, it should execute your app.
 		% It can be set for every node individually. Add it to that list if you need it, it will override this value.
-		{cmd,"-s actordb_core +S 2 +A 2 +sfwi 100 +sbwt none"},
+		{cmd,"-s actordb_core +S 2 +A 2 +sfwi 100 +sbwt none -start_epmd false -epmd_module actordb_pmd"},
 
 		% optional command to start erlang with
 		% {erlcmd,"../otp/bin/cerl -valgrind"},
@@ -93,6 +99,7 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 	Nd3 = butil:ds_val(node3,Param),
 	Nd4 = butil:ds_val(node4,Param),
 	Ndl = [N || N <- [Nd1,Nd2,Nd3,Nd4], N /= undefined],
+	% lager:info("~p",[Param]),
 	% rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
 	{ok,_} = rpc:call(Nd1,actordb_config,exec,[init(Ndl,TType)],3000),
 	timer:sleep(100),
@@ -434,8 +441,9 @@ run(Param,Nm) ->
 	lager:info("Unknown test type ~p",[Nm]).
 
 port(Nd) ->
-	["node"++Num,_] = string:tokens(butil:tolist(Nd),"@"),
-	50000+butil:toint(Num).
+	[Nd1,_] = string:tokens(butil:tolist(Nd),"@"),
+	NdNm = list_to_atom(Nd1),
+	hd([butil:ds_val(rpcport,Obj) || Obj <- ?ALL_NODES, butil:ds_val(name,Obj) == NdNm]).
 
 grp(N) ->
 	"insert into groups values ('grp"++butil:tolist(N)++"','cluster');".
