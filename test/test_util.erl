@@ -1,18 +1,40 @@
 % This Source Code Form is subject to the terms of the Mozilla Public
 % License, v. 2.0. If a copy of the MPL was not distributed with this
 % file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-define(GLOBAL,globstate).
 
 basic_write(Ndl) ->
-	basic_write(Ndl,<<"SOME TEXT">>).
-basic_write(Ndl,Txt) ->
+	basic_write(Ndl,1).
+basic_write(Ndl,Dir) ->
+	basic_write(Ndl,<<"SOME TEXT">>,Dir).
+basic_write(Ndl,Txt,Dir) ->
 	?INF("Basic write",[]),
+	Seq = case Dir of
+		1 ->
+			[1,?NUMACTORS,1];
+		-1 ->
+			[?NUMACTORS, 1, -1]
+	end,
 	[begin
-		?INF("Write ac~p",[N]),
-		{ok,_} = _R = exec(Ndl,<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
-									(integer_to_binary(flatnow()))/binary,",'",Txt/binary,"',1);">>)
+		Now = flatnow(),
+		?INF("Write ac~p ~p",[N,Now]),
+		run_sql(Ndl,<<"actor type1(ac",(integer_to_binary(N))/binary,") create; insert into tab values (",
+									(integer_to_binary(Now))/binary,",'",Txt/binary,"',1);">>)
 		% ?INF("~p",[R])
 	end
-	 || N <- lists:seq(1,?NUMACTORS)].
+	 || N <- apply(lists,seq,Seq)].
+
+run_sql(Ndl,Sql) ->
+	R = exec(Ndl,Sql),
+	case R of
+		{error,consensus_timeout} ->
+			?INF("Write retry after consensus_timeout: ~p",[Sql]),
+			timer:sleep(50),
+			run_sql(Ndl,Sql);
+		{ok,Ok} ->
+			{ok,Ok}
+	end.
+
 
 check_multiupdate_deadlock(Ndl) ->
 	L = ["ac1","ac2","ac3","ac4","ac5"],
@@ -43,6 +65,31 @@ wait_dl_resp([H|T]) ->
 	end;
 wait_dl_resp([]) ->
 	ok.
+
+spawn_writes(N,Ndl) ->
+	spawn_writes(N,Ndl,[]).
+spawn_writes(0,_,L) ->
+	wait_async(L);
+spawn_writes(N,Ndl,L) ->
+	case N rem 2 == 0 of
+		true ->
+			Dir = 1;
+		false ->
+			Dir = -1
+	end,
+	{Pid,_} = spawn_monitor(fun() -> basic_write(Ndl,Dir) end),
+	spawn_writes(N-1,Ndl,[Pid|L]).
+
+wait_async([H|T]) ->
+	receive
+		{'DOWN',_Monitor,_,H,normal} ->
+			wait_async(T);
+		{'DOWN',_Monitor,_,H,Err} ->
+			exit(Err)
+	end;
+wait_async([]) ->
+	ok.
+
 
 err_write(Ndl) ->
 	err_write(Ndl,<<"SOME TEXT">>).
@@ -353,8 +400,9 @@ rseed(N) ->
 	{A,B,C} = now(),
 	random:seed(A*erlang:phash2(["writer",now(),self()]),B+erlang:phash2([1,2,3,N]),C*N).
 flatnow() ->
-	{MS,S,MiS} = now(),
-	MS*1000000000000 + S*1000000 + MiS.
+	ets:update_counter(?GLOBAL, counter, {2,1}).
+	% {MS,S,MiS} = now(),
+	% MS*1000000000000 + S*1000000 + MiS.
 ltime() ->
 	element(2,lager_util:localtime_ms()).
 exec(Nodes,Bin) ->

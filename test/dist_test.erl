@@ -7,7 +7,7 @@
 
 -module(dist_test).
 -export([cfg/1,setup/1,cleanup/1,run/1]).
--define(INF(F,Param),io:format("~p ~p:~p ~s~n",[ltime(),?MODULE,?LINE,io_lib:fwrite(F,Param)])).
+-define(INF(F,Param),io:format("~p ~p ~p:~p ~s~n",[ltime(),self(),?MODULE,?LINE,io_lib:fwrite(F,Param)])).
 -define(INF(F),?INF(F,[])).
 -define(NUMACTORS,100).
 -include_lib("eunit/include/eunit.hrl").
@@ -46,6 +46,8 @@ cfg(Args) ->
 			throw(noparam);
 		["partitions"] ->
 			Nodes = [?ND1,?ND2,?ND3,?ND4,?ND5];
+		["cluster"] ->
+			Nodes = [?ND1,?ND2,?ND3,?ND4,?ND5];
 		_ ->
 			Nodes = [?ND1,?ND2,?ND3]
 	end,
@@ -77,6 +79,7 @@ cfg(Args) ->
 		{wait_for_app,actordb_core},
 		% What RPC to execute for stopping nodes (optional, def. is {init,stop,[]})
 		{stop,{actordb_core,stop_complete,[]}},
+		{internode_bw, 1024 * 128},
 		{nodes,Nodes}
 	].
 
@@ -89,6 +92,8 @@ cleanup(_Param) ->
 	ok.
 
 run(Param) ->
+	ets:new(?GLOBAL, [named_table,public,set]),
+	butil:ds_add(counter, 0, ?GLOBAL),
 	[TestType|_] = butil:ds_val(args,Param),
 	run(Param,TestType),
 	ok.
@@ -98,8 +103,9 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 	Nd2 = butil:ds_val(node2,Param),
 	Nd3 = butil:ds_val(node3,Param),
 	Nd4 = butil:ds_val(node4,Param),
-	Ndl = [N || N <- [Nd1,Nd2,Nd3,Nd4], N /= undefined],
-	% lager:info("~p",[Param]),
+	Nd5 = butil:ds_val(node5,Param),
+	Ndl = [N || N <- [Nd1,Nd2,Nd3,Nd4,Nd5], N /= undefined],
+	lager:info("~p",[Param]),
 	% rpc:call(Nd1,actordb_cmd,cmd,[init,commit,butil:ds_val(path,Param)++"/node1/etc"],3000),
 	{ok,_} = rpc:call(Nd1,actordb_config,exec,[init(Ndl,TType)],3000),
 	timer:sleep(100),
@@ -115,12 +121,14 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 	basic_write(Ndl),
 	basic_read(Ndl),
 	copyactor(Ndl),
-	[detest:stop_node(Nd) || Nd <- [Nd1,Nd2,Nd3,Nd4], Nd /= undefined],
+	[detest:stop_node(Nd) || Nd <- [Nd1,Nd2,Nd3,Nd4,Nd5], Nd /= undefined],
 	detest:add_node(?ND1),
 	case TType of
 		"cluster" ->
 			detest:add_node(?ND2),
-			detest:add_node(?ND3);
+			detest:add_node(?ND3),
+			detest:add_node(?ND4),
+			detest:add_node(?ND5);
 		"multicluster" ->
 			detest:add_node(?ND2),
 			detest:add_node(?ND3),
@@ -129,14 +137,20 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 			ok
 	end,
 	basic_write(Ndl),
-	basic_write(Ndl),
-	basic_write(Ndl),
+	detest_net:isolation_group_set([Nd2],nd2),
+	spawn_writes(2,Ndl),
+	detest_net:isolation_group_remove(nd2),
 	err_write(Ndl),
 	basic_write(Ndl),
-	basic_write(Ndl),
-	basic_write(Ndl),
-	basic_write(Ndl),
-	basic_write(Ndl);
+	detest_net:isolation_group_set([Nd3],nd3),
+	spawn_writes(2,Ndl),
+	detest_net:isolation_group_remove(nd3),
+	spawn_writes(2,Ndl),
+	detest_net:isolation_group_set([Nd1,Nd2],nd1),
+	Ndl1 = [N || N <- [Nd3,Nd4,Nd5], N /= undefined],
+	spawn_writes(2,Ndl1),
+	detest_net:isolation_group_remove(nd1),
+	spawn_writes(2,Ndl);
 	% ok = check_multiupdate_deadlock(Ndl);
 run(Param,"queue") ->
 	Nd1 = butil:ds_val(node1,Param),
