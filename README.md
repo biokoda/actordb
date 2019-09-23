@@ -71,19 +71,19 @@ Erlang: https://github.com/biokoda/actordb_client
 
 **ubuntu/debian package (64bit)**
 
-https://dzbscw1ubdtyw.cloudfront.net/actordb_0.10.27-1_amd64.deb
+https://dzbscw1ubdtyw.cloudfront.net/actordb_0.10.28-1_amd64.deb
 
 **osx package (64bit):**
 
-https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.27-OSX-x86_64.tar.gz
+https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.28-OSX-x86_64.tar.gz
 
 **red hat/centos package (64bit):**
 
-Centos 7: https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.27-1.el7.centos.x86_64.rpm
+Centos 7: https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.28-1.el7.centos.x86_64.rpm
 
 **general linux build (64bit)**
 
-https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.27-linux.tar.gz
+https://dzbscw1ubdtyw.cloudfront.net/actordb-0.10.28-linux.tar.gz
 
 **windows package (64bit):**
 
