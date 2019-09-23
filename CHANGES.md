@@ -1,7 +1,9 @@
-**0.10.28 - ??**
+**0.10.28 - 23.9.2019**
 - Bugfix: Starting a node in a cluster might not complete successfully.
 - Bugfix: Raft tunnel connection within driver had a missing send timeout.
 - Bugfix: Tunnel connection might not update due to queue being full.
+- Bugfix: When copying an actor from one node to another there might be a crash when trying to unlock an actor that has already ben unlocked.
+- Bugfix: Raft election logic, run on detected network changes to sync.
 
 **0.10.27 - 26 Jan 2019**
 - Improvements for when LMDB larger than RAM

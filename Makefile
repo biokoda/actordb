@@ -34,6 +34,10 @@ compile:
 	./rebar compile
 	./priv/mkconsole.escript
 
+test_cluster:
+	./detest test/dist_test.erl cluster
+
+test: compile test_cluster
 
 
 recompile:

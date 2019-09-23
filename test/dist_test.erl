@@ -111,6 +111,7 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 	timer:sleep(100),
 	{ok,_} = rpc:call(Nd1,actordb_config,exec_schema,[schema1()],3000),
 	ok = wait_tree(Nd1,10000),
+	% detest_net:reg_caller(),
 	basic_write(Ndl),
 	basic_read(Ndl),
 	basic_write(Ndl),
@@ -137,20 +138,37 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 			ok
 	end,
 	basic_write(Ndl),
+
+	% detest_net:shape_traffic_rand(),
+	% spawn_writes(2,undefined),
+	
 	detest_net:isolation_group_set([Nd2],nd2),
 	spawn_writes(2,Ndl),
 	detest_net:isolation_group_remove(nd2),
 	err_write(Ndl),
 	basic_write(Ndl),
+	
 	detest_net:isolation_group_set([Nd3],nd3),
 	spawn_writes(2,Ndl),
 	detest_net:isolation_group_remove(nd3),
 	spawn_writes(2,Ndl),
+	
+	?INF("Isolating nd1 nd2"),
 	detest_net:isolation_group_set([Nd1,Nd2],nd1),
 	Ndl1 = [N || N <- [Nd3,Nd4,Nd5], N /= undefined],
 	spawn_writes(2,Ndl1),
 	detest_net:isolation_group_remove(nd1),
+	?INF("Isolation end nd1 nd2"),
+	
+	?INF("Isolating nd2 nd3"),
+	detest_net:isolation_group_set([Nd2,Nd3],nd1),
+	Ndl2 = [N || N <- [Nd4,Nd5], N /= undefined],
+	spawn_writes(2,Ndl2),
+	detest_net:isolation_group_remove(nd1),
+	?INF("End isolation nd2 nd3"),
+	
 	spawn_writes(2,Ndl);
+	ok;
 	% ok = check_multiupdate_deadlock(Ndl);
 run(Param,"queue") ->
 	Nd1 = butil:ds_val(node1,Param),

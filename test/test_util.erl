@@ -32,7 +32,10 @@ run_sql(Ndl,Sql) ->
 			timer:sleep(50),
 			run_sql(Ndl,Sql);
 		{ok,Ok} ->
-			{ok,Ok}
+			{ok,Ok};
+		E ->
+			?INF("Write error ~p on sql=~p",[E,Sql]),
+			exit(E)
 	end.
 
 
@@ -77,7 +80,7 @@ spawn_writes(N,Ndl,L) ->
 		false ->
 			Dir = -1
 	end,
-	{Pid,_} = spawn_monitor(fun() -> basic_write(Ndl,Dir) end),
+	{Pid,_} = spawn_monitor(fun() -> detest_net:reg_caller(), basic_write(Ndl,Dir) end),
 	spawn_writes(N-1,Ndl,[Pid|L]).
 
 wait_async([H|T]) ->
@@ -405,6 +408,10 @@ flatnow() ->
 	% MS*1000000000000 + S*1000000 + MiS.
 ltime() ->
 	element(2,lager_util:localtime_ms()).
+exec(undefined,Bin) ->
+	Nd = detest_net:majority_node(),
+	?INF("Majority node ~p",[Nd]),
+	rpc:call(detest_net:majority_node(),actordb,exec,[iolist_to_binary(Bin)], 10000);
 exec(Nodes,Bin) ->
 	rpc:call(findnd(Nodes),actordb,exec,[iolist_to_binary(Bin)], 10000).
 exec(Nodes,Bin,Timeout) ->
