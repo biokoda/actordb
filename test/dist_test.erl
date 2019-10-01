@@ -167,7 +167,7 @@ run(Param,TType) when TType == "single"; TType == "cluster"; TType == "multiclus
 	detest_net:isolation_group_remove(nd1),
 	?INF("End isolation nd2 nd3"),
 	
-	spawn_writes(2,Ndl);
+	spawn_writes(2,Ndl),
 	ok;
 	% ok = check_multiupdate_deadlock(Ndl);
 run(Param,"queue") ->

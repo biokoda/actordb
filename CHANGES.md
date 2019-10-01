@@ -1,4 +1,7 @@
-**0.10.28 - 23.9.2019**
+**0.10.29 - 1 Oct 2019**
+- Bugfix: Bugfix for transaction restart after it was interrupted
+ 
+**0.10.28 - 23 Sep 2019**
 - Bugfix: Starting a node in a cluster might not complete successfully.
 - Bugfix: Raft tunnel connection within driver had a missing send timeout.
 - Bugfix: Tunnel connection might not update due to queue being full.

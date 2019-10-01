@@ -2,9 +2,10 @@
 % License, v. 2.0. If a copy of the MPL was not distributed with this
 % file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -module(actordb_console).
--export([main/1,cmd/1, map_print/1]).
+-export([main/1,cmd/1, map_print/1, connection_event/2, query_time/6]).
 % -include_lib("actordb_core/include/actordb.hrl").
 -define(PROMPT,"actordb>").
+
 
 -define(COMMANDS,delim()++"Databases:\n"++
 "use config (use c)  initialize/add nodes and user account management\n"++
@@ -25,6 +26,18 @@ delim()++
 
 delim() ->
 	"*******************************************************************\n".
+
+connection_event(_F, _A) -> 
+	% TS = io_lib:format("~p ",[time()]),
+	% AS = io_lib:format(_F,_A),
+	% file:write_file("console.log",[TS,AS,"\n"],[append]),
+	ok.
+
+query_time(_QMS, _QPO, _QST, _From, _CallFunc, _Args) ->
+	% L = io_lib:format("Query in={~p,~p,~p}, src=~p, func=~p, args=~p~n",[_QMS, _QPO, _QST, _From,_CallFunc,_Args]),
+	% file:write_file("console.log",L,[append]),
+	ok.
+
 
 % curdb changed with use statements
 % actordb - default can run queries directly
@@ -96,8 +109,10 @@ dologin(P) ->
 		{port,P#dp.port},
 		{framed, P#dp.framed}
 	],
+	actordb_client:set_trace_callback(?MODULE),
 	case actordb_client:start(PoolInfo,WorkerParams) of
 		ok ->
+			% actordb_client:set_trace_callback(?MODULE),
 			% print(P,"Connected to DB\n"),
 			ok;
 		{error,{login_failed,Msg}} when P#dp.env == wx ->
