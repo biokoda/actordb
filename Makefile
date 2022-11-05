@@ -2,8 +2,9 @@ REPO ?= actordb
 PKG_REVISION ?= $(shell git describe --tags)
 PKG_BUILD = 1
 BASE_DIR = $(shell pwd)
+LIB_DIR = _build/default/lib
 ERLANG_BIN = $(shell dirname $(shell which erl))
-REBAR ?= $(BASE_DIR)/rebar
+REBAR ?= rebar3
 OVERLAY_VARS    ?=
 uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 
@@ -12,13 +13,14 @@ ifeq ($(uname_S),Darwin)
 else ifeq ($(shell cat /etc/redhat-release | cut -d' ' -f1),CentOS)
 	SHELLCMD = gcc c_src/cmdshell.c -lreadline -lncurses  -o priv/cmdshell
 else
-	SHELLCMD = gcc c_src/cmdshell.c -static -Wl,-Bdynamic,-lgcc_s,-Bstatic -lreadline -lncurses -ltinfo  -o priv/cmdshell
+	#SHELLCMD = gcc c_src/cmdshell.c -static -Wl,-Bdynamic,-lgcc_s,-Bstatic -lreadline -lncurses -ltinfo  -o priv/cmdshell
+	SHELLCMD = gcc c_src/cmdshell.c -static -Bdynamic,-lgcc_s,-Bstatic -lreadline -lncurses -ltinfo  -o priv/cmdshell
 endif
 
 ifeq ($(uname_S),Darwin)
-	TOOLCMD = gcc deps/actordb_driver/c_src/tool.c deps/actordb_driver/c_src/mdb.c deps/actordb_driver/c_src/midl.c deps/actordb_driver/c_src/lz4.c -D_TESTAPP_=1  -DMDB_MAXKEYSIZE=0 -DSQLITE_DEFAULT_PAGE_SIZE=4096 -DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=0  -o actordb_tool
+	TOOLCMD = gcc $(LIB_DIR)/actordb_driver/c_src/tool.c $(LIB_DIR)/actordb_driver/c_src/mdb.c $(LIB_DIR)/actordb_driver/c_src/midl.c $(LIB_DIR)/actordb_driver/c_src/lz4.c -D_TESTAPP_=1  -DMDB_MAXKEYSIZE=0 -DSQLITE_DEFAULT_PAGE_SIZE=4096 -DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=0  -o actordb_tool
 else
-	TOOLCMD = gcc deps/actordb_driver/c_src/tool.c deps/actordb_driver/c_src/mdb.c deps/actordb_driver/c_src/midl.c deps/actordb_driver/c_src/lz4.c -D_TESTAPP_=1  -DMDB_MAXKEYSIZE=0 -DSQLITE_DEFAULT_PAGE_SIZE=4096 -DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=0 -lpthread -ldl -o actordb_tool
+	TOOLCMD = gcc $(LIB_DIR)/actordb_driver/c_src/tool.c $(LIB_DIR)/actordb_driver/c_src/mdb.c $(LIB_DIR)/actordb_driver/c_src/midl.c $(LIB_DIR)/actordb_driver/c_src/lz4.c -D_TESTAPP_=1  -DMDB_MAXKEYSIZE=0 -DSQLITE_DEFAULT_PAGE_SIZE=4096 -DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=0 -lpthread -ldl -o actordb_tool
 endif
 
 $(if $(ERLANG_BIN),,$(warning "Warning: No Erlang found in your path, this will probably not work"))
@@ -31,7 +33,7 @@ all: deps compile
 compile:
 	$(SHELLCMD)
 	$(TOOLCMD)
-	./rebar compile
+	rebar3 compile
 	./priv/mkconsole.escript
 
 test_cluster:
@@ -41,24 +43,26 @@ test: compile test_cluster
 
 
 recompile:
-	./rebar update-deps
-	./rebar compile
+	rebar3 update-deps
+	rebar3 compile
 
 update:
-	./rebar update-deps
+	rebar3 update-deps
 
 deps:
-	./rebar get-deps
+	rebar3 get-deps
 
 clean:
-	./rebar clean
-
+	rebar3 clean
+	
+run:
+	ERL_FLAGS="-config etc/app.config -args_file etc/vm.args" rebar3 shell
 
 distclean: clean relclean ballclean
-	./rebar delete-deps
+	rebar3 delete-deps
 
 generate:
-	./rebar generate  $(OVERLAY_VARS)
+	rebar3 generate  $(OVERLAY_VARS)
 
 rel: deps compile generate
 

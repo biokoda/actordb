@@ -5,3 +5,8 @@
 var/
 ebin/
 *.beam
+_build/
+rebar.lock
+*.swp
+actordb_tool
+priv/cmdshell

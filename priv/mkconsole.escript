@@ -2,8 +2,8 @@
 
 
 main(BinFiles1) ->
-  BinFiles = ["deps/bkdcore/ebin/butil.beam",
-    "deps/actordb_core/ebin/actordb_sql.beam",
+  BinFiles = ["_build/default/lib/bkdcore/ebin/butil.beam",
+    "_build/default/lib/actordb_core/ebin/actordb_sql.beam",
     "ebin/actordb_console.beam"] ++ BinFiles1,
   Apps = [thrift,lager,poolboy, actordb_client,adbt],
 
