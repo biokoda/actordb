@@ -10,3 +10,5 @@ rebar.lock
 *.swp
 actordb_tool
 priv/cmdshell
+priv/actordb_console
+erl_crash.dump
