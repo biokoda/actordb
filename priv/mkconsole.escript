@@ -25,11 +25,11 @@ main(BinFiles1) ->
 
   %% Add ebin paths to our path
   % true = code:add_path("ebin"),
-  ok = code:add_paths(filelib:wildcard("deps/*/ebin")),
+  ok = code:add_paths(filelib:wildcard("_build/default/lib/*/ebin")),
 
   %% Read the contents of the files in ebin(s)
   Files1 = [begin
-    FileList = filelib:wildcard("deps/"++atom_to_list(Dir)++"/ebin/*.*") ++ filelib:wildcard("ebin/*.*"),
+    FileList = filelib:wildcard("_build/default/lib/"++atom_to_list(Dir)++"/ebin/*.*") ++ filelib:wildcard("ebin/*.*"),
     [{filename:basename(Nm),element(2,file:read_file(Nm))} || Nm <- FileList]
   end || Dir <- Apps],
 

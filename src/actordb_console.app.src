@@ -1,0 +1,28 @@
+{application, actordb_console,
+	[{description, "An OTP application"},
+	{vsn, "0.1.0"},
+	{registered, []},
+	{mod, {actordb_console_app, []}},
+	{applications,
+		[kernel,
+		stdlib,
+		bkdcore,
+		actordb_client,
+		actordb_core,
+		distreg,
+		node_package,
+		adbt,
+		emurmur3,
+		goldrush,
+		lager,
+		ranch,
+		thrift,
+		actordb_thrift,
+		actordb_driver
+		]},
+	{env,[]},
+	{modules, []},
+
+	{licenses, ["Apache-2.0"]},
+	{links, []}
+	]}.

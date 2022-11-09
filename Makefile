@@ -66,6 +66,10 @@ generate:
 
 rel: deps compile generate
 
+release tar: 
+	make
+	rebar3 as prod tar
+
 relclean:
 	rm -rf rel/riak
 
